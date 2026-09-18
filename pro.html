@@ -47,7 +47,23 @@
         "priceCurrency": "JPY",
         "availability": "https://schema.org/InStock",
         "url": "https://misefits.kokokikaku.com/pro.html",
-        "seller": { "@type": "Organization", "name": "ここ企画", "url": "https://kokokikaku.com/" }
+        "seller": { "@type": "Organization", "name": "ここ企画", "url": "https://kokokikaku.com/" },
+        "hasMerchantReturnPolicy": {
+          "@type": "MerchantReturnPolicy",
+          "applicableCountry": "JP",
+          "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted",
+          "merchantReturnLink": "https://misefits.kokokikaku.com/tokushoho.html"
+        },
+        "shippingDetails": {
+          "@type": "OfferShippingDetails",
+          "shippingRate": { "@type": "MonetaryAmount", "value": 0, "currency": "JPY" },
+          "shippingDestination": { "@type": "DefinedRegion", "addressCountry": "JP" },
+          "deliveryTime": {
+            "@type": "ShippingDeliveryTime",
+            "handlingTime": { "@type": "QuantitativeValue", "minValue": 0, "maxValue": 0, "unitCode": "DAY" },
+            "transitTime": { "@type": "QuantitativeValue", "minValue": 0, "maxValue": 0, "unitCode": "DAY" }
+          }
+        }
       }
     },
     {
