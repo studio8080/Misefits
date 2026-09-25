@@ -8,6 +8,9 @@
 <meta name="keywords" content="間取り シミュレーション,2D 間取り,間取り 作成 無料,レイアウトシミュレーター,家具配置 シミュレーション,部屋 レイアウト,幅 奥行き,店舗レイアウト,図面,什器配置,美容室,カフェ,学習塾,クリニック,オフィス,会議室,貸会場,ゲストハウス,ギャラリー,イベントスペース,ここ企画,MiseFits">
 <meta name="robots" content="index,follow">
 <link rel="canonical" href="https://misefits.kokokikaku.com/">
+<link rel="alternate" hreflang="ja" href="https://misefits.kokokikaku.com/">
+<link rel="alternate" hreflang="en" href="https://misefits.kokokikaku.com/?lang=en">
+<link rel="alternate" hreflang="x-default" href="https://misefits.kokokikaku.com/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="MiseFits">
 <meta property="og:title" content="MiseFits｜2Dの間取り・店舗レイアウトシミュレーター（無料・登録不要）">
@@ -84,6 +87,17 @@
 function trackEvent(name, params){
   try{ if(typeof window.gtag==='function') window.gtag('event', name, params||{}); }catch(e){}
 }
+/* 表示言語。既定は日本語で、?lang=en か、以前に英語を選んだときだけ英語にする。
+   ブラウザの言語設定では自動で切り替えない（Googlebotは英語環境でレンダリングするため、
+   日本語のトップが英語で索引される事故を防ぐ）。 */
+var MF_LANG = (function(){
+  var q = null;
+  try{ q = new URLSearchParams(location.search).get('lang'); }catch(e){}
+  if(q==='en' || q==='ja'){ try{ localStorage.setItem('misefitsLang', q); }catch(e){} return q; }
+  try{ if(localStorage.getItem('misefitsLang')==='en') return 'en'; }catch(e){}
+  return 'ja';
+})();
+if(MF_LANG==='en') document.documentElement.lang = 'en';
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"
   integrity="sha384-sLpuECXYCB5TUyTbC06pftm/rgurDambREZmV4eRHwEqJzCQtU6lxI2Ve00z4XW5"
@@ -699,6 +713,9 @@ function trackEvent(name, params){
   hr{border:none;border-top:1px solid var(--line);margin:10px 0;}
   .muted{color:var(--sub);font-size:11.5px;line-height:1.6;}
   .colorswatch{width:26px;height:26px;border-radius:5px;border:1px solid #ccd1d9;padding:0;cursor:pointer;}
+  /* 言語別の出し分け。html[lang] は head のスクリプトで決まる */
+  html[lang="en"] .only-ja{display:none !important;}
+  html:not([lang="en"]) .only-en{display:none !important;}
 </style>
 </head>
 <body>
@@ -715,12 +732,13 @@ function trackEvent(name, params){
     </div>
   </button>
   <nav class="page-nav" aria-label="使い方ガイド">
-    <a href="guide.html#drawing">図面読込</a>
-    <a href="guide.html#scale">縮尺設定</a>
-    <a href="guide.html#place">什器配置</a>
-    <a href="guide.html#export">出力</a>
-    <a class="guide" href="guide.html">使い方ガイド</a>
-    <a class="pro" href="pro.html">料金・Pro</a>
+    <a href="guide.html#drawing" data-href-en="en/#how-to">図面読込</a>
+    <a href="guide.html#scale" data-href-en="en/#how-to">縮尺設定</a>
+    <a href="guide.html#place" data-href-en="en/#how-to">什器配置</a>
+    <a href="guide.html#export" data-href-en="en/#how-to">出力</a>
+    <a class="guide" href="guide.html" data-href-en="en/#how-to">使い方ガイド</a>
+    <a class="pro" href="pro.html" data-href-en="en/#pricing">料金・Pro</a>
+    <a class="guide" href="?lang=en" data-href-en="?lang=ja">English</a>
   </nav>
   <div class="top-actions">
     <button class="btn hbtn share-file-btn" onclick="shareLayoutImage()" title="図面を画像で共有（写真・ドライブ・AirDrop など）" aria-label="図面を画像で共有"><span class="ico">📤</span><span class="lbl"> 共有</span></button>
@@ -744,7 +762,8 @@ function trackEvent(name, params){
         <button class="start-card" onclick="pickDrawingFile()"><b>図面から</b><span>PDF/画像を読み込む</span></button>
         <button class="start-card" onclick="createBlankSheet()"><b>白紙から</b><span>サイズ指定で作成</span></button>
       </div>
-      <a class="intro-guide" href="guide.html">📘 はじめての方へ：使い方ガイド</a>
+      <a class="intro-guide" href="guide.html" data-href-en="en/#how-to">📘 はじめての方へ：使い方ガイド</a>
+      <a class="intro-guide" href="?lang=en" data-href-en="?lang=ja">🌐 English</a>
       <div class="industry-tags" aria-label="対応業種">
         <span>飲食</span><span>美容</span><span>教室</span><span>物販</span><span>医療</span><span>オフィス</span><span>会議室</span><span>貸会場</span><span>宿泊</span><span>ギャラリー</span><span>アパレル</span><span>イベント</span>
       </div>
@@ -843,7 +862,7 @@ function trackEvent(name, params){
         <div class="muted" style="margin-bottom:8px;">自由形状エディタ・PDF/画像トレース・什器ライブラリ拡張・高解像度出力・実寸スケール印刷・メモ機能を解放（買い切り・¥1,480）。無料の機能はこれまでどおりお使いいただけます。</div>
         <div class="row" style="margin-bottom:6px;">
           <button class="btn sm pop" id="webProBuyBtn" onclick="requestProPurchase('sidebar')" style="display:none;">¥1,480で購入する</button>
-          <a class="btn sm ghost" href="pro.html" target="_blank" rel="noopener">📘 使い方と購入の流れ</a>
+          <a class="btn sm ghost" href="pro.html" data-href-en="en/#pricing" target="_blank" rel="noopener">📘 使い方と購入の流れ</a>
         </div>
         <div class="row" style="margin-bottom:6px;">
           <input type="text" id="webLicenseInput" class="inp" placeholder="MFPRO-XXXX-XXXX-XXXX-XXXX" style="flex:1;min-width:160px;">
@@ -960,7 +979,7 @@ function trackEvent(name, params){
               </div>
               <div class="empty-actions">
                 <button class="btn" onclick="openDrawer()">パーツを見る</button>
-                <a class="btn outline" href="guide.html">使い方を見る</a>
+                <a class="btn outline" href="guide.html" data-href-en="en/#how-to">使い方を見る</a>
               </div>
             </div>
           </section>
@@ -1059,7 +1078,7 @@ function trackEvent(name, params){
     <p>図面の表示に必要なライブラリ（<code>cdnjs.cloudflare.com</code>）を読み込めませんでした。オフラインのとき、または社内ネットワークなどで外部CDNが遮断されているときに発生します。</p>
     <p>通信環境をご確認のうえ、ページを再読み込みしてください。作業中のデータは端末内に自動保存されているため、復旧後に復元できます。</p>
     <button class="btn" onclick="location.reload()">再読み込み</button>
-    <a class="btn ghost" href="guide.html" style="margin-left:8px;">使い方を見る</a>
+    <a class="btn ghost" href="guide.html" data-href-en="en/#how-to" style="margin-left:8px;">使い方を見る</a>
   </div>
 </div>
 
@@ -1179,7 +1198,7 @@ function trackEvent(name, params){
       <li data-f="fixture">什器ライブラリ拡張（建築要素・設備など60点以上）</li>
     </ul>
     <div class="modal-actions">
-      <a class="btn ghost" href="pro.html" target="_blank" rel="noopener" onclick="trackEvent('pro_detail_click',{feature:proModalFeature})">詳しく見る</a>
+      <a class="btn ghost" href="pro.html" data-href-en="en/#pricing" target="_blank" rel="noopener" onclick="trackEvent('pro_detail_click',{feature:proModalFeature})">詳しく見る</a>
       <button class="btn pop" onclick="proceedToProPurchase()">¥1,480で購入する</button>
     </div>
     <p class="pro-modal-note">購入後に表示されるライセンスキーで、そのまま解放できます（同じキーで最大5台まで）。<button type="button" class="linklike" onclick="closeProModal(); focusLicenseInput();">すでにキーをお持ちの方</button></p>
@@ -1192,15 +1211,20 @@ function trackEvent(name, params){
     <div class="foot-text">
       <b>MiseFits</b>
       <div class="foot-company">
-        <a href="guide.html">使い方</a>
-        <a href="madori-2d.html">2Dの間取り検討</a>
-        <a href="pro.html">Proガイド</a>
-        <a href="faq.html">FAQ</a>
-        <a href="releases.html">リリースノート</a>
-        <a href="privacy.html">プライバシー・免責</a>
-        <a href="tokushoho.html">特商法表記</a>
-        <a href="https://menufits.kokokikaku.com/" target="_blank" rel="noopener">姉妹ツール MenuFits（メニュー表）</a>
+        <a href="guide.html" data-href-en="en/#how-to">使い方</a>
+        <a class="only-ja" href="madori-2d.html">2Dの間取り検討</a>
+        <a class="only-ja" href="pro.html">Proガイド</a>
+        <a class="only-ja" href="faq.html">FAQ</a>
+        <a class="only-ja" href="releases.html">リリースノート</a>
+        <a class="only-en" href="en/restaurant-floor-plan.html">Restaurant floor plans</a>
+        <a class="only-en" href="en/fixture-sizes.html">Fixture sizes</a>
+        <a class="only-en" href="en/#pricing">Pricing</a>
+        <a href="privacy.html" data-href-en="en/privacy.html">プライバシー・免責</a>
+        <a class="only-ja" href="tokushoho.html">特商法表記</a>
+        <a class="only-en" href="en/terms.html">Terms &amp; refunds</a>
+        <a class="only-ja" href="https://menufits.kokokikaku.com/" target="_blank" rel="noopener">姉妹ツール MenuFits（メニュー表）</a>
         <a href="https://kokokikaku.com/" target="_blank" rel="noopener">ここ企画</a>
+        <a href="?lang=en" data-href-en="?lang=ja">English</a>
       </div>
     </div>
   </div>
@@ -1212,6 +1236,596 @@ function trackEvent(name, params){
   </div>
 </footer>
 
+<script>
+/* ================= 英語表示（?lang=en） =================
+   日本語の原文をキーにして英語を引く。日本語表示のときは t() が原文をそのまま返すので、
+   既存の表示は1文字も変わらない。文言を足したら I18N_EN にも英訳を足すこと（無ければ日本語のまま出る）。
+   %PRICE% は英語版の価格表示に置き換わる。 */
+const PRO_PRICE_EN = 'US$19';
+const I18N_EN = {
+"MiseFits かんたん店舗レイアウトシミュレーター": "MiseFits — free floor plan & store layout planner",
+"メニュー": "Menu",
+"ホームに戻る（作業中のシートは保持されます）": "Back to home (your open sheets are kept)",
+"ホームに戻る": "Back to home",
+"かんたん店舗レイアウトシミュレーター": "Floor plan & store layout planner",
+"使い方ガイド": "How to use",
+"図面読込": "Load plan",
+"縮尺設定": "Set scale",
+"什器配置": "Place fixtures",
+"出力": "Export",
+"料金・Pro": "Pricing / Pro",
+"English": "日本語",
+"図面を画像で共有（写真・ドライブ・AirDrop など）": "Share the layout as an image (Photos, Drive, AirDrop, etc.)",
+"図面を画像で共有": "Share the layout as an image",
+"共有": "Share",
+"プロジェクトをJSONで保存": "Save the project as JSON",
+"保存(JSON)": "Save (JSON)",
+"保存したJSONを読み込む": "Open a saved JSON file",
+"読込": "Open",
+"PNGを書き出す": "Export PNG",
+"PDFを書き出す": "Export PDF",
+"印刷する": "Print",
+"印刷": "Print",
+"飲食店、美容室、教室、物販、クリニック、オフィスから、会議室、貸会場、宿泊、ギャラリー、イベントスペースまで、小さな現場のレイアウト検討に使えます。": "Plan layouts for restaurants, cafés, salons, classrooms, retail, clinics, offices, meeting rooms, event venues, guesthouses and galleries — at real size, in your browser.",
+"図面から": "From a plan",
+"PDF/画像を読み込む": "Load a PDF or image",
+"白紙から": "From scratch",
+"サイズ指定で作成": "Enter room size",
+"📘 はじめての方へ：使い方ガイド": "📘 New here? Read the quick guide",
+"対応業種": "Supported uses",
+"飲食": "Restaurant",
+"美容": "Salon",
+"教室": "Classroom",
+"物販": "Retail",
+"医療": "Clinic",
+"オフィス": "Office",
+"会議室": "Meeting room",
+"貸会場": "Venue",
+"宿泊": "Lodging",
+"ギャラリー": "Gallery",
+"アパレル": "Apparel",
+"イベント": "Events",
+"図面シート": "Sheets",
+"＋画像": "+Image",
+"白紙作成": "New blank",
+"縮尺（実寸設定）": "Scale (real size)",
+"図面が未選択です": "No sheet selected",
+"📏 2点クリックで縮尺を設定": "📏 Set scale by clicking 2 points",
+"図面上で長さの分かる2点（寸法線の端など）をクリックし、実寸(mm)を入力します。": "Click two points on the plan whose distance you know (e.g. the ends of a dimension line), then enter the real length in mm.",
+"グリッド / 吸着": "Grid / snapping",
+"グリッドを表示": "Show grid",
+"グリッドに吸着": "Snap to grid",
+"什器・壁に吸着（ガイド表示）": "Snap to fixtures and walls (guides)",
+"間隔": "Spacing",
+"計測（通路幅チェック）": "Measure (aisle width check)",
+"📐 距離を測る": "📐 Measure distance",
+"最後の1本を取消": "Undo last line",
+"すべてクリア": "Clear all",
+"通路幅の目安": "Aisle width guide",
+"600mm未満": "under 600 mm",
+"900mm未満": "under 900 mm",
+"900mm以上": "900 mm or more",
+"2点をクリック（タップ）すると実寸の距離を表示します。": "Click (tap) two points to show the real distance. ",
+"計測モード中に線をクリックすると、その1本だけ削除": "In measure mode, click a line to delete just that line",
+"できます。計測線は保存・出力には含まれません。": ". Measurement lines are not saved or exported.",
+"面積トレース": "Area trace",
+"✎ 輪郭をなぞる": "✎ Trace an outline",
+"確定": "Done",
+"図面の上をクリックしていくと輪郭ができ、": "Click around an area on the plan to draw its outline and get ",
+"囲んだ範囲の実寸面積": "the real area inside it",
+"が出ます。最初の点をもう一度クリック（または「確定」）で閉じます。計測線と違い、": ". Click the first point again (or \"Done\") to close it. Unlike measurement lines, ",
+"保存・PNG/PDF出力にも残ります": "traces are kept in saves and PNG/PDF exports",
+"什器・設備パーツ": "Fixtures & equipment",
+"業種カテゴリから選び、クリックで中央に追加、またはキャンバスへドラッグ＆ドロップ。": "Pick a category, then click a part to add it to the center, or drag it onto the canvas.",
+"パーツを検索（例: 受付、ベッド、棚）": "Search parts (e.g. table, bed, shelf)",
+"パーツを検索": "Search parts",
+"該当するパーツがありません。別の言葉で検索してください。": "No matching parts. Try a different word.",
+"操作": "Edit",
+"複製": "Duplicate",
+"90°回転": "Rotate 90°",
+"前面へ": "Bring forward",
+"背面へ": "Send backward",
+"削除": "Delete",
+"すべて削除": "Delete all",
+"ショートカット: M=計測 / Ctrl+Z=元に戻す / Ctrl+Shift+Z=やり直す / R=15°回転 / Shift+R=逆回転 / [ ]=±15° / Delete=削除 / Ctrl+D=複製 / Space+ドラッグ=画面移動 / ホイール=拡大縮小": "Shortcuts: M = measure / Ctrl+Z = undo / Ctrl+Shift+Z = redo / R = rotate 15° / Shift+R = rotate back / [ ] = ±15° / Delete = delete / Ctrl+D = duplicate / Space+drag = pan / wheel = zoom",
+"自由形状エディタ・PDF/画像トレース・什器ライブラリ拡張・高解像度出力・実寸スケール印刷・メモ機能を解放（買い切り・¥1,480）。無料の機能はこれまでどおりお使いいただけます。": "Unlocks the free-shape editor, area tracing, 60+ extra fixtures, high-resolution export, true-scale printing and notes (one-time %PRICE%). Everything free stays free.",
+"¥1,480で購入する": "Buy for %PRICE%",
+"📘 使い方と購入の流れ": "📘 What you get",
+"解放する": "Unlock",
+"✅ MiseFits Proが有効です（このブラウザで解放済み）。": "✅ MiseFits Pro is active in this browser.",
+"メモ": "Notes",
+"📌 メモを追加": "📌 Add a note",
+"集計": "Summary",
+"出力・印刷": "Export & print",
+"用紙": "Paper",
+"向きは図面に合わせ自動": "Orientation follows the plan",
+"縮尺": "Scale",
+"自動フィット": "Fit to page",
+"MiseFits Proについて": "About MiseFits Pro",
+"📄 PDF出力": "📄 Export PDF",
+"🖨 印刷": "🖨 Print",
+"📤 画像を共有": "📤 Share image",
+"📤 PDFを共有": "📤 Share PDF",
+"写真・ファイル・ドライブへの保存や、AirDrop・LINE・メールへの送信など、端末の共有メニューが開きます。": "Opens your device's share menu — save to Photos, Files or Drive, or send via AirDrop, WhatsApp, email and more.",
+"現在表示中のシート（図面＋配置）を用紙に収めて出力します。グリッドは印刷されません。": "Exports the current sheet (plan + layout) fitted to the paper. The grid is not printed.",
+"MiseFitsの概要": "About MiseFits",
+"MiseFitsで始める": "Get started",
+"お店や施設のレイアウトを、実寸で考える。": "Plan your space at real size.",
+"PDFや画像の図面を読み込み、分かっている寸法から縮尺を合わせるだけ。図面がまだ無い時は、白紙サイズから配置を先に検討できます。": "Load a PDF or image of your floor plan and calibrate it from one known length. No plan yet? Start from a blank sheet with your room size.",
+"利用シーン": "Use cases",
+"美容室": "Hair salon",
+"学習塾": "Tutoring school",
+"花・物販": "Florist / retail",
+"クリニック": "Clinic",
+"ゲストハウス": "Guesthouse",
+"図面を読み込む": "Load a floor plan",
+"白紙から作る": "Start blank",
+"かんたんなレイアウト検討の入口。": "The quick way to try a layout.",
+"ExcelやWordでセルや図形を並べるのはしんどい。": "Drawing layouts with spreadsheet cells and shapes is painful. ",
+"でも、建築図面を本格的に引くほどでもない。MiseFitsは、自分のイメージでざっくりした配置を組んでみたい人向けの軽いシミュレーターです。": "But you don't need full CAD either. MiseFits is a lightweight planner for trying out a rough layout of your own.",
+"表計算より直感的": "Easier than a spreadsheet",
+"セル幅や図形位置の調整に時間を取られません。": "No fiddling with cell widths and shape positions.",
+"CADより軽い": "Lighter than CAD",
+"本格図面の前に、配置の当たりを試せます。": "Test a layout before commissioning full drawings.",
+"実寸で確認": "Check at real size",
+"mm単位の什器を図面上で動かして検討できます。": "Move fixtures sized in millimetres right on your plan.",
+"パーツを見る": "Browse parts",
+"使い方を見る": "See how it works",
+"読み込む、合わせる、置いてみる。": "Load. Calibrate. Place.",
+"PCでは細かく編集、スマホでは確認やざっくり配置。必要な操作を左パネルとキャンバスにまとめています。": "Fine-tune on a computer, review or sketch on your phone. Everything lives in the side panel and the canvas.",
+"図面か白紙を用意": "Plan or blank sheet",
+"PDF/画像、またはmm指定の白紙から始めます。": "Start from a PDF/image or a blank sheet sized in mm.",
+"縮尺を合わせる": "Calibrate the scale",
+"図面ありの場合は2点クリックで実寸(mm)に補正します。": "With a plan, click two points to set the real scale (mm).",
+"配置を試す": "Try layouts",
+"ジャンル別パーツを選んでキャンバスへ置きます。": "Pick parts by category and place them on the canvas.",
+"JSON保存": "Save as JSON",
+"プロジェクトを書き出し、後日再編集できます。": "Save the project and keep editing later.",
+"図面画像、縮尺、什器の位置・サイズ・角度をまとめて保存します。": "Saves the plan image, scale, and every fixture's position, size and angle.",
+"概要スライド": "Overview slides",
+"概要": "Overview",
+"考え方": "Why",
+"使い方": "How",
+"📏 縮尺設定モード：1点目をクリック": "📏 Scale mode: click the first point",
+"什器": "Fixture",
+"メモを編集": "Edit note",
+"✎ 編集": "✎ Edit",
+"詳細の表示切替": "Show/hide details",
+"詳細 ▾": "More ▾",
+"選択を解除": "Deselect",
+"🖐 移動": "🖐 Move",
+"⤢ サイズ・回転": "⤢ Size & rotate",
+"幅 W(mm)": "Width W (mm)",
+"奥行 D(mm)": "Depth D (mm)",
+"色": "Color",
+"角度": "Angle",
+"15°刻み": "15° steps",
+"反時計回り45°": "Counter-clockwise 45°",
+"反時計回り15°": "Counter-clockwise 15°",
+"時計回り15°": "Clockwise 15°",
+"時計回り45°": "Clockwise 45°",
+"元に戻す (Ctrl+Z)": "Undo (Ctrl+Z)",
+"元に戻す": "Undo",
+"戻す": "Undo",
+"やり直す (Ctrl+Shift+Z)": "Redo (Ctrl+Shift+Z)",
+"やり直す": "Redo",
+"進む": "Redo",
+"2点間の距離を測る": "Measure the distance between two points",
+"距離を測る": "Measure distance",
+"計測": "Measure",
+"よく使うパーツ": "Recent parts",
+"縮小": "Zoom out",
+"拡大": "Zoom in",
+"全体表示": "Fit to screen",
+"MiseFitsを起動できませんでした": "MiseFits couldn't start",
+"図面の表示に必要なライブラリ（": "The libraries needed to display plans (",
+"）を読み込めませんでした。オフラインのとき、または社内ネットワークなどで外部CDNが遮断されているときに発生します。": ") couldn't be loaded. This happens when you're offline or a network (e.g. a corporate one) blocks external CDNs.",
+"通信環境をご確認のうえ、ページを再読み込みしてください。作業中のデータは端末内に自動保存されているため、復旧後に復元できます。": "Check your connection and reload the page. Your work is auto-saved on this device and can be restored afterwards.",
+"再読み込み": "Reload",
+"白紙シートを作成": "Create a blank sheet",
+"閉じる": "Close",
+"形状を選ぶ": "Choose a shape",
+"矩形": "Rectangle",
+"L字": "L-shape",
+"コの字": "U-shape",
+"自由": "Free",
+"自由形状": "Free shape",
+"自由形状エディタ": "free-shape editor",
+"横幅 W(mm)": "Width W (mm)",
+"全体の横幅 W(mm)": "Overall width W (mm)",
+"全体の奥行 D(mm)": "Overall depth D (mm)",
+"欠けの幅(mm)": "Notch width (mm)",
+"欠けの奥行(mm)": "Notch depth (mm)",
+"欠けの位置": "Notch position",
+"左上": "Top left",
+"右上": "Top right",
+"左下": "Bottom left",
+"右下": "Bottom right",
+"開口部の幅(mm)": "Opening width (mm)",
+"凹みの深さ(mm)": "Recess depth (mm)",
+"開口部の向き": "Opening side",
+"上が開口": "Open at top",
+"下が開口": "Open at bottom",
+"左が開口": "Open at left",
+"右が開口": "Open at right",
+"形をリセット": "Reset shape",
+"頂点を1つ戻す": "Undo last vertex",
+"辺をクリックすると頂点が増えます。頂点はドラッグで移動、ダブルクリックで削除できます。": "Click an edge to add a vertex. Drag a vertex to move it; double-click to delete it.",
+"延べ床面積の目安：—": "Approx. floor area: —",
+"キャンセル": "Cancel",
+"この形で作成": "Create",
+"内容（改行できます）": "Note (line breaks allowed)",
+"例）ここに電源が必要\n要確認：避難経路の幅": "e.g. Need a power outlet here\nCheck: escape route width",
+"黄": "Yellow",
+"赤": "Red",
+"青": "Blue",
+"緑": "Green",
+"保存": "Save",
+"MiseFits Pro で次の機能が解放されます。": "MiseFits Pro unlocks the following:",
+"買い切り／サブスクではありません・登録不要": "One-time payment · not a subscription · no account needed",
+"自由形状エディタ（斜め壁・変形物件を頂点単位で作成）": "Free-shape editor (angled walls and irregular rooms, vertex by vertex)",
+"面積トレース（囲んだ範囲の実寸面積を自動計算）": "Area trace (real area of any outlined region)",
+"メモ機能（キャンバスに付箋を貼って残す）": "Notes (pin sticky notes on the canvas)",
+"高解像度出力（PNG/PDFが4倍精細）": "High-resolution export (4× PNG/PDF)",
+"実寸スケール印刷（1:20〜1:200で出力）": "True-scale printing (1:20 to 1:200)",
+"什器ライブラリ拡張（建築要素・設備など60点以上）": "Extended fixture library (60+ doors, columns, equipment and more)",
+"詳しく見る": "Learn more",
+"購入後に表示されるライセンスキーで、そのまま解放できます（同じキーで最大5台まで）。": "Unlock right away with the license key shown after purchase (one key works on up to 5 devices). ",
+"すでにキーをお持ちの方": "Already have a key?",
+"プライバシー・免責": "Privacy & disclaimer",
+"ここ企画": "Koko Kikaku",
+"SNSシェア": "Share",
+"シェア": "Share",
+"リンク": "Link",
+"実寸スケール印刷・高解像度出力": "true-scale printing & high-resolution export",
+"メモ機能": "notes",
+"Pro什器": "Pro fixture",
+"サイドバーの「MiseFits Pro」からライセンスキーを入力すると解放されます": "Enter your license key under \"MiseFits Pro\" in the side panel to unlock",
+"この機能は MiseFits Pro でご利用いただけます": "This feature is part of MiseFits Pro",
+"「{label}」は MiseFits Pro の機能です。買い切りで次のすべてが解放されます。": "\"{label}\" is a MiseFits Pro feature. A one-time purchase unlocks all of these:",
+"ライセンスキーを入力してください。": "Please enter your license key.",
+"確認中…": "Checking…",
+"MiseFits Proを解放しました": "MiseFits Pro unlocked",
+"このキーは上限の5台で使用中のため解放できません。端末の入れ替え（リセット）をご希望の場合はお問い合わせください。": "This key is already in use on 5 devices (the limit). Contact us if you need to reset your devices.",
+"無効なキーです。入力内容をご確認ください。": "Invalid key. Please check what you entered.",
+"確認に失敗しました。通信環境をご確認のうえ再度お試しください。": "Couldn't verify the key. Check your connection and try again.",
+"ラベル": "Label",
+"PDFを読み込みますか？\nOK: PDF / キャンセル: 画像": "Load a PDF?\nOK: PDF / Cancel: image",
+"未校正": "Not calibrated",
+"配置を調整できます": "Adjust your layout",
+"次: パーツを追加": "Next: add parts",
+"次: 縮尺を設定": "Next: set the scale",
+"席 {n}": "{n} seats",
+"パーツ {n}": "{n} parts",
+"図面が大きく端末に自動保存できません。JSONで保存してください": "The plan is too large to auto-save on this device. Please save as JSON.",
+"自動保存できません": "Auto-save unavailable",
+"このシートを削除しますか？（配置した什器も消えます）": "Delete this sheet? (Its fixtures will be deleted too.)",
+"サンプルデータが見つかりません。": "Sample data not found.",
+"サンプル図面を読み込みました（縮尺1:25として設定済み）": "Sample plan loaded (scale set to 1:25)",
+"画像を読み込みました{keep}。「縮尺を設定」で実寸を合わせてください": "Image loaded{keep}. Use \"Set scale\" to calibrate the real size",
+"PDFの読み込みに必要なライブラリを読み込めませんでした（オンライン環境が必要です）": "Couldn't load the PDF library (an internet connection is required)",
+"PDFを読み込みました{keep}。「縮尺を設定」で実寸を合わせてください": "PDF loaded{keep}. Use \"Set scale\" to calibrate the real size",
+"PDFを読み込めませんでした。別のPDF、または画像として書き出したものをお試しください": "Couldn't read this PDF. Try another PDF, or export it as an image first",
+"（元の図面はシート一覧に残っています）": " (your previous plan is still in the sheet list)",
+"これ以上戻せません": "Nothing more to undo",
+"頂点 {n}": "{n} vertices",
+"三角形より少なくはできません": "A shape needs at least 3 vertices",
+"延べ床面積の目安：約 {a} m²": "Approx. floor area: {a}",
+"頂点が足りません（3つ以上必要です）": "Not enough vertices (3 or more needed)",
+"形が潰れています。頂点を動かして面積のある形にしてください": "The shape has no area. Move the vertices to open it up",
+"横幅・奥行を正しく入力してください": "Please enter a valid width and depth",
+"欠けの寸法を正しく入力してください": "Please enter valid notch dimensions",
+"欠けの寸法が全体より大きくなっています。小さくしてください": "The notch is larger than the room. Make it smaller",
+"白紙 {w}×{d}mm": "Blank {w}×{d} mm",
+"白紙({shape}) {w}×{d}mm": "Blank ({shape}) {w}×{d} mm",
+"白紙レイアウト（{shape}）を作成しました：延べ床 約{a}m²{keep}": "Blank layout ({shape}) created: approx. {a} floor area{keep}",
+"1以上の数値(mm)を入力してください": "Please enter a number (mm) of 1 or more",
+"テキスト": "Text",
+"先に図面シートを読み込んでください": "Load a sheet first",
+"メモの内容を入力してください": "Please write something in the note",
+"図面に付箋メモを貼り、施主や現場との確認事項を書き残せます（Pro機能）。": "Pin sticky notes on the plan to keep track of things to check with your client or contractor (Pro).",
+"まだメモはありません。": "No notes yet.",
+"クリックでその位置へ移動": "Click to jump to it",
+"編集": "Edit",
+"サイズ・回転モード：四隅ハンドルで変更できます": "Size & rotate mode: use the corner handles",
+"移動モード：ドラッグで移動のみ（サイズ/角度は下の数値で変更）": "Move mode: drag to move only (change size/angle with the numbers below)",
+"閉じる ▴": "Close ▴",
+"トレース範囲": "Traced area",
+"{name}（約{a}m²）": "{name} (approx. {a})",
+"オブジェクト": "Object",
+"範囲": "Area",
+"直径 φ(mm)": "Diameter φ (mm)",
+"文字サイズ(px)": "Font size (px)",
+"先に図面を読み込んでください": "Load a plan first",
+"📏 縮尺設定モード：1点目をクリック（キャンセルはEsc）": "📏 Scale mode: click the first point (Esc to cancel)",
+"📏 2点目をクリック": "📏 Click the second point",
+"この2点間の実際の長さを mm で入力してください：": "Enter the real distance between these two points in mm:",
+"縮尺を設定しました：1px = {v} mm": "Scale set: 1 px = {v} mm",
+"白紙サイズ{shape} <b>外形 {w} × {h} mm</b>": "Blank sheet{shape} <b>outline {w} × {h} mm</b>",
+"（{shape}）": " ({shape})",
+"延べ床 約{a}m²": "Floor area approx. {a}",
+"1px = {v} mm / グリッド1マス ≈ {g}px": "1 px = {v} mm / 1 grid cell ≈ {g} px",
+"グリッド1マス ≈ {g}px": "1 grid cell ≈ {g} px",
+"仮に 1px={v}mm": "assuming 1 px = {v} mm",
+"「縮尺を設定」で実寸を合わせてください": "Use \"Set scale\" to calibrate the real size",
+"{name} を追加": "Add {name}",
+"＋ 一覧": "+ All parts",
+"パーツ一覧を開く": "Open the parts list",
+"白紙サイズ（{shape}）": "Blank sheet ({shape})",
+"白紙サイズ": "Blank sheet",
+"図面範囲（余白含む）": "Plan area (incl. margins)",
+"図面シートを読み込むと、席数と面積を自動で集計します。": "Load a sheet to see seat counts and areas automatically.",
+"席・人数の目安": "Est. seats",
+"配置パーツ数": "Parts placed",
+"什器の合計面積": "Total fixture area",
+"占有率": "Coverage",
+"席数は什器ごとの標準的な人数から自動計算した目安です（カウンター席は幅600mmで1席換算）。テキストは集計に含みません。": "Seat counts are estimates based on each fixture's typical capacity (counters: 1 seat per 600 mm). Text labels are not counted.",
+"📐 計測モード：1点目をクリック／既存の線をクリックで削除（終了はEsc）": "📐 Measure mode: click the first point / click a line to delete it (Esc to exit)",
+"📐 計測を終了": "📐 Stop measuring",
+"先に「縮尺を設定」してください。未校正のままでは面積が正しく出ません": "Please \"Set scale\" first. Areas are wrong until the plan is calibrated",
+"✎ トレース：輪郭に沿ってクリック（最初の点で閉じる／Escで中止）": "✎ Trace: click along the outline (close on the first point / Esc to cancel)",
+"トレースを中止しました": "Trace cancelled",
+"✎ トレースを中止": "✎ Cancel trace",
+"✎ トレース：{n}点／現在 約{a}m²（最初の点で閉じる）": "✎ Trace: {n} points / approx. {a} so far (close on the first point)",
+"✎ トレース：{n}点（3点以上で閉じられます／Escで中止）": "✎ Trace: {n} points (close after 3 or more / Esc to cancel)",
+"3点以上必要です": "3 or more points needed",
+"面積が0になっています。線が交差していないか確認してください": "The area is zero. Check that the lines don't cross",
+"トレース範囲：約 {a} m²": "Traced area: approx. {a}",
+"取り消す計測線がありません": "No measurement lines to undo",
+"計測線を1本取り消しました": "Removed the last measurement line",
+"計測線を削除しました": "Measurement line deleted",
+"📐 2点目をクリック（終了はEsc）": "📐 Click the second point (Esc to exit)",
+"📐 計測モード：1点目をクリック（終了はEsc）": "📐 Measure mode: click the first point (Esc to exit)",
+"計測：{mm} mm": "Distance: {mm} mm",
+"（通路としては狭めです）": " (tight for an aisle)",
+"計測線はありません": "There are no measurement lines",
+"計測線 {n} 本をすべて消しますか？": "Delete all {n} measurement lines?",
+"計測線をクリアしました": "Measurement lines cleared",
+"削除するパーツがありません": "There are no parts to delete",
+"このシートに配置した {n} 個のパーツをすべて削除しますか？\n（Ctrl+Z で元に戻せます）": "Delete all {n} parts on this sheet?\n(You can undo with Ctrl+Z.)",
+"配置をすべて削除しました（Ctrl+Z で戻せます）": "All parts deleted (Ctrl+Z to undo)",
+"プロジェクトを保存しました": "Project saved",
+"シート": "Sheet",
+"プロジェクトを読み込みました（{n}件のシートは形式が不正なため除外）": "Project loaded ({n} invalid sheet(s) skipped)",
+"プロジェクトを読み込みました": "Project loaded",
+"図面がありません": "No plan loaded",
+"縮尺を設定してから実寸出力してください（未校正の図面では正確な縮尺になりません）": "Set the scale before exporting at true scale (uncalibrated plans won't be accurate)",
+"実寸スケール印刷と高解像度出力は Pro 機能です。": "True-scale printing and high-resolution export are Pro features.",
+"Pro: 4倍精細で書き出します。": "Pro: exports at 4× resolution.",
+"1:{s} で出力すると用紙上で約 {w}×{h} mm になります。": "At 1:{s} the plan will be about {w}×{h} mm on paper.",
+" 印刷時はプリンタ設定の倍率を「100%（実際のサイズ）」にしてください。": " Set your printer scale to \"100% (actual size)\" when printing.",
+"MiseFitsで作成したレイアウト図": "Layout made with MiseFits",
+"共有メニューを開きました": "Share menu opened",
+"共有できなかったため、ファイルとして保存します": "Couldn't share, so saving as a file instead",
+"この端末は共有に未対応のため、PNGとして保存します": "Sharing isn't supported on this device, so saving as PNG",
+"MiseFits レイアウト": "MiseFits layout",
+"この端末は共有に未対応のため、PDFとして保存します": "Sharing isn't supported on this device, so saving as PDF",
+"PNGを書き出しました（{w}×{h}px）": "PNG exported ({w}×{h} px)",
+"PNGを書き出しました": "PNG exported",
+"PDFを書き出しました": "PDF exported",
+"PDFライブラリの読み込みに失敗しました（オンライン環境が必要）": "Couldn't load the PDF library (an internet connection is required)",
+"1:{s} では用紙に収まりません（必要 {w}×{h}mm）。": "At 1:{s} the plan doesn't fit the paper (needs {w}×{h} mm). ",
+"用紙を大きくするか、縮尺の数字を大きくしてください。": "Choose a larger paper size or a smaller scale.",
+"1:{s} で印刷します。プリンタ設定の倍率を必ず「100%（実際のサイズ）」にしてください": "Printing at 1:{s}. Make sure your printer scale is \"100% (actual size)\"",
+"印刷ダイアログを準備しました": "Print dialog ready",
+"これ以上は戻せません": "Nothing more to undo",
+"これ以上は進めません": "Nothing more to redo",
+"元に戻しました": "Undone",
+"やり直しました": "Redone",
+"図面が大きいため自動保存できません。💾 保存(JSON) でファイルに保存してください": "This plan is too large to auto-save. Use 💾 Save (JSON) to save it to a file",
+"前回の作業データが見つかりました。復元しますか？": "Found your previous work. Restore it?",
+"MiseFits | かんたん店舗レイアウトシミュレーター": "MiseFits | Free floor plan & store layout planner",
+"ExcelやWordより気軽に、お店や施設のレイアウトを実寸で試せるMiseFits。": "Plan a restaurant, shop or room layout at real size — free, in your browser, no sign-up.",
+"共有リンクをコピーしました": "Share link copied",
+"このURLをコピーしてください": "Copy this URL",
+"読み込みに失敗しました": "Couldn't open the file",
+"MiseFits｜2Dの間取り・店舗レイアウトシミュレーター（無料・登録不要）": "MiseFits — Free Restaurant & Store Floor Plan Maker (no sign-up)",
+"__META_DESC__": "Free 2D floor plan maker for restaurants, cafés, shops and rooms. Load your PDF floor plan, set the scale, and drag tables and fixtures at real size (mm). Seat count and aisle-width check built in. No sign-up.",
+"建築要素": "Building elements",
+"片開きドア": "Single door",
+"両開きドア": "Double door",
+"引戸": "Sliding door",
+"自動ドア": "Automatic door",
+"窓": "Window",
+"柱（角）": "Column (square)",
+"柱（丸）": "Column (round)",
+"階段": "Stairs",
+"エレベーター": "Elevator",
+"PS（配管）": "Pipe shaft",
+"バリアフリー・設備": "Accessibility & utilities",
+"車椅子転回 φ1500": "Wheelchair turning φ1500",
+"多目的トイレ": "Accessible toilet",
+"手すり": "Handrail",
+"スロープ": "Ramp",
+"消火器": "Fire extinguisher",
+"分電盤": "Distribution board",
+"室外機": "AC outdoor unit",
+"共通・受付": "Reception & general",
+"受付カウンター": "Reception counter",
+"レジ台": "Cash desk",
+"待合ベンチ": "Waiting bench",
+"丸イス": "Round stool",
+"角イス": "Square stool",
+"ソファ": "Sofa",
+"間仕切り": "Partition",
+"収納棚": "Storage shelf",
+"飲食店": "Restaurant & café",
+"2人テーブル": "Table for 2",
+"4人テーブル": "Table for 4",
+"丸テーブル2人": "Round table for 2",
+"丸テーブル4人": "Round table for 4",
+"カウンター席": "Counter seating",
+"ドリンク台": "Drink station",
+"6人テーブル": "Table for 6",
+"ボックス席4人": "Booth for 4",
+"券売機": "Ticket machine",
+"ビールサーバー": "Beer tap",
+"POSレジ": "POS terminal",
+"子供椅子": "High chair",
+"物販・花・食料品": "Retail, florist & grocery",
+"陳列テーブル": "Display table",
+"壁面棚": "Wall shelf",
+"ハンガーラック": "Clothes rack",
+"ショーケース": "Showcase",
+"花桶台": "Flower bucket stand",
+"冷蔵ケース": "Refrigerated case",
+"カゴ置き": "Basket stand",
+"ゴンドラ什器": "Gondola shelving",
+"試着室": "Fitting room",
+"レジカウンターL字": "L-shaped checkout",
+"エンド陳列": "End cap",
+"カート置場": "Cart bay",
+"美容・サロン": "Beauty & salon",
+"セット椅子": "Styling chair",
+"ミラー面": "Mirror",
+"シャンプー台": "Shampoo unit",
+"施術ベッド": "Treatment bed",
+"ワゴン": "Trolley",
+"ドライヤー席": "Dryer seat",
+"ネイルテーブル": "Nail table",
+"アイラッシュ台": "Lash bed",
+"サロン受付": "Salon reception",
+"タオル棚": "Towel shelf",
+"フットバス": "Foot spa",
+"教室・オフィス": "Classroom & office",
+"1人デスク": "Desk (1 person)",
+"2人机": "Desk (2 people)",
+"会議テーブル": "Meeting table",
+"ホワイトボード": "Whiteboard",
+"ロッカー": "Locker",
+"複合機": "Copier",
+"4人島デスク": "Desk island (4)",
+"書庫・キャビネット": "Filing cabinet",
+"学習机": "Student desk",
+"集中ブース": "Focus booth",
+"サーバーラック": "Server rack",
+"クリニック・ケア": "Clinic & care",
+"診察ベッド": "Exam bed",
+"診察デスク": "Consultation desk",
+"医療ワゴン": "Medical cart",
+"衝立": "Privacy screen",
+"待合3席": "Waiting seats (3)",
+"手洗い": "Hand basin",
+"ジム・宿泊・ランドリー": "Gym, lodging & laundry",
+"ランニングマシン": "Treadmill",
+"マット": "Mat",
+"更衣ロッカー": "Changing lockers",
+"シングルベッド": "Single bed",
+"洗濯機": "Washing machine",
+"乾燥機": "Dryer",
+"作業/たたみ台": "Folding table",
+"厨房・水回り": "Kitchen & plumbing",
+"シンク": "Sink",
+"二槽シンク": "Double sink",
+"コンロ台": "Range / burners",
+"冷蔵庫": "Refrigerator",
+"冷凍庫": "Freezer",
+"作業台": "Worktable",
+"トイレ": "Toilet",
+"手洗い器": "Hand sink",
+"フライヤー": "Fryer",
+"オーブン": "Oven",
+"製氷機": "Ice machine",
+"食器洗浄機": "Dishwasher",
+"レンジフード": "Range hood",
+"食器棚": "Dish shelf",
+"グリストラップ": "Grease trap",
+"会議室・セミナー": "Meeting & seminar",
+"長机（会議用）": "Seminar table",
+"スタッキングチェア": "Stacking chair",
+"演台": "Lectern",
+"スクリーン": "Projection screen",
+"プロジェクター台": "Projector cart",
+"ステージ台（小）": "Stage platform (small)",
+"貸会場・レンタルスペース": "Venues & rental spaces",
+"折りたたみ長机": "Folding table (long)",
+"パイプ椅子": "Folding chair",
+"円卓（宴会用）": "Banquet round table",
+"可動間仕切り": "Movable partition",
+"クロークハンガー": "Cloakroom rack",
+"組立ステージ": "Modular stage",
+"宿泊・ゲストハウス": "Hotel & guesthouse",
+"ダブルベッド": "Double bed",
+"2段ベッド": "Bunk bed",
+"荷物置き": "Luggage rack",
+"貴重品ロッカー": "Valuables locker",
+"シャワーユニット": "Shower unit",
+"ユニットバス": "Bathroom pod",
+"ギャラリー・工房": "Gallery & workshop",
+"展示パネル": "Display panel",
+"展示台": "Plinth",
+"作業台（工房）": "Workbench",
+"イーゼル": "Easel",
+"ピクチャーレール壁": "Picture-rail wall",
+"工具棚": "Tool shelf",
+"窯・電気炉": "Kiln",
+"アパレル・衣料品": "Apparel",
+"マネキン": "Mannequin",
+"壁面ハンガー": "Wall hanging rail",
+"島什器ラック": "Island rack",
+"姿見ミラー": "Full-length mirror",
+"ストック棚": "Stock shelf",
+"アクセサリーケース": "Accessory case",
+"包装台": "Wrapping counter",
+"ライブ・イベント": "Live & events",
+"ステージ": "Stage",
+"スピーカー": "Speaker",
+"PA・音響ブース": "Sound booth",
+"ドリンクカウンター": "Bar counter",
+"DJブース": "DJ booth",
+"物販テーブル": "Merch table",
+"柵・バリケード": "Crowd barrier",
+"自由図形": "Basic shapes",
+"四角": "Rectangle",
+"丸": "Circle",
+"🌐 English": "🌐 日本語",
+"¥1,480": "%PRICE%"
+};
+Object.keys(I18N_EN).forEach(k=>{ I18N_EN[k] = I18N_EN[k].replace(/%PRICE%/g, PRO_PRICE_EN); });
+function t(s, v){
+  let r = (MF_LANG==='en' && Object.prototype.hasOwnProperty.call(I18N_EN, s)) ? I18N_EN[s] : s;
+  if(v) r = r.replace(/\{(\w+)\}/g, (m,k)=> Object.prototype.hasOwnProperty.call(v,k) ? v[k] : m);
+  return r;
+}
+/* 面積。英語版はシンガポール・UAE・英国などテナント面積を sq ft で見る地域があるので併記する。
+   areaNum は文中の差し込み用（日本語は数値だけ）、areaStr は単位まで含めた単独表示用。 */
+const SQFT_PER_M2 = 10.7639;
+function areaNum(mm2, digits){
+  const n = (mm2/1e6).toFixed(digits);
+  return MF_LANG==='en' ? `${n} m² (${Math.round(mm2/1e6*SQFT_PER_M2).toLocaleString('en')} sq ft)` : n;
+}
+function areaStr(mm2, digits){ return MF_LANG==='en' ? areaNum(mm2, digits) : `${(mm2/1e6).toFixed(digits)} m²`; }
+function applyI18nDom(root){
+  if(MF_LANG!=='en') return;
+  const has = k => Object.prototype.hasOwnProperty.call(I18N_EN, k);
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: n => {
+    const tag = n.parentNode && n.parentNode.nodeName;
+    if(tag==='SCRIPT' || tag==='STYLE') return NodeFilter.FILTER_REJECT;
+    return /\S/.test(n.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+  }});
+  const nodes = []; while(walker.nextNode()) nodes.push(walker.currentNode);
+  nodes.forEach(n=>{
+    const raw = n.nodeValue, key = raw.replace(/\s+/g,' ').trim();
+    const en = has(key) ? I18N_EN[key] : (key==='。' ? '.' : null);
+    if(en==null) return;
+    n.nodeValue = raw.match(/^\s*/)[0] + en + raw.match(/\s*$/)[0];
+  });
+  root.querySelectorAll('[title],[aria-label],[placeholder]').forEach(el=>{
+    ['title','aria-label','placeholder'].forEach(a=>{
+      const v = el.getAttribute(a); if(v && has(v)) el.setAttribute(a, I18N_EN[v]);
+    });
+  });
+  root.querySelectorAll('[data-href-en]').forEach(a=> a.setAttribute('href', a.getAttribute('data-href-en')));
+}
+if(MF_LANG==='en'){
+  document.title = t('MiseFits｜2Dの間取り・店舗レイアウトシミュレーター（無料・登録不要）');
+  const md = document.querySelector('meta[name="description"]');
+  if(md) md.setAttribute('content', I18N_EN.__META_DESC__);
+  const cn = document.querySelector('link[rel="canonical"]');
+  if(cn) cn.setAttribute('href', 'https://misefits.kokokikaku.com/?lang=en');
+  applyI18nDom(document.body);
+}
+</script>
 <script>
 /* ================= サンプル図面データ（100DPI, 実寸 6.35 mm/px = 1:25） ================= */
 const SAMPLES = {};
@@ -1404,6 +2018,7 @@ const LIBRARY = [
 ];
 const ITEM_INDEX = {};
 LIBRARY.forEach(c=>c.items.forEach(it=>ITEM_INDEX[it.key]=it));
+if(MF_LANG==='en') LIBRARY.forEach(c=>{ c.cat=t(c.cat); c.items.forEach(it=>{ it.nameJa=it.name; it.name=t(it.name); }); });
 
 /* ================= 状態 ================= */
 let canvas;
@@ -1436,17 +2051,21 @@ window.addEventListener('message', handleNativeMessage);
 document.addEventListener('message', handleNativeMessage); // WebView実装差異（Android等）向けの保険
 // 本番のStripe決済リンク。本番モードのPayment Linkを作成したらここに入れる
 // （テストモードのリンクは公開版に置かないこと）。空のあいだはキー入力欄へ誘導する。
-const PRO_PURCHASE_URL = 'https://buy.stripe.com/cNi7sEb0eg2g7HtcOv9R600';
+const PRO_PURCHASE_URL_JA = 'https://buy.stripe.com/cNi7sEb0eg2g7HtcOv9R600';
+// 英語版（海外向け）は Lemon Squeezy の Checkout。ストアの本番化後にURLを入れる。
+// 空のあいだは購入ボタンを出さず、ロック機能に触れたらキー入力欄へ案内する（従来の挙動）。
+const PRO_PURCHASE_URL_EN = '';
+const PRO_PURCHASE_URL = MF_LANG==='en' ? PRO_PURCHASE_URL_EN : PRO_PURCHASE_URL_JA;
 let proModalFeature = 'unknown';
 const PRO_FEATURE_LABELS = {
-  free_shape:'自由形状エディタ', area_trace:'面積トレース',
-  memo_add:'メモ機能', memo_edit:'メモ機能',
-  export_scale:'実寸スケール印刷・高解像度出力'
+  free_shape:t('自由形状エディタ'), area_trace:t('面積トレース'),
+  memo_add:t('メモ機能'), memo_edit:t('メモ機能'),
+  export_scale:t('実寸スケール印刷・高解像度出力')
 };
 function proFeatureLabel(feature){
   if(feature && feature.indexOf('fixture:')===0){
     const it = ITEM_INDEX[feature.slice(8)];
-    return it ? it.name : 'Pro什器';
+    return it ? it.name : t('Pro什器');
   }
   return PRO_FEATURE_LABELS[feature] || '';
 }
@@ -1471,17 +2090,17 @@ function focusLicenseInput(){
     sec.scrollIntoView({ behavior:'smooth', block:'center' });
     const inp=document.getElementById('webLicenseInput');
     if(inp) setTimeout(()=>inp.focus(), 420);
-    showHint('サイドバーの「MiseFits Pro」からライセンスキーを入力すると解放されます', 4500);
+    showHint(t('サイドバーの「MiseFits Pro」からライセンスキーを入力すると解放されます'), 4500);
   }else{
-    showHint('この機能は MiseFits Pro でご利用いただけます', 3500);
+    showHint(t('この機能は MiseFits Pro でご利用いただけます'), 3500);
   }
 }
 function openProModal(feature){
   const label = proFeatureLabel(feature);
   const lead = document.getElementById('proModalLead');
   if(lead) lead.textContent = label
-    ? `「${label}」は MiseFits Pro の機能です。買い切りで次のすべてが解放されます。`
-    : 'MiseFits Pro で次の機能が解放されます。';
+    ? t('「{label}」は MiseFits Pro の機能です。買い切りで次のすべてが解放されます。', {label})
+    : t('MiseFits Pro で次の機能が解放されます。');
   // 触った機能の行だけ目立たせる（什器はキー付きで来るのでまとめる）
   const hit = feature && feature.indexOf('fixture:')===0 ? 'fixture' : feature;
   document.querySelectorAll('#proModalList li').forEach(li=>{
@@ -1543,8 +2162,8 @@ function submitWebLicense(){
   const input = document.getElementById('webLicenseInput');
   const msg = document.getElementById('webLicenseMsg');
   const key = (input && input.value || '').trim().toUpperCase();
-  if(!key){ if(msg) msg.textContent = 'ライセンスキーを入力してください。'; return; }
-  if(msg) msg.textContent = '確認中…';
+  if(!key){ if(msg) msg.textContent = t('ライセンスキーを入力してください。'); return; }
+  if(msg) msg.textContent = t('確認中…');
   fetch(FUNCTIONS_BASE + '/verifyLicense?key=' + encodeURIComponent(key) + '&device=' + encodeURIComponent(webDeviceId()))
     .then(r => r.json())
     .then(data => {
@@ -1553,18 +2172,18 @@ function submitWebLicense(){
         if(msg) msg.textContent = '';
         updateWebProUI();
         trackEvent('license_unlock_success', { location: 'app' });
-        showHint('MiseFits Proを解放しました', 3000);
+        showHint(t('MiseFits Proを解放しました'), 3000);
       }else if(data && data.reason === 'device_limit'){
         trackEvent('license_unlock_fail', { reason: 'device_limit', location: 'app' });
-        if(msg) msg.textContent = 'このキーは上限の5台で使用中のため解放できません。端末の入れ替え（リセット）をご希望の場合はお問い合わせください。';
+        if(msg) msg.textContent = t('このキーは上限の5台で使用中のため解放できません。端末の入れ替え（リセット）をご希望の場合はお問い合わせください。');
       }else{
         trackEvent('license_unlock_fail', { reason: 'invalid', location: 'app' });
-        if(msg) msg.textContent = '無効なキーです。入力内容をご確認ください。';
+        if(msg) msg.textContent = t('無効なキーです。入力内容をご確認ください。');
       }
     })
     .catch(() => {
       trackEvent('license_unlock_fail', { reason: 'network', location: 'app' });
-      if(msg) msg.textContent = '確認に失敗しました。通信環境をご確認のうえ再度お試しください。';
+      if(msg) msg.textContent = t('確認に失敗しました。通信環境をご確認のうえ再度お試しください。');
     });
 }
 updateWebProUI();
@@ -1618,7 +2237,7 @@ function buildLibrary(){
       const p=document.createElement('div'); p.className='part'; p.draggable=true;
       let dim, sw;
       if(it.shape==='text'){
-        dim='ラベル';
+        dim=t('ラベル');
         sw=`<span class="sw" style="width:34px;height:20px;background:${it.color}1f;border:1px dashed ${it.color};color:${it.color};font-size:12px;line-height:18px;text-align:center;">A</span>`;
       } else {
         // プレビューの縦横比を実寸 w:d に合わせる（最大46×30の枠に収める）
@@ -1634,7 +2253,7 @@ function buildLibrary(){
       const badge = it.pro ? `<span class="pro-badge">${locked?'🔒':'PRO'}</span>` : '';
       p.innerHTML=`<span class="swbox">${sw}</span>${it.name}${badge}<br><span class="dim">${dim}</span>`;
       if(locked) p.classList.add('locked');
-      p.dataset.search=`${c.cat} ${it.name} ${dim}${it.pro?' pro':''}`.toLowerCase();
+      p.dataset.search=`${c.cat} ${it.name} ${dim}${it.pro?' pro':''}${it.nameJa?' '+it.nameJa:''}`.toLowerCase();
       p.onclick=()=>addFixture(it.key);
       // Pro什器は無料版ではドラッグでも入れられないようにする（クリック経路だけ塞いでも意味がないため）
       p.draggable = !locked;
@@ -1650,7 +2269,7 @@ function buildLibrary(){
 }
 
 function pickDrawingFile(){
-  const usePdf=confirm('PDFを読み込みますか？\nOK: PDF / キャンセル: 画像');
+  const usePdf=confirm(t('PDFを読み込みますか？\nOK: PDF / キャンセル: 画像'));
   document.getElementById(usePdf?'addPdf':'addImg').click();
 }
 
@@ -1677,7 +2296,7 @@ function renderSheetList(){
   const el=document.getElementById('sheetList'); el.innerHTML='';
   project.sheets.forEach((s,i)=>{
     const d=document.createElement('div'); d.className='sheet-item'+(i===project.active?' active':'');
-    d.innerHTML=`<span class="nm" title="${escapeHtml(s.name)}">${escapeHtml(s.name)}</span><span class="x" title="削除">✕</span>`;
+    d.innerHTML=`<span class="nm" title="${escapeHtml(s.name)}">${escapeHtml(s.name)}</span><span class="x" title="${t('削除')}">✕</span>`;
     d.querySelector('.nm').onclick=()=>switchSheet(i);
     d.querySelector('.x').onclick=(e)=>{e.stopPropagation();removeSheet(i);};
     el.appendChild(d);
@@ -1695,12 +2314,12 @@ function updateWorkStatus(){
   // 注記（メモ・トレース範囲）は什器ではないのでパーツ数に含めない（集計パネルと揃える）
   const countable=o=>o.data && o.data.shape!=='text' && o.data.kind!=='memo' && o.data.kind!=='trace';
   const count=canvas ? canvas.getObjects().filter(countable).length : ((s.objects||[]).filter(countable).length);
-  const scaleLabel=s.calibrated ? `${s.mmPerPixel.toFixed(3)}mm/px` : '未校正';
-  const next=s.calibrated ? (count ? '配置を調整できます' : '次: パーツを追加') : '次: 縮尺を設定';
+  const scaleLabel=s.calibrated ? `${s.mmPerPixel.toFixed(3)}mm/px` : t('未校正');
+  const next=s.calibrated ? (count ? t('配置を調整できます') : t('次: パーツを追加')) : t('次: 縮尺を設定');
   const seats=computeSummary().seats;
-  const seatPill=seats? `<span class="status-pill">席 ${seats}</span>` : '';
-  const savePill=autosaveFailed? '<span class="status-pill danger" title="図面が大きく端末に自動保存できません。JSONで保存してください">⚠ 自動保存できません</span>' : '';
-  box.innerHTML=`<b title="${escapeHtml(s.name)}">${escapeHtml(s.name)}</b><span class="status-pill ${s.calibrated?'ok':'warn'}">${scaleLabel}</span><span class="status-pill">パーツ ${count}</span>${seatPill}${savePill}<span class="status-next">${next}</span>`;
+  const seatPill=seats? `<span class="status-pill">${t('席 {n}',{n:seats})}</span>` : '';
+  const savePill=autosaveFailed? '<span class="status-pill danger" title="'+t('図面が大きく端末に自動保存できません。JSONで保存してください')+'">⚠ '+t('自動保存できません')+'</span>' : '';
+  box.innerHTML=`<b title="${escapeHtml(s.name)}">${escapeHtml(s.name)}</b><span class="status-pill ${s.calibrated?'ok':'warn'}">${scaleLabel}</span><span class="status-pill">${t('パーツ {n}',{n:count})}</span>${seatPill}${savePill}<span class="status-next">${next}</span>`;
   box.classList.add('show');
   updateSummary();
   renderMemoList();   // メモ一覧もオブジェクトの増減に合わせて更新
@@ -1743,7 +2362,7 @@ function switchSheet(i){
 }
 
 function removeSheet(i){
-  if(!confirm('このシートを削除しますか？（配置した什器も消えます）')) return;
+  if(!confirm(t('このシートを削除しますか？（配置した什器も消えます）'))) return;
   if(i===project.active){ syncActiveObjects(); }
   project.sheets.splice(i,1);
   if(project.active>=project.sheets.length) project.active=project.sheets.length-1;
@@ -1787,13 +2406,13 @@ function goHome(){
 /* ================= サンプル・アップロード ================= */
 function loadSamples(){
   const keys=Object.keys(SAMPLES);
-  if(!keys.length){ alert('サンプルデータが見つかりません。'); return; }
+  if(!keys.length){ alert(t('サンプルデータが見つかりません。')); return; }
   keys.forEach(k=>{
     addSheet({ name:SAMPLES[k].name, image:SAMPLES[k].data, mmPerPixel:SAMPLE_MMPP, calibrated:true, objects:[] }, false);
   });
   switchSheet(project.sheets.length-keys.length);
   if(isMobile()) closeDrawer();
-  showHint('サンプル図面を読み込みました（縮尺1:25として設定済み）');
+  showHint(t('サンプル図面を読み込みました（縮尺1:25として設定済み）'));
 }
 
 document.addEventListener('DOMContentLoaded',()=>{});
@@ -1802,12 +2421,12 @@ function handleImageFile(file, name){
   const hadExisting = project.sheets.length>0;   // 既に図面がある状態への追加か
   const r=new FileReader();
   r.onload=f=>{ addSheet({ name:name||file.name, image:f.target.result, mmPerPixel:SAMPLE_MMPP, calibrated:false, objects:[] });
-    showHint('画像を読み込みました'+keepNote(hadExisting)+'。「縮尺を設定」で実寸を合わせてください', hadExisting?4200:2600); };
+    showHint(t('画像を読み込みました{keep}。「縮尺を設定」で実寸を合わせてください',{keep:keepNote(hadExisting)}), hadExisting?4200:2600); };
   r.readAsDataURL(file);
 }
 
 async function handlePdfFile(file){
-  if(!window.pdfjsLib){ showHint('PDFの読み込みに必要なライブラリを読み込めませんでした（オンライン環境が必要です）', 5000); return; }
+  if(!window.pdfjsLib){ showHint(t('PDFの読み込みに必要なライブラリを読み込めませんでした（オンライン環境が必要です）'), 5000); return; }
   const hadExisting = project.sheets.length>0;     // 既に図面がある状態への追加か
   try{
     const buf=await file.arrayBuffer();
@@ -1818,16 +2437,16 @@ async function handlePdfFile(file){
     await page.render({canvasContext:cv.getContext('2d'), viewport:vp}).promise;
     addSheet({ name:file.name.replace(/\.pdf$/i,''), image:cv.toDataURL('image/png'),
                mmPerPixel:SAMPLE_MMPP, calibrated:false, objects:[] });
-    showHint('PDFを読み込みました'+keepNote(hadExisting)+'。「縮尺を設定」で実寸を合わせてください', hadExisting?4200:2600);
+    showHint(t('PDFを読み込みました{keep}。「縮尺を設定」で実寸を合わせてください',{keep:keepNote(hadExisting)}), hadExisting?4200:2600);
   }catch(e){
-    showHint('PDFを読み込めませんでした。別のPDF、または画像として書き出したものをお試しください', 5000);
+    showHint(t('PDFを読み込めませんでした。別のPDF、または画像として書き出したものをお試しください'), 5000);
   }
 }
 
 // 「白紙から」ボタンは形状選択モーダルを開く
 function createBlankSheet(){ openShapeModal(); }
 // 既存シートがある状態で追加した場合に添える一言（消えたのではなく一覧に残ることを明示）
-function keepNote(hadExisting){ return hadExisting ? '（元の図面はシート一覧に残っています）' : ''; }
+function keepNote(hadExisting){ return hadExisting ? t('（元の図面はシート一覧に残っています）') : ''; }
 
 /* ================= 白紙シート：形状プリセット（矩形／L字／コの字） =================
    有料プラン候補: 頂点を自由にドラッグして編集できる完全自由形状エディタ、
@@ -1909,7 +2528,7 @@ function drawShapeRaster(ctx, pxW, pxH, vertsPx, blankMmpp){
   ctx.restore();
   ctx.strokeStyle='#93a2b6'; ctx.lineWidth=3; ctx.stroke(path);
 }
-const SHAPE_LABEL = { rect:'矩形', L:'L字', U:'コの字', free:'自由形状' };
+const SHAPE_LABEL = { rect:t('矩形'), L:t('L字'), U:t('コの字'), free:t('自由形状') };
 
 /* ---- Pro: 自由形状エディタ（プレビュー上で頂点を直接編集する） ---- */
 let freeDragIdx=-1;                 // ドラッグ中の頂点
@@ -1960,7 +2579,7 @@ function pushFreeUndo(){
   if(freeUndoStack.length>40) freeUndoStack.shift();
 }
 function undoFreeVertex(){
-  if(!freeUndoStack.length){ showHint('これ以上戻せません'); return; }
+  if(!freeUndoStack.length){ showHint(t('これ以上戻せません')); return; }
   shapeState.verts=JSON.parse(freeUndoStack.pop());
   normalizeFreeVerts(shapeState); syncShapeForm(); renderShapePreview();
 }
@@ -1981,7 +2600,7 @@ function updateFreeBBox(key, val){
   shapeState.verts = vs.map(([x,y])=>[Math.round(x*sx), Math.round(y*sy)]);
   normalizeFreeVerts(shapeState); renderShapePreview();
   const cnt=document.getElementById('freeVertCount');
-  if(cnt) cnt.textContent=`頂点 ${shapeState.verts.length}`;
+  if(cnt) cnt.textContent=t('頂点 {n}',{n:shapeState.verts.length});
 }
 function bindFreeShapeEditor(){
   const cv=document.getElementById('shapePreviewCanvas'); if(!cv || cv.__freeBound) return;
@@ -2019,7 +2638,7 @@ function bindFreeShapeEditor(){
     const [px,py]=previewPointerPos(e);
     const hit=findFreeVertexAt(px,py);
     if(hit<0) return;
-    if(shapeState.verts.length<=3){ showHint('三角形より少なくはできません'); return; }
+    if(shapeState.verts.length<=3){ showHint(t('三角形より少なくはできません')); return; }
     pushFreeUndo();
     shapeState.verts.splice(hit,1);
     normalizeFreeVerts(shapeState); syncShapeForm(); renderShapePreview();
@@ -2070,7 +2689,7 @@ function syncShapeForm(){
     const bb=vertsBBox(shapeState.verts||defaultFreeVerts());
     if(wf) wf.value=bb.W; if(df) df.value=bb.D;
     const cnt=document.getElementById('freeVertCount');
-    if(cnt) cnt.textContent=`頂点 ${(shapeState.verts||[]).length}`;
+    if(cnt) cnt.textContent=t('頂点 {n}',{n:(shapeState.verts||[]).length});
     return;
   }
   const suf = shapeState.type==='L'?'_L': shapeState.type==='U'?'_U':'';
@@ -2095,7 +2714,7 @@ function renderShapePreview(){
   const verts=shapeVertsMm(shapeState);
   const bb = free ? vertsBBox(verts) : { W:shapeState.W, D:shapeState.D };
   const W=bb.W, D=bb.D;
-  if(!(W>0)||!(D>0)){ if(note) note.textContent='延べ床面積の目安：—'; return; }
+  if(!(W>0)||!(D>0)){ if(note) note.textContent=t('延べ床面積の目安：—'); return; }
   const pad = free ? 20 : 12;
   const scale=Math.min((cv.width-pad*2)/W, (cv.height-pad*2)/D);
   previewTf={ scale, padX:pad, padY:pad };   // 頂点編集の座標変換に使う
@@ -2115,19 +2734,19 @@ function renderShapePreview(){
       ctx.lineWidth=2; ctx.strokeStyle='#0066cc'; ctx.stroke();
     });
   }
-  if(note) note.textContent = `延べ床面積の目安：約 ${(polygonAreaMm(verts)/1e6).toFixed(1)} m²`;
+  if(note) note.textContent = t('延べ床面積の目安：約 {a} m²',{a:areaNum(polygonAreaMm(verts),1)});
 }
 function confirmCreateBlankSheet(){
   const st=shapeState;
   if(st.type==='free'){
-    if(!st.verts || st.verts.length<3){ showHint('頂点が足りません（3つ以上必要です）'); return; }
+    if(!st.verts || st.verts.length<3){ showHint(t('頂点が足りません（3つ以上必要です）')); return; }
     normalizeFreeVerts(st);
-    if(polygonAreaMm(st.verts) <= 0){ showHint('形が潰れています。頂点を動かして面積のある形にしてください', 4000); return; }
+    if(polygonAreaMm(st.verts) <= 0){ showHint(t('形が潰れています。頂点を動かして面積のある形にしてください'), 4000); return; }
   }
-  if(!(st.W>0) || !(st.D>0)){ showHint('横幅・奥行を正しく入力してください'); return; }
+  if(!(st.W>0) || !(st.D>0)){ showHint(t('横幅・奥行を正しく入力してください')); return; }
   if(st.type!=='rect' && st.type!=='free'){
-    if(!(st.nw>0) || !(st.nd>0)){ showHint('欠けの寸法を正しく入力してください'); return; }
-    if(st.nw>=st.W || st.nd>=st.D){ showHint('欠けの寸法が全体より大きくなっています。小さくしてください'); return; }
+    if(!(st.nw>0) || !(st.nd>0)){ showHint(t('欠けの寸法を正しく入力してください')); return; }
+    if(st.nw>=st.W || st.nd>=st.D){ showHint(t('欠けの寸法が全体より大きくなっています。小さくしてください')); return; }
   }
   const blankMmpp=10;
   const vertsMm=shapeVertsMm(st);
@@ -2140,7 +2759,7 @@ function confirmCreateBlankSheet(){
   const shapeLabel=SHAPE_LABEL[st.type];
   const hadExisting=project.sheets.length>0;
   addSheet({
-    name: st.type==='rect' ? `白紙 ${st.W}×${st.D}mm` : `白紙(${shapeLabel}) ${st.W}×${st.D}mm`,
+    name: st.type==='rect' ? t('白紙 {w}×{d}mm',{w:st.W,d:st.D}) : t('白紙({shape}) {w}×{d}mm',{shape:shapeLabel,w:st.W,d:st.D}),
     freeVerts: st.type==='free' ? st.verts.map(v=>v.slice()) : undefined,   // 再編集・面積再計算のため残す
     image: cv.toDataURL('image/png'),
     mmPerPixel: blankMmpp,
@@ -2154,14 +2773,14 @@ function confirmCreateBlankSheet(){
     objects: []
   });
   closeShapeModal();
-  showHint(`白紙レイアウト（${shapeLabel}）を作成しました：延べ床 約${(realArea/1e6).toFixed(1)}m²`+keepNote(hadExisting), hadExisting?4400:3000);
+  showHint(t('白紙レイアウト（{shape}）を作成しました：延べ床 約{a}m²{keep}',{shape:shapeLabel,a:areaNum(realArea,1),keep:keepNote(hadExisting)}), hadExisting?4400:3000);
 }
 
 function askPositiveNumber(message, fallback){
   const raw=prompt(message, String(fallback));
   if(raw===null) return null;
   const n=Math.round(Number(String(raw).replace(/[^\d.]/g,'')));
-  if(!Number.isFinite(n) || n<=0){ showHint('1以上の数値(mm)を入力してください'); return null; }
+  if(!Number.isFinite(n) || n<=0){ showHint(t('1以上の数値(mm)を入力してください')); return null; }
   return n;
 }
 
@@ -2172,7 +2791,7 @@ function makeFixture(item, opts){
   const common={ originX:'center', originY:'center', data:{ key:item.key, name:item.name, shape:item.shape,
     realW:item.w, realD:item.d, baseW:item.w/scale, baseH:item.d/scale } };
   if(item.shape==='text'){
-    obj=new fabric.IText(opts.text||'テキスト',{ ...common, fontSize:Math.max(80/scale*6, 14),
+    obj=new fabric.IText(opts.text||t('テキスト'),{ ...common, fontSize:Math.max(80/scale*6, 14),
       fill:item.color, fontFamily:'inherit' });
     obj.data.realW=0; obj.data.realD=0; obj.data.baseW=0; obj.data.baseH=0;
     return obj;
@@ -2213,7 +2832,7 @@ function makeMemo(text, color){
   const wpx=MEMO_W_MM/scale;
   const fs=Math.max(wpx*0.11, 9);
   const pad=wpx*0.07;
-  const body=new fabric.Textbox(text||'メモ',{
+  const body=new fabric.Textbox(text||t('メモ'),{
     width:wpx-pad*2, fontSize:fs, fill:'#3a3320', fontFamily:'inherit', lineHeight:1.35,
     originX:'center', originY:'top', textAlign:'left'
   });
@@ -2225,13 +2844,13 @@ function makeMemo(text, color){
   body.set({ left:-wpx/2+pad, top:-hpx/2+pad });
   body.originX='left';
   const g=new fabric.Group([card, body, pin],{ originX:'center', originY:'center',
-    data:{ kind:'memo', name:'メモ', text:text||'メモ', color:color||MEMO_COLORS[0] } });
+    data:{ kind:'memo', name:t('メモ'), text:text||t('メモ'), color:color||MEMO_COLORS[0] } });
   return g;
 }
 
 function addMemo(){
   if(!isPro()){ requestProPurchase('memo_add'); return; }
-  if(project.active<0){ showHint('先に図面シートを読み込んでください'); if(isMobile())closeDrawer(); return; }
+  if(project.active<0){ showHint(t('先に図面シートを読み込んでください')); if(isMobile())closeDrawer(); return; }
   memoEditTarget=null;                 // null = 新規
   memoEditColor=MEMO_COLORS[0];
   openMemoEditor('');
@@ -2261,7 +2880,7 @@ function syncMemoSwatches(){
 }
 function saveMemoEditor(){
   const text=(document.getElementById('memoText').value||'').trim();
-  if(!text){ showHint('メモの内容を入力してください'); return; }
+  if(!text){ showHint(t('メモの内容を入力してください')); return; }
   if(memoEditTarget){
     // 位置・角度を保ったまま中身だけ差し替える（Textboxの高さが変わるため作り直しが確実）
     const old=memoEditTarget;
@@ -2307,21 +2926,21 @@ function renderMemoList(){
   const addBtn=document.getElementById('memoAddBtn');
   if(lock) lock.style.display = pro ? 'none' : '';
   if(addBtn) addBtn.classList.toggle('ghost', !pro);
-  if(!pro){ box.innerHTML='<div class="memo-empty">図面に付箋メモを貼り、施主や現場との確認事項を書き残せます（Pro機能）。</div>'; return; }
+  if(!pro){ box.innerHTML='<div class="memo-empty">'+t('図面に付箋メモを貼り、施主や現場との確認事項を書き残せます（Pro機能）。')+'</div>'; return; }
   const list=memoObjects();
-  if(!list.length){ box.innerHTML='<div class="memo-empty">まだメモはありません。</div>'; return; }
+  if(!list.length){ box.innerHTML='<div class="memo-empty">'+t('まだメモはありません。')+'</div>'; return; }
   box.innerHTML='';
   list.forEach((o,i)=>{
-    const first=((o.data&&o.data.text)||'').split('\n')[0] || 'メモ';
+    const first=((o.data&&o.data.text)||'').split('\n')[0] || t('メモ');
     const row=document.createElement('div'); row.className='memo-item';
-    const t=document.createElement('span'); t.className='mtxt'; t.textContent=`${i+1}. ${first}`;
-    t.title='クリックでその位置へ移動';
-    t.addEventListener('click',()=>jumpToMemo(o));
-    const e=document.createElement('button'); e.className='mbtn'; e.textContent='✎'; e.title='編集';
+    const txt=document.createElement('span'); txt.className='mtxt'; txt.textContent=`${i+1}. ${first}`;
+    txt.title=t('クリックでその位置へ移動');
+    txt.addEventListener('click',()=>jumpToMemo(o));
+    const e=document.createElement('button'); e.className='mbtn'; e.textContent='✎'; e.title=t('編集');
     e.addEventListener('click',()=>editMemo(o));
-    const d=document.createElement('button'); d.className='mbtn'; d.textContent='🗑'; d.title='削除';
+    const d=document.createElement('button'); d.className='mbtn'; d.textContent='🗑'; d.title=t('削除');
     d.addEventListener('click',()=>deleteMemo(o));
-    row.append(t,e,d); box.appendChild(row);
+    row.append(txt,e,d); box.appendChild(row);
   });
 }
 
@@ -2331,7 +2950,7 @@ function addFixture(key, pos){
     requestProPurchase('fixture:' + key);
     return;
   }
-  if(project.active<0){ showHint('先に図面シートを読み込んでください'); if(isMobile())closeDrawer(); return; }
+  if(project.active<0){ showHint(t('先に図面シートを読み込んでください')); if(isMobile())closeDrawer(); return; }
   const obj=makeFixture(item,{});
   const p = pos || viewCenterScene();
   obj.set({ left:p.x, top:p.y });
@@ -2359,7 +2978,7 @@ function setHandleMode(v){
   const a=canvas.getActiveObject(); if(a){ a.hasControls=handleMode; a.setCoords(); }
   updateModeSeg();
   canvas.requestRenderAll();
-  showHint(v ? 'サイズ・回転モード：四隅ハンドルで変更できます' : '移動モード：ドラッグで移動のみ（サイズ/角度は下の数値で変更）');
+  showHint(v ? t('サイズ・回転モード：四隅ハンドルで変更できます') : t('移動モード：ドラッグで移動のみ（サイズ/角度は下の数値で変更）'));
 }
 function updateModeSeg(){
   const mv=document.getElementById('modeMove'), ed=document.getElementById('modeEdit');
@@ -2395,8 +3014,8 @@ function applyPropsCollapse(){
   const box=document.getElementById('props');
   const collapse = isMobile() && !propsExpanded;
   box.classList.toggle('collapsed', collapse);
-  const t=document.getElementById('propsToggle');
-  if(t) t.textContent = collapse ? '詳細 ▾' : '閉じる ▴';
+  const tg=document.getElementById('propsToggle');
+  if(tg) tg.textContent = collapse ? t('詳細 ▾') : t('閉じる ▴');
 }
 function togglePropsExpand(){ propsExpanded=!propsExpanded; applyPropsCollapse(); }
 function deselectActive(){ canvas.discardActiveObject(); canvas.requestRenderAll(); }
@@ -2413,9 +3032,9 @@ function updateProps(){
   const trace = d.kind==='trace';
   const annot = memo || trace;   // 注記は什器としての寸法欄を持たない
   document.getElementById('pName').textContent = trace
-    ? `${d.name||'トレース範囲'}（約${((d.areaMm2||0)/1e6).toFixed(2)}m²）`
-    : (d.name||'オブジェクト');
-  document.getElementById('pTag').textContent = memo ? 'メモ' : (trace ? '範囲' : '什器');
+    ? t('{name}（約{a}m²）',{name:d.name||t('トレース範囲'),a:areaNum(d.areaMm2||0,2)})
+    : (d.name||t('オブジェクト'));
+  document.getElementById('pTag').textContent = memo ? t('メモ') : (trace ? t('範囲') : t('什器'));
   // メモは内容の編集ボタンを出す（トレースは面積表示のみ）
   document.getElementById('pMemoEdit').style.display = memo ? '' : 'none';
   const wLabel=document.getElementById('pW').parentElement;
@@ -2425,7 +3044,7 @@ function updateProps(){
   const isCircle = d.shape==='circle';
   document.getElementById('pDwrap').style.display = (annot||isText||isCircle)?'none':'flex';
   const wl=document.getElementById('pW').parentElement;
-  if(!annot) wl.childNodes[0].nodeValue = isCircle? '直径 φ(mm)' : (isText?'文字サイズ(px)':'幅 W(mm)');
+  if(!annot) wl.childNodes[0].nodeValue = isCircle? t('直径 φ(mm)') : (isText?t('文字サイズ(px)'):t('幅 W(mm)'));
   if(annot){ /* サイズ欄は使わない */ }
   else if(isText){ document.getElementById('pW').value=Math.round(o.fontSize); }
   else { document.getElementById('pW').value=sz.w; document.getElementById('pD').value=sz.d; }
@@ -2484,11 +3103,11 @@ function applyProps(){
 
 /* ================= 縮尺キャリブレーション ================= */
 function startCalibration(){
-  if(project.active<0){ showHint('先に図面を読み込んでください'); return; }
+  if(project.active<0){ showHint(t('先に図面を読み込んでください')); return; }
   if(measMode) endMeasure();
   calMode=true; calP1=null; clearCalMarks();
   document.getElementById('calBtn').classList.add('on');
-  document.getElementById('calBanner').textContent='📏 縮尺設定モード：1点目をクリック（キャンセルはEsc）';
+  document.getElementById('calBanner').textContent=t('📏 縮尺設定モード：1点目をクリック（キャンセルはEsc）');
   document.getElementById('calBanner').classList.add('show');
   canvas.discardActiveObject(); canvas.selection=false; setObjectsInteractive(false);
   canvas.defaultCursor='crosshair'; canvas.requestRenderAll();
@@ -2508,14 +3127,14 @@ function calClick(p){
   if(!calP1){
     calP1=p;
     const dot=calDot(p); calDots.push(dot); canvas.add(dot);
-    document.getElementById('calBanner').textContent='📏 2点目をクリック';
+    document.getElementById('calBanner').textContent=t('📏 2点目をクリック');
   } else {
     const dot=calDot(p); calDots.push(dot); canvas.add(dot);
     calLine=new fabric.Line([calP1.x,calP1.y,p.x,p.y],{stroke:'#2a9d8f',strokeWidth:2/canvas.getZoom(),
       selectable:false,evented:false}); canvas.add(calLine); canvas.requestRenderAll();
     const dist=Math.hypot(p.x-calP1.x, p.y-calP1.y);
     setTimeout(()=>{
-      const ans=prompt('この2点間の実際の長さを mm で入力してください：', '1000');
+      const ans=prompt(t('この2点間の実際の長さを mm で入力してください：'), '1000');
       if(ans!==null){
         const mm=parseFloat(ans);
         if(mm>0 && dist>0){ applyCalibration(mm/dist); }
@@ -2546,24 +3165,24 @@ function applyCalibration(newMmpp){
   });
   updateScaleBox(); canvas.requestRenderAll(); autosave(); historyMark();
   updateWorkStatus();
-  showHint('縮尺を設定しました：1px = '+newMmpp.toFixed(3)+' mm');
+  showHint(t('縮尺を設定しました：1px = {v} mm',{v:newMmpp.toFixed(3)}));
 }
 
 function updateScaleBox(){
   updateScaleNote();   // 実寸出力の案内はシートの校正状態・寸法に依存するので併せて更新
   const s=activeSheet(); const box=document.getElementById('scaleBox');
-  if(!s){ box.innerHTML='図面が未選択です'; return; }
+  if(!s){ box.innerHTML=t('図面が未選択です'); return; }
   const mppv=s.mmPerPixel;
   const gpx=(+document.getElementById('gridMM').value)/mppv;
   if(s.blank){
-    const shapeTag = (s.shape && s.shape!=='rect') ? `（${SHAPE_LABEL[s.shape]||s.shape}）` : '';
-    const areaLine = s.realArea ? `<br><span class="muted">延べ床 約${(s.realArea/1e6).toFixed(1)}m²</span>` : '';
-    box.innerHTML = `白紙サイズ${shapeTag} <b>外形 ${s.realW} × ${s.realH} mm</b>${areaLine}<br><span class="muted">1px = ${mppv.toFixed(1)} mm / グリッド1マス ≈ ${gpx.toFixed(1)}px</span>`;
+    const shapeTag = (s.shape && s.shape!=='rect') ? t('（{shape}）',{shape:SHAPE_LABEL[s.shape]||s.shape}) : '';
+    const areaLine = s.realArea ? `<br><span class="muted">${t('延べ床 約{a}m²',{a:areaNum(s.realArea,1)})}</span>` : '';
+    box.innerHTML = `${t('白紙サイズ{shape} <b>外形 {w} × {h} mm</b>',{shape:shapeTag,w:s.realW,h:s.realH})}${areaLine}<br><span class="muted">${t('1px = {v} mm / グリッド1マス ≈ {g}px',{v:mppv.toFixed(1),g:gpx.toFixed(1)})}</span>`;
     return;
   }
   box.innerHTML = s.calibrated
-    ? `1px = <b>${mppv.toFixed(3)} mm</b><br><span class="muted">グリッド1マス ≈ ${gpx.toFixed(1)}px</span>`
-    : `<span class="warn">未校正</span> 仮に 1px=${mppv.toFixed(2)}mm<br><span class="muted">「縮尺を設定」で実寸を合わせてください</span>`;
+    ? `1px = <b>${mppv.toFixed(3)} mm</b><br><span class="muted">${t('グリッド1マス ≈ {g}px',{g:gpx.toFixed(1)})}</span>`
+    : `<span class="warn">${t('未校正')}</span> ${t('仮に 1px={v}mm',{v:mppv.toFixed(2)})}<br><span class="muted">${t('「縮尺を設定」で実寸を合わせてください')}</span>`;
 }
 
 /* ================= クイックパーツ（スマホ用の追加バー） ================= */
@@ -2592,15 +3211,15 @@ function renderQuickParts(){
   recentKeys().forEach(k=>{
     const it=ITEM_INDEX[k];
     const b=document.createElement('button');
-    b.type='button'; b.className='qchip'; b.title=`${it.name} を追加`;
+    b.type='button'; b.className='qchip'; b.title=t('{name} を追加',{name:it.name});
     const round=it.shape==='circle'?'border-radius:50%;':'';
     b.innerHTML=`<i style="background:${it.color};${round}"></i>${escapeHtml(it.name)}`;
     b.onclick=()=>addFixture(k);
     bar.appendChild(b);
   });
   const more=document.createElement('button');
-  more.type='button'; more.className='qchip more'; more.textContent='＋ 一覧';
-  more.title='パーツ一覧を開く';
+  more.type='button'; more.className='qchip more'; more.textContent=t('＋ 一覧');
+  more.title=t('パーツ一覧を開く');
   more.onclick=()=>{ openDrawer(); const el=document.getElementById('librarySearch'); if(el) el.scrollIntoView({block:'center'}); };
   bar.appendChild(more);
 }
@@ -2636,9 +3255,9 @@ function computeSummary(){
   res.list=Object.entries(counts).sort((a,b)=>b[1]-a[1] || a[0].localeCompare(b[0]));
   if(s.blank && s.realArea){
     res.sheetArea=s.realArea;
-    res.sheetLabel=(s.shape && s.shape!=='rect') ? `白紙サイズ（${SHAPE_LABEL[s.shape]||s.shape}）` : '白紙サイズ';
-  } else if(s.blank && s.realW){ res.sheetArea=s.realW*s.realH; res.sheetLabel='白紙サイズ'; }
-  else if(s.calibrated && s._imgW){ res.sheetArea=(s._imgW*s.mmPerPixel)*(s._imgH*s.mmPerPixel); res.sheetLabel='図面範囲（余白含む）'; }
+    res.sheetLabel=(s.shape && s.shape!=='rect') ? t('白紙サイズ（{shape}）',{shape:SHAPE_LABEL[s.shape]||s.shape}) : t('白紙サイズ');
+  } else if(s.blank && s.realW){ res.sheetArea=s.realW*s.realH; res.sheetLabel=t('白紙サイズ'); }
+  else if(s.calibrated && s._imgW){ res.sheetArea=(s._imgW*s.mmPerPixel)*(s._imgH*s.mmPerPixel); res.sheetLabel=t('図面範囲（余白含む）'); }
   if(res.sheetArea>0) res.ratio=res.areaMm2/res.sheetArea;
   return res;
 }
@@ -2646,21 +3265,21 @@ function m2(mm2){ return (mm2/1e6); }
 function updateSummary(){
   const box=document.getElementById('summaryBox'); if(!box) return;
   const s=activeSheet();
-  if(!s){ box.innerHTML='<span class="muted">図面シートを読み込むと、席数と面積を自動で集計します。</span>'; return; }
+  if(!s){ box.innerHTML='<span class="muted">'+t('図面シートを読み込むと、席数と面積を自動で集計します。')+'</span>'; return; }
   const r=computeSummary();
   let html=`<div class="sum-kpi">
-      <div><b>${r.seats}</b><span>席・人数の目安</span></div>
-      <div><b>${r.items}</b><span>配置パーツ数</span></div>
+      <div><b>${r.seats}</b><span>${t('席・人数の目安')}</span></div>
+      <div><b>${r.items}</b><span>${t('配置パーツ数')}</span></div>
     </div>
-    <div class="sum-row"><span>什器の合計面積</span><b>${m2(r.areaMm2).toFixed(2)} m²</b></div>`;
+    <div class="sum-row"><span>${t('什器の合計面積')}</span><b>${areaStr(r.areaMm2,2)}</b></div>`;
   if(r.sheetArea>0){
-    html+=`<div class="sum-row"><span>${r.sheetLabel}</span><b>${m2(r.sheetArea).toFixed(2)} m²</b></div>`;
-    html+=`<div class="sum-row"><span>占有率</span><b>${Math.round(r.ratio*100)} %</b></div>`;
+    html+=`<div class="sum-row"><span>${r.sheetLabel}</span><b>${areaStr(r.sheetArea,2)}</b></div>`;
+    html+=`<div class="sum-row"><span>${t('占有率')}</span><b>${Math.round(r.ratio*100)} %</b></div>`;
   }
   if(r.list.length){
     html+='<div class="sum-list">'+r.list.map(([n,c])=>`<div><span>${escapeHtml(n)}</span><i>×${c}</i></div>`).join('')+'</div>';
   }
-  html+='<div class="sum-note">席数は什器ごとの標準的な人数から自動計算した目安です（カウンター席は幅600mmで1席換算）。テキストは集計に含みません。</div>';
+  html+='<div class="sum-note">'+t('席数は什器ごとの標準的な人数から自動計算した目安です（カウンター席は幅600mmで1席換算）。テキストは集計に含みません。')+'</div>';
   box.innerHTML=html;
 }
 
@@ -2674,13 +3293,13 @@ function setObjectsInteractive(v){
 }
 function toggleMeasure(){ measMode? endMeasure() : startMeasure(); }
 function startMeasure(){
-  if(project.active<0){ showHint('先に図面シートを読み込んでください'); return; }
+  if(project.active<0){ showHint(t('先に図面シートを読み込んでください')); return; }
   if(calMode) endCalibration();
   measMode=true; measP1=null; measHover=null;
   canvas.discardActiveObject(); canvas.selection=false; setObjectsInteractive(false);
   canvas.defaultCursor='crosshair';
   updateMeasureUI();
-  document.getElementById('calBanner').textContent='📐 計測モード：1点目をクリック／既存の線をクリックで削除（終了はEsc）';
+  document.getElementById('calBanner').textContent=t('📐 計測モード：1点目をクリック／既存の線をクリックで削除（終了はEsc）');
   document.getElementById('calBanner').classList.add('show');
   canvas.requestRenderAll();
 }
@@ -2695,7 +3314,7 @@ function endMeasure(){
 function updateMeasureUI(){
   const b=document.getElementById('measBtn'); if(b) b.classList.toggle('on', measMode);
   const s=document.getElementById('measBtnSide');
-  if(s){ s.classList.toggle('on', measMode); s.textContent = measMode? '📐 計測を終了' : '📐 距離を測る'; }
+  if(s){ s.classList.toggle('on', measMode); s.textContent = measMode? t('📐 計測を終了') : t('📐 距離を測る'); }
 }
 
 /* ================= Pro: 面積トレース =================
@@ -2714,16 +3333,16 @@ function isAnnotation(o){ return isMemo(o) || isTrace(o); }
 function toggleTrace(){ traceMode ? endTrace(true) : startTrace(); }
 function startTrace(){
   if(!isPro()){ requestProPurchase('area_trace'); return; }
-  if(project.active<0){ showHint('先に図面シートを読み込んでください'); if(isMobile())closeDrawer(); return; }
+  if(project.active<0){ showHint(t('先に図面シートを読み込んでください')); if(isMobile())closeDrawer(); return; }
   const s=activeSheet();
-  if(!s.calibrated){ showHint('先に「縮尺を設定」してください。未校正のままでは面積が正しく出ません', 5000); return; }
+  if(!s.calibrated){ showHint(t('先に「縮尺を設定」してください。未校正のままでは面積が正しく出ません'), 5000); return; }
   if(measMode) endMeasure();
   if(calMode) endCalibration();
   traceMode=true; tracePts=[];
   canvas.discardActiveObject(); canvas.selection=false; setObjectsInteractive(false);
   canvas.defaultCursor='crosshair';
   updateTraceUI();
-  document.getElementById('calBanner').textContent='✎ トレース：輪郭に沿ってクリック（最初の点で閉じる／Escで中止）';
+  document.getElementById('calBanner').textContent=t('✎ トレース：輪郭に沿ってクリック（最初の点で閉じる／Escで中止）');
   document.getElementById('calBanner').classList.add('show');
   canvas.requestRenderAll();
   if(isMobile()) closeDrawer();
@@ -2735,7 +3354,7 @@ function endTrace(silent){
   updateTraceUI();
   document.getElementById('calBanner').classList.remove('show');
   canvas.requestRenderAll();
-  if(!silent) showHint('トレードを中止しました');
+  if(!silent) showHint(t('トレースを中止しました'));
 }
 function updateTraceUI(){
   const b=document.getElementById('traceBtnSide');
@@ -2743,7 +3362,7 @@ function updateTraceUI(){
   const lock=document.getElementById('traceLock');
   const pro=isPro();
   if(lock) lock.style.display = pro ? 'none' : '';
-  if(b){ b.classList.toggle('on', traceMode); b.textContent = traceMode ? '✎ トレースを中止' : '✎ 輪郭をなぞる'; }
+  if(b){ b.classList.toggle('on', traceMode); b.textContent = traceMode ? t('✎ トレースを中止') : t('✎ 輪郭をなぞる'); }
   if(fin) fin.style.display = (traceMode && tracePts.length>=3) ? '' : 'none';
 }
 function traceClick(p){
@@ -2759,31 +3378,31 @@ function traceClick(p){
   if(tracePts.length>=3){
     const a=polygonAreaMm(tracePts.map(q=>[q.x*s.mmPerPixel, q.y*s.mmPerPixel]));
     document.getElementById('calBanner').textContent =
-      `✎ トレース：${tracePts.length}点／現在 約${(a/1e6).toFixed(2)}m²（最初の点で閉じる）`;
+      t('✎ トレース：{n}点／現在 約{a}m²（最初の点で閉じる）',{n:tracePts.length,a:areaNum(a,2)});
   }else{
     document.getElementById('calBanner').textContent =
-      `✎ トレース：${tracePts.length}点（3点以上で閉じられます／Escで中止）`;
+      t('✎ トレース：{n}点（3点以上で閉じられます／Escで中止）',{n:tracePts.length});
   }
   canvas.requestRenderAll();
 }
 function finishTrace(){
-  if(tracePts.length<3){ showHint('3点以上必要です'); return; }
+  if(tracePts.length<3){ showHint(t('3点以上必要です')); return; }
   const s=activeSheet();
   const areaMm2=polygonAreaMm(tracePts.map(q=>[q.x*s.mmPerPixel, q.y*s.mmPerPixel]));
-  if(areaMm2<=0){ showHint('面積が0になっています。線が交差していないか確認してください', 4500); endTrace(true); return; }
+  if(areaMm2<=0){ showHint(t('面積が0になっています。線が交差していないか確認してください'), 4500); endTrace(true); return; }
   const z=canvas.getZoom();
   const poly=new fabric.Polygon(tracePts.map(q=>({x:q.x,y:q.y})),{
     fill:'rgba(0,102,204,0.10)', stroke:'#0066cc', strokeWidth:Math.max(1, 2/z),
     originX:'center', originY:'center', objectCaching:false
   });
   const c=poly.getCenterPoint();
-  const label=new fabric.Text(`${(areaMm2/1e6).toFixed(2)} m²`,{
+  const label=new fabric.Text(areaStr(areaMm2,2),{
     fontSize:Math.max(10, 16/z), fill:'#004f9f', fontFamily:'inherit',
     originX:'center', originY:'center'
   });
   const g=new fabric.Group([poly,label],{
     originX:'center', originY:'center',
-    data:{ kind:'trace', name:'トレース範囲', areaMm2:Math.round(areaMm2) }
+    data:{ kind:'trace', name:t('トレース範囲'), areaMm2:Math.round(areaMm2) }
   });
   g.set({ left:c.x, top:c.y });
   applyObjMode(g);
@@ -2791,7 +3410,7 @@ function finishTrace(){
   endTrace(true);
   canvas.setActiveObject(g); canvas.requestRenderAll();
   updateWorkStatus(); autosave(); historyMark();
-  showHint(`トレース範囲：約 ${(areaMm2/1e6).toFixed(2)} m²`, 4000);
+  showHint(t('トレース範囲：約 {a} m²',{a:areaNum(areaMm2,2)}), 4000);
 }
 // 確定前の途中経過を描く（after:render から呼ぶ）
 function drawTracePreview(){
@@ -2826,9 +3445,9 @@ function measureHitTest(p){
 }
 function undoLastMeasure(){
   const list=sheetMeasures();
-  if(!list.length){ showHint('取り消す計測線がありません'); return; }
+  if(!list.length){ showHint(t('取り消す計測線がありません')); return; }
   list.pop(); measP1=null; measHover=null;
-  canvas.requestRenderAll(); showHint('計測線を1本取り消しました');
+  canvas.requestRenderAll(); showHint(t('計測線を1本取り消しました'));
 }
 function measClick(p){
   if(!measP1){
@@ -2836,27 +3455,27 @@ function measClick(p){
     if(hit>=0){
       sheetMeasures().splice(hit,1);
       canvas.requestRenderAll();
-      showHint('計測線を削除しました');
+      showHint(t('計測線を削除しました'));
       return;
     }
     measP1={x:p.x,y:p.y}; measHover={x:p.x,y:p.y};
-    document.getElementById('calBanner').textContent='📐 2点目をクリック（終了はEsc）';
+    document.getElementById('calBanner').textContent=t('📐 2点目をクリック（終了はEsc）');
   } else {
     sheetMeasures().push({x1:measP1.x,y1:measP1.y,x2:p.x,y2:p.y});
     const mm=Math.round(Math.hypot(p.x-measP1.x,p.y-measP1.y)*mmpp());
     measP1=null; measHover=null;
-    document.getElementById('calBanner').textContent='📐 計測モード：1点目をクリック（終了はEsc）';
-    showHint(`計測：${mm.toLocaleString()} mm` + (mm<AISLE_TIGHT?'（通路としては狭めです）':''));
+    document.getElementById('calBanner').textContent=t('📐 計測モード：1点目をクリック（終了はEsc）');
+    showHint(t('計測：{mm} mm',{mm:mm.toLocaleString()}) + (mm<AISLE_TIGHT?t('（通路としては狭めです）'):''));
   }
   canvas.requestRenderAll();
 }
 function clearMeasures(){
   const s=activeSheet(); if(!s) return;
   const n=(s._meas||[]).length;
-  if(!n){ showHint('計測線はありません'); return; }
-  if(n>1 && !confirm(`計測線 ${n} 本をすべて消しますか？`)) return;
+  if(!n){ showHint(t('計測線はありません')); return; }
+  if(n>1 && !confirm(t('計測線 {n} 本をすべて消しますか？',{n}))) return;
   s._meas=[]; measP1=null; measHover=null; canvas.requestRenderAll();
-  showHint('計測線をクリアしました');
+  showHint(t('計測線をクリアしました'));
 }
 function measColor(mm){ return mm<AISLE_TIGHT? '#e63946' : (mm<AISLE_OK? '#e07c0a' : '#1f8f7d'); }
 function drawMeasures(){
@@ -3111,16 +3730,16 @@ function deleteSel(){ const objs=canvas.getActiveObjects(); if(!objs.length) ret
   objs.forEach(o=>canvas.remove(o)); canvas.discardActiveObject(); canvas.requestRenderAll(); updateWorkStatus(); autosave(); historyMark(); }
 // このシートに置いたパーツをすべて削除（Undoで戻せる）
 function clearFixtures(){
-  if(project.active<0){ showHint('先に図面シートを読み込んでください'); return; }
+  if(project.active<0){ showHint(t('先に図面シートを読み込んでください')); return; }
   const objs=canvas.getObjects();
-  if(!objs.length){ showHint('削除するパーツがありません'); return; }
-  if(!confirm(`このシートに配置した ${objs.length} 個のパーツをすべて削除しますか？\n（Ctrl+Z で元に戻せます）`)) return;
+  if(!objs.length){ showHint(t('削除するパーツがありません')); return; }
+  if(!confirm(t('このシートに配置した {n} 個のパーツをすべて削除しますか？\n（Ctrl+Z で元に戻せます）',{n:objs.length}))) return;
   canvas.discardActiveObject();
   objs.slice().forEach(o=>canvas.remove(o));
   canvas.requestRenderAll();
   updateWorkStatus(); autosave(); historyMark();
   if(isMobile()) closeDrawer();
-  showHint('配置をすべて削除しました（Ctrl+Z で戻せます）', 4000);
+  showHint(t('配置をすべて削除しました（Ctrl+Z で戻せます）'), 4000);
 }
 function duplicateSel(){ const o=canvas.getActiveObject(); if(!o) return;
   o.clone(cl=>{ cl.set({left:o.left+20/canvas.getZoom(), top:o.top+20/canvas.getZoom()});
@@ -3139,7 +3758,7 @@ function saveProject(){
   const data=serializeProject();
   const blob=new Blob([JSON.stringify(data)],{type:'application/json'});
   triggerDownload(URL.createObjectURL(blob), 'layout_'+new Date().toISOString().slice(0,10)+'.json');
-  showHint('プロジェクトを保存しました');
+  showHint(t('プロジェクトを保存しました'));
 }
 // 外部JSONは信用せず、型と値域を整えてから取り込む
 function sanitizeSheet(s){
@@ -3147,7 +3766,7 @@ function sanitizeSheet(s){
   const img = typeof s.image==='string' ? s.image : '';
   const mpp = Number(s.mmPerPixel);
   return {
-    name: String(s.name==null?'シート':s.name).slice(0,120),
+    name: String(s.name==null?t('シート'):s.name).slice(0,120),
     image: /^data:image\//.test(img) ? img : '',   // 埋め込み画像のみ許可（外部URLは読み込まない）
     mmPerPixel: (Number.isFinite(mpp)&&mpp>0) ? mpp : SAMPLE_MMPP,
     calibrated: !!s.calibrated,
@@ -3188,7 +3807,7 @@ function loadProjectData(data){
     canvas.clear(); canvas.backgroundColor='#fff'; canvas.setBackgroundImage(null,canvas.renderAll.bind(canvas));
   }
   updateWorkStatus(); updateScaleBox();
-  showHint(dropped ? `プロジェクトを読み込みました（${dropped}件のシートは形式が不正なため除外）` : 'プロジェクトを読み込みました');
+  showHint(dropped ? t('プロジェクトを読み込みました（{n}件のシートは形式が不正なため除外）',{n:dropped}) : t('プロジェクトを読み込みました'));
 }
 // 現在のシート（図面＋什器、グリッド無し）を合成してPNGのdataURLを生成
 /* ================= Pro: 出力強化（高解像度・実寸スケール） =================
@@ -3224,8 +3843,8 @@ function selectedScaleDenom(){
 }
 // 縮尺指定が実際に使えるか判定し、使えない理由を返す（使えるなら null）。
 function scaleBlockReason(s){
-  if(!s) return '図面がありません';
-  if(!s.calibrated) return '縮尺を設定してから実寸出力してください（未校正の図面では正確な縮尺になりません）';
+  if(!s) return t('図面がありません');
+  if(!s.calibrated) return t('縮尺を設定してから実寸出力してください（未校正の図面では正確な縮尺になりません）');
   return null;
 }
 function updateScaleNote(){
@@ -3238,22 +3857,22 @@ function updateScaleNote(){
   sel.disabled = !pro;
   if(!pro){
     if(sel.value!=='fit') sel.value='fit';
-    note.textContent = '実寸スケール印刷と高解像度出力は Pro 機能です。';
+    note.textContent = t('実寸スケール印刷と高解像度出力は Pro 機能です。');
     return;
   }
   const denom=selectedScaleDenom();
-  if(!denom){ note.textContent = 'Pro: 4倍精細で書き出します。'; return; }
+  if(!denom){ note.textContent = t('Pro: 4倍精細で書き出します。'); return; }
   const s=activeSheet();
   const reason=scaleBlockReason(s);
   if(reason){ note.textContent = '⚠ ' + reason; return; }
   const wmm = s._imgW * s.mmPerPixel, hmm = s._imgH * s.mmPerPixel;
   const dw = wmm/denom, dh = hmm/denom;
-  note.textContent = `1:${denom} で出力すると用紙上で約 ${dw.toFixed(0)}×${dh.toFixed(0)} mm になります。`
-    + ' 印刷時はプリンタ設定の倍率を「100%（実際のサイズ）」にしてください。';
+  note.textContent = t('1:{s} で出力すると用紙上で約 {w}×{h} mm になります。',{s:denom,w:dw.toFixed(0),h:dh.toFixed(0)})
+    + t(' 印刷時はプリンタ設定の倍率を「100%（実際のサイズ）」にしてください。');
 }
 
 function renderComposite(cb, multiplier){
-  const s=activeSheet(); if(!s){ showHint('図面がありません'); return; }
+  const s=activeSheet(); if(!s){ showHint(t('図面がありません')); return; }
   syncActiveObjects();
   const off=new fabric.StaticCanvas(null,{width:s._imgW,height:s._imgH,backgroundColor:'#fff'});
   fabric.Image.fromURL(s.image, img=>{
@@ -3287,28 +3906,28 @@ function dataURLtoBlob(url){
 }
 async function shareFile(file, title, fallback){
   try{
-    await navigator.share({ files:[file], title:title, text:'MiseFitsで作成したレイアウト図' });
-    showHint('共有メニューを開きました');
+    await navigator.share({ files:[file], title:title, text:t('MiseFitsで作成したレイアウト図') });
+    showHint(t('共有メニューを開きました'));
   }catch(e){
     if(e && e.name==='AbortError') return;           // ユーザーが閉じただけ
-    showHint('共有できなかったため、ファイルとして保存します', 4000);
+    showHint(t('共有できなかったため、ファイルとして保存します'), 4000);
     fallback();
   }
 }
 // 図面＋配置をPNGにして共有（写真・ファイル・ドライブ・AirDrop など）
 function shareLayoutImage(){
-  if(project.active<0){ showHint('先に図面シートを読み込んでください'); return; }
-  if(!canShareFiles()){ showHint('この端末は共有に未対応のため、PNGとして保存します', 4000); exportPNG(); return; }
+  if(project.active<0){ showHint(t('先に図面シートを読み込んでください')); return; }
+  if(!canShareFiles()){ showHint(t('この端末は共有に未対応のため、PNGとして保存します'), 4000); exportPNG(); return; }
   renderComposite((url,w,h,s)=>{
     const name=(s.name||'layout')+'.png';
     const file=new File([dataURLtoBlob(url)], name, {type:'image/png'});
-    shareFile(file, s.name||'MiseFits レイアウト', ()=>triggerDownload(url, name));
+    shareFile(file, s.name||t('MiseFits レイアウト'), ()=>triggerDownload(url, name));
   }, 2);
 }
 // 同じ内容をPDFにして共有
 function shareLayoutPDF(){
-  if(project.active<0){ showHint('先に図面シートを読み込んでください'); return; }
-  if(!canShareFiles()){ showHint('この端末は共有に未対応のため、PDFとして保存します', 4000); exportPDF(); return; }
+  if(project.active<0){ showHint(t('先に図面シートを読み込んでください')); return; }
+  if(!canShareFiles()){ showHint(t('この端末は共有に未対応のため、PDFとして保存します'), 4000); exportPDF(); return; }
   buildPDF((blob,name)=>{
     const file=new File([blob], name, {type:'application/pdf'});
     shareFile(file, name.replace(/\.pdf$/,''), ()=>triggerDownload(URL.createObjectURL(blob), name));
@@ -3329,20 +3948,20 @@ function exportPNG(){
     // 端末の上限で倍率が落ちることがあるので、実際に出た画素数をそのまま伝える
     const m=exportMultiplier(w,h);
     showHint(isPro()
-      ? `PNGを書き出しました（${Math.round(w*m)}×${Math.round(h*m)}px）`
-      : 'PNGを書き出しました', 3200);
+      ? t('PNGを書き出しました（{w}×{h}px）',{w:Math.round(w*m),h:Math.round(h*m)})
+      : t('PNGを書き出しました'), 3200);
   });
 }
 
 function exportPDF(){
   buildPDF((blob,name)=>{
     triggerDownload(URL.createObjectURL(blob), name);
-    showHint('PDFを書き出しました');
+    showHint(t('PDFを書き出しました'));
   });
 }
 // PDFを組み立てて cb(blob, filename) に渡す（出力と共有で共通）
 function buildPDF(cb){
-  if(!window.jspdf || !window.jspdf.jsPDF){ showHint('PDFライブラリの読み込みに失敗しました（オンライン環境が必要）'); return; }
+  if(!window.jspdf || !window.jspdf.jsPDF){ showHint(t('PDFライブラリの読み込みに失敗しました（オンライン環境が必要）')); return; }
   const fmt=(document.getElementById('paperSize')||{}).value || 'a4';
   const denom=selectedScaleDenom();
   if(denom){
@@ -3362,8 +3981,8 @@ function buildPDF(cb){
       dh = (h * s.mmPerPixel) / denom;
       if(dw > availW || dh > availH){
         // 収まらないまま出すと「1:50と書いてあるのに実際は違う」PDFになるため中止する
-        showHint(`1:${denom} では用紙に収まりません（必要 ${dw.toFixed(0)}×${dh.toFixed(0)}mm）。`
-          + '用紙を大きくするか、縮尺の数字を大きくしてください。', 6000);
+        showHint(t('1:{s} では用紙に収まりません（必要 {w}×{h}mm）。',{s:denom,w:dw.toFixed(0),h:dh.toFixed(0)})
+          + t('用紙を大きくするか、縮尺の数字を大きくしてください。'), 6000);
         return;
       }
     }else{
@@ -3410,8 +4029,8 @@ function printLayout(){
     if(img.complete) setTimeout(go,150); else img.onload=()=>setTimeout(go,150);
     // ブラウザ既定の「用紙に合わせる」が有効だと縮尺が狂うため、必ず案内する
     showHint(denom
-      ? `1:${denom} で印刷します。プリンタ設定の倍率を必ず「100%（実際のサイズ）」にしてください`
-      : '印刷ダイアログを準備しました', denom ? 6000 : 2600);
+      ? t('1:{s} で印刷します。プリンタ設定の倍率を必ず「100%（実際のサイズ）」にしてください',{s:denom})
+      : t('印刷ダイアログを準備しました'), denom ? 6000 : 2600);
   });
 }
 
@@ -3461,12 +4080,12 @@ function redo(){ historyGo(1); }
 function historyGo(dir){
   historyCommit();                               // 保留中の変更を確定してから移動
   const s=activeSheet();
-  if(!s||!s._hist){ showHint('先に図面シートを読み込んでください'); return; }
+  if(!s||!s._hist){ showHint(t('先に図面シートを読み込んでください')); return; }
   const i=s._histIdx+dir;
-  if(i<0){ showHint('これ以上は戻せません'); return; }
-  if(i>=s._hist.length){ showHint('これ以上は進めません'); return; }
+  if(i<0){ showHint(t('これ以上は戻せません')); return; }
+  if(i>=s._hist.length){ showHint(t('これ以上は進めません')); return; }
   s._histIdx=i;
-  historyApply(JSON.parse(s._hist[i]), dir<0?'元に戻しました':'やり直しました');
+  historyApply(JSON.parse(s._hist[i]), dir<0?t('元に戻しました'):t('やり直しました'));
 }
 function historyApply(state, msg){
   const s=activeSheet(); if(!s) return;
@@ -3515,7 +4134,7 @@ function persistProject(){
     updateWorkStatus();
     if(!autosaveWarned){
       autosaveWarned=true;
-      showHint('図面が大きいため自動保存できません。💾 保存(JSON) でファイルに保存してください', 7000);
+      showHint(t('図面が大きいため自動保存できません。💾 保存(JSON) でファイルに保存してください'), 7000);
     }
   }
 }
@@ -3534,7 +4153,7 @@ function tryRestore(){
   if(raw){
     try{ const data=JSON.parse(raw);
       if(data.sheets&&data.sheets.length){
-        if(confirm('前回の作業データが見つかりました。復元しますか？')){ loadProjectData(data); return; }
+        if(confirm(t('前回の作業データが見つかりました。復元しますか？'))){ loadProjectData(data); return; }
       }
     }catch(e){}
   }
@@ -3564,8 +4183,8 @@ function showHeroSlide(index){
 
 function sharePayload(){
   return {
-    title:'MiseFits | かんたん店舗レイアウトシミュレーター',
-    text:'ExcelやWordより気軽に、お店や施設のレイアウトを実寸で試せるMiseFits。',
+    title:t('MiseFits | かんたん店舗レイアウトシミュレーター'),
+    text:t('ExcelやWordより気軽に、お店や施設のレイアウトを実寸で試せるMiseFits。'),
     url:location.origin.includes('127.0.0.1') || location.origin.includes('localhost')
       ? 'https://misefits.kokokikaku.com/'
       : location.href
@@ -3574,7 +4193,7 @@ function sharePayload(){
 async function shareApp(){
   const payload=sharePayload();
   if(navigator.share){
-    try{ await navigator.share(payload); showHint('共有メニューを開きました'); return; }
+    try{ await navigator.share(payload); showHint(t('共有メニューを開きました')); return; }
     catch(e){ if(e.name==='AbortError') return; }
   }
   copyShareLink();
@@ -3593,9 +4212,9 @@ async function copyShareLink(){
   const p=sharePayload();
   try{
     await navigator.clipboard.writeText(p.url);
-    showHint('共有リンクをコピーしました');
+    showHint(t('共有リンクをコピーしました'));
   }catch(e){
-    prompt('このURLをコピーしてください', p.url);
+    prompt(t('このURLをコピーしてください'), p.url);
   }
 }
 
@@ -3603,7 +4222,7 @@ function bindEvents(){
   document.getElementById('addPdf').addEventListener('change',e=>{ if(e.target.files[0]) handlePdfFile(e.target.files[0]); e.target.value=''; });
   document.getElementById('addImg').addEventListener('change',e=>{ if(e.target.files[0]) handleImageFile(e.target.files[0]); e.target.value=''; });
   document.getElementById('loadProj').addEventListener('change',e=>{ const f=e.target.files[0]; if(!f) return;
-    const r=new FileReader(); r.onload=x=>{ try{ loadProjectData(JSON.parse(x.target.result)); }catch(err){ alert('読み込みに失敗しました'); } }; r.readAsText(f); e.target.value=''; });
+    const r=new FileReader(); r.onload=x=>{ try{ loadProjectData(JSON.parse(x.target.result)); }catch(err){ alert(t('読み込みに失敗しました')); } }; r.readAsText(f); e.target.value=''; });
 
   ['pW','pD','pA'].forEach(id=>document.getElementById(id).addEventListener('change',applyProps));
   document.getElementById('pASlider').addEventListener('input',e=>setAngle(+e.target.value));
