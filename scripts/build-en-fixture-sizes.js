@@ -94,7 +94,7 @@ const out = `<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Restaurant &amp; Shop Fixture Sizes (mm) — ${total} tables, counters and kitchen equipment | MiseFits</title>
-<meta name="description" content="Standard sizes in millimetres for ${total} restaurant, café, retail, salon, office and commercial kitchen fixtures — tables, booths, counters, shelving, sinks, fridges, fryers and more. Drop any of them onto your floor plan at real size.">
+<meta name="description" content="Standard sizes in mm for ${total} restaurant, café, retail, salon, office and commercial kitchen fixtures — tables, booths, counters, sinks and fridges. Free to place at real size.">
 <meta name="robots" content="index,follow">
 <link rel="canonical" href="https://misefits.kokokikaku.com/en/fixture-sizes.html">
 <link rel="alternate" hreflang="en" href="https://misefits.kokokikaku.com/en/fixture-sizes.html">
@@ -108,6 +108,7 @@ const out = `<!DOCTYPE html>
 <meta property="og:description" content="Standard sizes for tables, counters, shelving and kitchen equipment, ready to place on your floor plan.">
 <meta property="og:url" content="https://misefits.kokokikaku.com/en/fixture-sizes.html">
 <meta property="og:image" content="https://misefits.kokokikaku.com/assets/misefits-ogp.jpg">
+<meta property="og:image:alt" content="MiseFits floor plan and layout planner">
 <meta property="og:locale" content="en_AU">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#0066cc">
@@ -219,7 +220,8 @@ ${faqLd}
   var GA_ID = 'G-W0Y7GMPVRK';   /* MiseFits プロパティの測定ID */
   if(!GA_ID) return;
   try{ if(localStorage.getItem('misefitsAnalyticsOptOut')==='1'){ window['ga-disable-'+GA_ID]=true; return; } }catch(e){}
-  if(navigator.doNotTrack==='1'||window.doNotTrack==='1') return;
+  if(navigator.doNotTrack==='1'||window.doNotTrack==='1'||navigator.globalPrivacyControl===true) return;
+  try{ if(String(Intl.DateTimeFormat().resolvedOptions().timeZone).indexOf('Europe/')===0) return; }catch(e){}   /* EU/UK の同意バナー導入までは送らない */
   window.dataLayer=window.dataLayer||[];
   window.gtag=function(){window.dataLayer.push(arguments);};
   window.gtag('js', new Date());

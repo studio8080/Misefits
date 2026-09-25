@@ -30,11 +30,14 @@
   var GA_ID = 'G-W0Y7GMPVRK';   /* MiseFits プロパティの測定ID */
   if(!GA_ID) return;
   try{ if(localStorage.getItem('misefitsAnalyticsOptOut')==='1'){ window['ga-disable-'+GA_ID]=true; return; } }catch(e){}
-  if(navigator.doNotTrack==='1'||window.doNotTrack==='1') return;
+  if(navigator.doNotTrack==='1'||window.doNotTrack==='1'||navigator.globalPrivacyControl===true) return;
+  try{ if(String(Intl.DateTimeFormat().resolvedOptions().timeZone).indexOf('Europe/')===0) return; }catch(e){}   /* EU/UK の同意バナー導入までは送らない */
   window.dataLayer=window.dataLayer||[];
   window.gtag=function(){window.dataLayer.push(arguments);};
   window.gtag('js', new Date());
-  window.gtag('config', GA_ID, {anonymize_ip:true});
+  // session_id（キーを受け取る鍵）を GA に送らないよう、クエリを除いた URL を渡す
+  window.gtag('config', GA_ID, {anonymize_ip:true, page_location: location.origin + location.pathname});
+  if(window.top !== window.self){ try{ window.top.location = window.self.location; }catch(e){} }
   var s=document.createElement('script');
   s.async=true; s.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(GA_ID);
   document.head.appendChild(s);

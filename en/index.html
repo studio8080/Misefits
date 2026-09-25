@@ -4,9 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Free Restaurant Floor Plan Maker — trace your PDF plan at real size | MiseFits</title>
-<meta name="description" content="Plan a restaurant, café or shop layout on your own floor plan. Load the PDF from your landlord or architect, set the scale from one known length, and drag tables and kitchen equipment at real size. Seat count, aisle check, m² and sq ft. Free, no sign-up.">
+<meta name="description" content="Free restaurant & shop floor plan maker. Load your PDF plan, set the scale and place tables and kitchen equipment at real size. Seat count, aisle check, m² and sq ft.">
 <meta name="robots" content="index,follow">
 <link rel="canonical" href="https://misefits.kokokikaku.com/en/">
+<link rel="alternate" hreflang="en" href="https://misefits.kokokikaku.com/en/">
+<link rel="alternate" hreflang="ja" href="https://misefits.kokokikaku.com/">
+<link rel="alternate" hreflang="x-default" href="https://misefits.kokokikaku.com/">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com; font-src 'self' data:; connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta property="og:type" content="website">
@@ -18,6 +21,7 @@
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="MiseFits floor plan and layout planner">
 <meta property="og:locale" content="en_AU">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Free Restaurant Floor Plan Maker | MiseFits">
@@ -165,7 +169,8 @@
   var GA_ID = 'G-W0Y7GMPVRK';   /* MiseFits プロパティの測定ID */
   if(!GA_ID) return;
   try{ if(localStorage.getItem('misefitsAnalyticsOptOut')==='1'){ window['ga-disable-'+GA_ID]=true; return; } }catch(e){}
-  if(navigator.doNotTrack==='1'||window.doNotTrack==='1') return;
+  if(navigator.doNotTrack==='1'||window.doNotTrack==='1'||navigator.globalPrivacyControl===true) return;
+  try{ if(String(Intl.DateTimeFormat().resolvedOptions().timeZone).indexOf('Europe/')===0) return; }catch(e){}   /* EU/UK の同意バナー導入までは送らない */
   window.dataLayer=window.dataLayer||[];
   window.gtag=function(){window.dataLayer.push(arguments);};
   window.gtag('js', new Date());
@@ -247,7 +252,7 @@ function trackEvent(name, params){
       </div>
       <div class="plan pro">
         <h3>MiseFits Pro</h3>
-        <div class="price">US$19<small>one-time · not a subscription</small></div>
+        <div class="price">US$19<small>total incl. tax · one-time · not a subscription</small></div>
         <ul>
           <li>Free-shape editor for angled walls and irregular rooms</li>
           <li>Area trace — real area of any outlined region</li>
@@ -260,7 +265,7 @@ function trackEvent(name, params){
         <div class="soon" id="proSoon">Checkout for the English version is opening soon. Everything free already works — start planning now.</div>
       </div>
     </div>
-    <div class="note">Prices are in US dollars. Checkout is run by Stripe, and your order is sold through Link, LLC (Stripe's reseller), which is the merchant of record and handles local taxes such as GST and VAT. See our <a href="terms.html">terms and refund policy</a>.</div>
+    <div class="note">US$19 is the total price — it includes GST/VAT where applicable, and no tax is added at checkout. Checkout is run by Stripe, and your order is sold through Link, LLC (Stripe's reseller), which is the merchant of record and handles local taxes. Pro is not yet offered in the EU/EEA, the UK, Switzerland or the UAE. See our <a href="terms.html">terms and refund policy</a>.</div>
   </section>
 
   <section class="blk" id="faq">

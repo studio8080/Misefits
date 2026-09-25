@@ -29,6 +29,10 @@ const stripePriceIdEn = defineString('STRIPE_PRICE_ID_EN', { default: '' });
 const MP_TAX_COUNTRIES = new Set(('CM EG GH KE NG UG ZA ZM ZW AM AU AZ BN GE HK ID IL IN JP KG KR KW KZ LA MO MY NP NZ '
   + 'PH QA SA SG TH TJ TR TW VN AL BY CH GB GI IS LI MD NO RS UA AT BE BG CY CZ DE DK EE ES FI FR GR HR HU IE IT '
   + 'LT LU LV MT NL PL PT RO SE SI SK BB BM KY MX VG CA US').split(' '));
+// 税は MP が処理するが、GDPR（EU 代理人の設置・同意バナー）の準備ができるまで英語版を売らない地域。
+// 規約（en/terms.html）に「返金する」と明記してある。準備ができたらこの一覧から外して規約も直す。
+const EN_NOT_YET_OFFERED = new Set(('AT BE BG CY CZ DE DK EE ES FI FR GR HR HU IE IT LT LU LV MT NL PL PT RO SE SI SK '
+  + 'IS LI NO GB CH').split(' '));
 
 // ライセンスキーの控えメール。購入完了ページを閉じてしまった人がキーを失わないようにする。
 // ホスト名とポートは非個人情報なので通常のパラメータ（functions/.env）。
@@ -73,6 +77,7 @@ function licenseMailBodyEn(key) {
     '',
     'Help: https://misefits.kokokikaku.com/en/',
     'Refunds and terms: https://misefits.kokokikaku.com/en/terms.html',
+    'Questions or refunds: studio@kokokikaku.com',
     '',
     'MiseFits (by Koko Kikaku, Japan)',
   ].join('\n');
@@ -163,7 +168,8 @@ exports.stripeWebhook = onRequest(
       return;
     }
 
-    if (event.type !== 'checkout.session.completed') {
+    // 後から支払いが確定する決済手段（銀行振込型など）は async_payment_succeeded で届く
+    if (event.type !== 'checkout.session.completed' && event.type !== 'checkout.session.async_payment_succeeded') {
       res.status(200).send('ignored (unhandled event type)');
       return;
     }
@@ -204,7 +210,9 @@ exports.stripeWebhook = onRequest(
     const paymentIntent = typeof session.payment_intent === 'string' ? session.payment_intent : null;
     const country = session.customer_details?.address?.country || null;
     const outsideMpTax = lang === 'en' && !!country && !MP_TAX_COUNTRIES.has(country);
+    const notYetOffered = lang === 'en' && !!country && EN_NOT_YET_OFFERED.has(country);
     if (outsideMpTax) console.warn('English order from a country outside Managed Payments tax coverage', session.id, country);
+    if (notYetOffered) console.warn('English order from a country where Pro is not yet offered (refund it)', session.id, country);
     await db.collection('licenses').doc(key).set({
       email,
       sessionId: session.id,
@@ -212,6 +220,7 @@ exports.stripeWebhook = onRequest(
       lang,
       country,
       ...(outsideMpTax ? { outsideMpTax: true } : {}),
+      ...(notYetOffered ? { notYetOffered: true } : {}),
       createdAt: FieldValue.serverTimestamp(),
     });
     await sessionRef.set({

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Restaurant Floor Plan: Seats, Table Sizes and Aisle Widths | MiseFits</title>
-<meta name="description" content="Plan a restaurant or café floor plan to real size: work out how many seats fit your floor area, check table, booth and kitchen equipment sizes in mm, and measure aisle widths on your landlord's PDF. Free, no sign-up.">
+<meta name="description" content="How to plan a restaurant floor plan at real size: seat count from floor area, table and booth sizes, aisle widths and the kitchen balance — with a free planner.">
 <meta name="keywords" content="restaurant floor plan,restaurant layout planner,restaurant seating layout,restaurant table sizes,restaurant aisle width,how many seats restaurant,cafe floor plan,MiseFits">
 <meta name="robots" content="index,follow">
 <link rel="canonical" href="https://misefits.kokokikaku.com/en/restaurant-floor-plan.html">
@@ -12,7 +12,7 @@
 <link rel="alternate" hreflang="ja" href="https://misefits.kokokikaku.com/layout-restaurant.html">
 <link rel="alternate" hreflang="x-default" href="https://misefits.kokokikaku.com/en/restaurant-floor-plan.html">
 <!-- This page lives under /en/, so 'self' already covers ../assets/. The CSP is kept identical to the Japanese landing pages. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.a8.net; font-src 'self' data:; connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com; font-src 'self' data:; connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="MiseFits">
@@ -20,6 +20,7 @@
 <meta property="og:description" content="A practical method for seat count, table and kitchen equipment sizes in mm, and aisle widths — planned to real size on your own floor plan.">
 <meta property="og:url" content="https://misefits.kokokikaku.com/en/restaurant-floor-plan.html">
 <meta property="og:image" content="https://misefits.kokokikaku.com/assets/misefits-ogp.jpg">
+<meta property="og:image:alt" content="MiseFits floor plan and layout planner">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -268,7 +269,8 @@
   var GA_ID = 'G-W0Y7GMPVRK';   /* MiseFits property measurement ID */
   if(!GA_ID) return;
   try{ if(localStorage.getItem('misefitsAnalyticsOptOut')==='1'){ window['ga-disable-'+GA_ID]=true; return; } }catch(e){}
-  if(navigator.doNotTrack==='1'||window.doNotTrack==='1') return;
+  if(navigator.doNotTrack==='1'||window.doNotTrack==='1'||navigator.globalPrivacyControl===true) return;
+  try{ if(String(Intl.DateTimeFormat().resolvedOptions().timeZone).indexOf('Europe/')===0) return; }catch(e){}   /* EU/UK の同意バナー導入までは送らない */
   window.dataLayer=window.dataLayer||[];
   window.gtag=function(){window.dataLayer.push(arguments);};
   window.gtag('js', new Date());

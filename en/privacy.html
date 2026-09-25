@@ -9,6 +9,7 @@
 <link rel="canonical" href="https://misefits.kokokikaku.com/en/privacy.html">
 <link rel="alternate" hreflang="en" href="https://misefits.kokokikaku.com/en/privacy.html">
 <link rel="alternate" hreflang="ja" href="https://misefits.kokokikaku.com/privacy.html">
+<link rel="alternate" hreflang="x-default" href="https://misefits.kokokikaku.com/en/privacy.html">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com; font-src 'self' data:; connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="theme-color" content="#0066cc">
@@ -51,7 +52,8 @@
   var GA_ID = 'G-W0Y7GMPVRK';
   if(!GA_ID) return;
   try{ if(localStorage.getItem('misefitsAnalyticsOptOut')==='1'){ window['ga-disable-'+GA_ID]=true; return; } }catch(e){}
-  if(navigator.doNotTrack==='1'||window.doNotTrack==='1') return;
+  if(navigator.doNotTrack==='1'||window.doNotTrack==='1'||navigator.globalPrivacyControl===true) return;
+  try{ if(String(Intl.DateTimeFormat().resolvedOptions().timeZone).indexOf('Europe/')===0) return; }catch(e){}   /* EU/UK の同意バナー導入までは送らない */
   window.dataLayer=window.dataLayer||[];
   window.gtag=function(){window.dataLayer.push(arguments);};
   window.gtag('js', new Date());
@@ -70,7 +72,7 @@
 </header>
 <main>
   <h1>Privacy Policy &amp; Disclaimer</h1>
-  <p class="meta">MiseFits (“the Service”) is a browser tool for planning store and room layouts at real size, provided by Koko Kikaku, Japan (“we”). Effective 25 September 2026. The Japanese version is at <a href="../privacy.html" hreflang="ja">privacy.html</a>; if the two differ, this English version applies to users of the English Service.</p>
+  <p class="meta">MiseFits (“the Service”) is a browser tool for planning store and room layouts at real size, provided by Koko Kikaku, a sole proprietorship in Japan (“we”). Contact for privacy questions: <a href="mailto:studio@kokokikaku.com">studio@kokokikaku.com</a>. Effective 25 September 2026. The Japanese version is at <a href="../privacy.html" hreflang="ja">privacy.html</a>; if the two differ, this English version applies to users of the English Service.</p>
 
   <section>
     <h2>1. Your floor plans and layouts</h2>
@@ -85,7 +87,7 @@
 
   <section>
     <h2>2. Analytics and cookies</h2>
-    <p>To understand how the Service is used and improve it, we use Google Analytics 4, which uses cookies to collect pages viewed, referring sites, approximate region, and browser and device type. It does not collect your name, address, phone number or email, IP addresses are anonymised, and the content of your plans is never collected. If your browser sends “Do Not Track”, analytics is not loaded.</p>
+    <p>To understand how the Service is used and improve it, we use Google Analytics 4, which uses cookies to collect pages viewed, referring sites, approximate region, and browser and device type. It does not collect your name, address, phone number or email, Google Analytics 4 does not store IP addresses, and the content of your plans is never collected. If your browser sends “Do Not Track” or a Global Privacy Control signal, or your device is set to a European time zone (EU/EEA, UK, Switzerland), analytics is not loaded. We keep analytics data for no longer than 14 months.</p>
     <p>Information collected by Google is handled under <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google's Privacy Policy</a> (see also <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener">how Google uses data from sites that use its services</a>).</p>
     <div class="optout"><span id="optState">Checking…</span><button class="btn outline" id="optBtn" type="button">Toggle</button></div>
     <p style="margin-top:8px;">This setting applies to this browser on this device.</p>
@@ -100,7 +102,8 @@
       <tr><td>cdnjs (Cloudflare)</td><td>Libraries for drawing and reading PDFs</td><td>IP address, browser</td></tr>
       <tr><td>Google Analytics</td><td>Usage statistics</td><td>Pages viewed, referrer, region, device (cookies)</td></tr>
       <tr><td>Stripe / Link, LLC</td><td>Checkout, payment, receipts and tax for MiseFits Pro (Link, LLC is the merchant of record)</td><td>Details you enter at checkout, such as email, billing country and payment details. We never receive card numbers.</td></tr>
-      <tr><td>Firebase (Google Cloud)</td><td>Issuing and checking license keys</td><td>Purchase email, order ID, license key, IP address</td></tr>
+      <tr><td>Firebase (Google Cloud)</td><td>Issuing and checking license keys</td><td>Purchase email, billing country, checkout and payment IDs, license key, random device IDs, IP address</td></tr>
+      <tr><td>Google Workspace (Gmail)</td><td>Emailing your license key</td><td>Your email address and license key</td></tr>
     </table></div>
     <p>Your floor plans and layouts are never sent to any of these services.</p>
   </section>
@@ -112,12 +115,16 @@
       <li><strong>What we keep:</strong> to confirm your purchase and issue your key, we receive your email address, billing country and checkout ID from Stripe and store them with your license key in Firebase (Cloud Functions / Cloud Firestore). We use them only to deliver the key, provide support, handle refunds and prevent misuse.</li>
       <li><strong>Checking a key:</strong> when you enter a key in the app, the key and a random device ID created in your browser are sent to Firebase to check it and count devices (up to 5). Nothing about your plans is sent.</li>
       <li><strong>Unlock status:</strong> saved in your browser (localStorage). If you clear site data, enter the same key again.</li>
+      <li><strong>Where it is stored:</strong> purchase records are stored on Google Cloud in the United States and accessed from Japan. Our service providers (Google, Stripe) process data for us under contractual data-protection terms.</li>
+      <li><strong>How long:</strong> we keep purchase and license records while your license is valid and for up to 7 years after purchase (for tax and accounting records), then delete them.</li>
     </ul>
   </section>
 
   <section>
     <h2>5. Your choices and rights</h2>
-    <p>You can turn off analytics above at any time. To ask about, correct or delete the purchase information we hold (email, order ID, license key), contact us through <a href="https://kokokikaku.com/" target="_blank" rel="noopener">kokokikaku.com</a>. We will respond within a reasonable time and in line with the privacy law that applies to you. Deleting purchase records may mean we can no longer restore a lost key.</p>
+    <p>You can turn off analytics above at any time. To access, correct or delete the purchase information we hold (email, billing country, order IDs, license key), email <a href="mailto:studio@kokokikaku.com">studio@kokokikaku.com</a> from the address you used at purchase so we can confirm it is you. We will respond within 30 days and in line with the privacy law that applies to you. Deleting purchase records may mean we can no longer restore a lost key.</p>
+    <p>If you are not satisfied with our response, you can complain to your local regulator, for example the Office of the Australian Information Commissioner (OAIC), the New Zealand Office of the Privacy Commissioner, Singapore's Personal Data Protection Commission (PDPC) or Japan's Personal Information Protection Commission.</p>
+    <p>The Service is intended for business and adult users and is not directed at children under 16.</p>
   </section>
 
   <section>
@@ -127,7 +134,7 @@
       <li>The Service does not check compliance with building, fire, accessibility, health or any other regulations, which differ by country and city. Always confirm your design with a qualified local architect, certifier, contractor or authority.</li>
       <li>Fixture sizes are typical planning values. Check the specifications of the products you intend to buy.</li>
       <li>To the extent permitted by law, we are not liable for loss arising from use of the Service, including loss of auto-saved data. Save important work as a JSON file.</li>
-      <li>We may change or discontinue the Service without notice.</li>
+      <li>We may change or discontinue the free features of the Service. If we ever discontinue MiseFits Pro, we will give license holders notice and refunds as described in the <a href="terms.html">terms</a>.</li>
     </ul>
     <div class="box"><strong>Aisle colours</strong> (red under 600 mm, orange under 900 mm) are a quick planning guide only. Required widths depend on the use, size and occupancy of the space and on local rules.</div>
     <p style="margin-top:10px;">Nothing in this policy limits rights you have under consumer protection law in your country.</p>
@@ -135,7 +142,7 @@
 
   <section>
     <h2>7. Copyright, contact and changes</h2>
-    <p>The Service and its content belong to Koko Kikaku. Plans you load and layouts you create belong to you or their rightful owners; do not load plans you have no right to use. Contact: <a href="https://kokokikaku.com/" target="_blank" rel="noopener">kokokikaku.com</a>. We may update this policy; changes take effect when posted on this page.</p>
+    <p>The Service and its content belong to Koko Kikaku. Plans you load and layouts you create belong to you or their rightful owners; do not load plans you have no right to use. Contact: <a href="mailto:studio@kokokikaku.com">studio@kokokikaku.com</a>. We may update this policy; changes take effect when posted on this page, and we will email license holders about material changes.</p>
   </section>
 </main>
 <footer>

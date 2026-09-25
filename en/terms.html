@@ -47,7 +47,8 @@
   var GA_ID = 'G-W0Y7GMPVRK';
   if(!GA_ID) return;
   try{ if(localStorage.getItem('misefitsAnalyticsOptOut')==='1'){ window['ga-disable-'+GA_ID]=true; return; } }catch(e){}
-  if(navigator.doNotTrack==='1'||window.doNotTrack==='1') return;
+  if(navigator.doNotTrack==='1'||window.doNotTrack==='1'||navigator.globalPrivacyControl===true) return;
+  try{ if(String(Intl.DateTimeFormat().resolvedOptions().timeZone).indexOf('Europe/')===0) return; }catch(e){}   /* EU/UK の同意バナー導入までは送らない */
   window.dataLayer=window.dataLayer||[];
   window.gtag=function(){window.dataLayer.push(arguments);};
   window.gtag('js', new Date());
@@ -71,14 +72,14 @@
   <section>
     <h2>At a glance</h2>
     <dl>
-      <dt>Provider</dt><dd>Koko Kikaku (Japan) — contact via <a href="https://kokokikaku.com/" target="_blank" rel="noopener">kokokikaku.com</a></dd>
+      <dt>Provider</dt><dd>Koko Kikaku, a sole proprietorship in Japan. Email: <a href="mailto:studio@kokokikaku.com">studio@kokokikaku.com</a></dd>
       <dt>Product</dt><dd>MiseFits Pro — a one-time license that unlocks extra features in the MiseFits web app</dd>
-      <dt>Price</dt><dd>US$19, one-time. Applicable taxes (VAT/GST/sales tax) are calculated and shown at checkout.</dd>
+      <dt>Price</dt><dd>US$19 total, one-time — includes GST/VAT where applicable. No tax is added at checkout. Checkout may show the equivalent amount in your local currency.</dd>
       <dt>Seller of record</dt><dd>Orders are sold through Link, LLC, Stripe's reseller and the merchant of record, which handles payment, receipts and sales tax (GST/VAT). Your receipt comes from Link, and the charge on your card statement starts with <code>LINK.COM*</code>.</dd>
       <dt>Delivery</dt><dd>Your license key is shown right after checkout and emailed to the address you used.</dd>
       <dt>Devices</dt><dd>One key unlocks Pro in up to 5 browsers/devices.</dd>
       <dt>Refunds</dt><dd>Full refund on request within 14 days of purchase — see below.</dd>
-      <dt>Where you can buy</dt><dd>Pro can be bought from countries where our reseller handles local sales tax, including Australia, New Zealand, Singapore, the UK, the EU, Canada and the US. It is not currently offered in some countries, including the United Arab Emirates; orders from those countries are refunded. The free version works everywhere.</dd>
+      <dt>Where you can buy</dt><dd>Pro is currently offered to customers in Australia, New Zealand, Singapore and other countries where our reseller handles local sales tax. It is <strong>not yet offered</strong> in the European Union/EEA, the United Kingdom, Switzerland or the United Arab Emirates; orders from those countries are refunded in full. The free version works everywhere.</dd>
       <dt>Requirements</dt><dd>A current version of Chrome, Safari, Edge or Firefox and an internet connection. Try the free version first to check that it works on your device.</dd>
     </dl>
   </section>
@@ -93,16 +94,16 @@
     <ul>
       <li>A Pro license is a personal, non-transferable right to use the Pro features for as long as we operate the Service. It is not a subscription and never renews.</li>
       <li>You may use one key on up to 5 devices (counted per browser). If you replace devices and hit the limit, contact us and we will reset it.</li>
-      <li>Do not publish or share your key with people outside your business or household. Keys found shared publicly may be disabled.</li>
-      <li>We may add, change or improve Pro features over time. We will not remove the core Pro features listed on the <a href="./#pricing">pricing section</a> from existing license holders while the Service operates.</li>
+      <li>Do not publish or share your key with people outside your business or household. If we find a key shared publicly, we will contact you first and give you 14 days to respond before disabling it.</li>
+      <li>We may add, change or improve Pro features over time. We will not remove the core Pro features listed on the <a href="./#pricing">pricing section</a> from existing license holders. If we ever discontinue Pro, we will give at least 90 days' notice by email and refund licenses bought in the previous 12 months.</li>
     </ul>
   </section>
 
   <section id="refunds">
     <h2>3. Refunds</h2>
-    <p>If MiseFits Pro isn't right for you, ask for a refund within <strong>14 days</strong> of purchase and we will refund you in full — no reason needed. Contact us through <a href="https://kokokikaku.com/" target="_blank" rel="noopener">kokokikaku.com</a> with the email address you used at checkout. You can also request help from <a href="https://support.link.com/" target="_blank" rel="noopener">Link support</a>, which appears on your receipt.</p>
+    <p>If MiseFits Pro isn't right for you, ask for a refund within <strong>14 days</strong> of purchase and we will refund you in full — no reason needed. Email <a href="mailto:studio@kokokikaku.com">studio@kokokikaku.com</a> from (or mentioning) the email address you used at checkout. You can also request help from <a href="https://support.link.com/" target="_blank" rel="noopener">Link support</a>, which appears on your receipt.</p>
     <p>Refunds are paid back to the original payment method. Once refunded, the license key can no longer be used to unlock new devices.</p>
-    <p>Duplicate charges and payment errors are refunded at any time. Nothing in this policy limits your rights under the consumer law of your country (for example, the consumer guarantees under the Australian Consumer Law).</p>
+    <p>Duplicate charges and payment errors are refunded at any time. After 14 days, you may still be entitled to a refund or other remedy under consumer law if Pro has a major failure. Nothing in this policy limits your rights under the consumer law of your country (for example, the consumer guarantees under the Australian Consumer Law or the New Zealand Consumer Guarantees Act).</p>
   </section>
 
   <section>
@@ -112,12 +113,12 @@
 
   <section>
     <h2>5. Liability</h2>
-    <p>The Service is provided on an “as is” basis. To the extent permitted by law, our total liability relating to MiseFits Pro is limited to the amount you paid for it, and we are not liable for indirect loss or for loss of data saved in your browser. This does not exclude liability that cannot be excluded under applicable law.</p>
+    <p>Except for guarantees that cannot be excluded by law (such as those under the Australian Consumer Law and the New Zealand Consumer Guarantees Act), the Service is provided on an “as is” basis. To the extent permitted by law, our total liability relating to MiseFits Pro is limited to the amount you paid for it, and we are not liable for indirect loss or for loss of data saved in your browser. This does not exclude liability that cannot be excluded under applicable law.</p>
   </section>
 
   <section>
     <h2>6. Changes and law</h2>
-    <p>We may update these terms; the version posted here applies from the date shown. These terms are governed by the laws of Japan, without affecting any mandatory consumer protection that applies in your country of residence.</p>
+    <p>We may update these terms; the version posted here applies from the date shown. Changes will not reduce the rights of existing Pro license holders, and we will email license holders about material changes. These terms are governed by the laws of Japan, without affecting any mandatory consumer protection that applies in your country of residence.</p>
     <p>Privacy is covered in our <a href="privacy.html">privacy policy</a>.</p>
   </section>
 </main>

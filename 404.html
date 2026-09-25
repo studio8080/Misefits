@@ -51,7 +51,8 @@
   var GA_ID = 'G-W0Y7GMPVRK';   /* MiseFits プロパティの測定ID */
   if(!GA_ID) return;
   try{ if(localStorage.getItem('misefitsAnalyticsOptOut')==='1'){ window['ga-disable-'+GA_ID]=true; return; } }catch(e){}
-  if(navigator.doNotTrack==='1'||window.doNotTrack==='1') return;
+  if(navigator.doNotTrack==='1'||window.doNotTrack==='1'||navigator.globalPrivacyControl===true) return;
+  try{ if(String(Intl.DateTimeFormat().resolvedOptions().timeZone).indexOf('Europe/')===0) return; }catch(e){}   /* EU/UK の同意バナー導入までは送らない */
   window.dataLayer=window.dataLayer||[];
   window.gtag=function(){window.dataLayer.push(arguments);};
   window.gtag('js', new Date());
@@ -82,5 +83,27 @@
     </div>
     <div class="foot">Produced by <a href="https://kokokikaku.com/" target="_blank" rel="noopener">ここ企画</a></div>
   </div>
+<script>
+/* /en/ 配下、または英語を選んだことがある人には英語で案内する */
+(function(){
+  var en = location.pathname.indexOf('/en/') === 0;
+  try{ if(localStorage.getItem('misefitsLang') === 'en') en = true; }catch(e){}
+  if(!en) return;
+  document.documentElement.lang = 'en';
+  document.title = 'Page not found | MiseFits';
+  var q = function(s){ return document.querySelector(s); };
+  q('h1').textContent = 'We couldn\u2019t find that page.';
+  var ps = document.querySelectorAll('.box > p');
+  ps[0].textContent = 'The address may have changed or been mistyped.';
+  ps[1].textContent = 'Try the planner or one of the guides below.';
+  q('.actions').innerHTML = '<a class="btn" href="/?lang=en">Open MiseFits</a>'
+    + '<a class="btn outline" href="/en/">How it works</a>'
+    + '<a class="btn outline" href="/en/restaurant-floor-plan.html">Restaurant floor plans</a>'
+    + '<a class="btn outline" href="/en/fixture-sizes.html">Fixture sizes</a>'
+    + '<a class="btn outline" href="/en/privacy.html">Privacy</a>';
+  q('.foot').innerHTML = 'Made by Koko Kikaku, Japan';
+  q('.brand').setAttribute('href', '/en/');
+})();
+</script>
 </body>
 </html>

@@ -9,7 +9,7 @@
 <meta name="robots" content="index,follow">
 <link rel="canonical" href="https://misefits.kokokikaku.com/">
 <link rel="alternate" hreflang="ja" href="https://misefits.kokokikaku.com/">
-<link rel="alternate" hreflang="en" href="https://misefits.kokokikaku.com/?lang=en">
+<link rel="alternate" hreflang="en" href="https://misefits.kokokikaku.com/en/">
 <link rel="alternate" hreflang="x-default" href="https://misefits.kokokikaku.com/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="MiseFits">
@@ -74,7 +74,8 @@
   var GA_ID = 'G-W0Y7GMPVRK';   /* MiseFits プロパティの測定ID */
   if(!GA_ID) return;
   try{ if(localStorage.getItem('misefitsAnalyticsOptOut')==='1'){ window['ga-disable-'+GA_ID]=true; return; } }catch(e){}
-  if(navigator.doNotTrack==='1'||window.doNotTrack==='1') return;
+  if(navigator.doNotTrack==='1'||window.doNotTrack==='1'||navigator.globalPrivacyControl===true) return;
+  try{ if(String(Intl.DateTimeFormat().resolvedOptions().timeZone).indexOf('Europe/')===0) return; }catch(e){}   /* EU/UK の同意バナー導入までは送らない */
   window.dataLayer=window.dataLayer||[];
   window.gtag=function(){window.dataLayer.push(arguments);};
   window.gtag('js', new Date());
@@ -716,6 +717,7 @@ if(MF_LANG==='en') document.documentElement.lang = 'en';
   /* 言語別の出し分け。html[lang] は head のスクリプトで決まる */
   html[lang="en"] .only-ja{display:none !important;}
   html:not([lang="en"]) .only-en{display:none !important;}
+  html[lang="en"] body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,"Hiragino Kaku Gothic ProN","Yu Gothic UI",sans-serif;}
 </style>
 </head>
 <body>
@@ -865,7 +867,7 @@ if(MF_LANG==='en') document.documentElement.lang = 'en';
           <a class="btn sm ghost" href="pro.html" data-href-en="en/#pricing" target="_blank" rel="noopener">📘 使い方と購入の流れ</a>
         </div>
         <div class="row" style="margin-bottom:6px;">
-          <input type="text" id="webLicenseInput" class="inp" placeholder="MFPRO-XXXX-XXXX-XXXX-XXXX" style="flex:1;min-width:160px;">
+          <input type="text" id="webLicenseInput" class="inp" aria-label="ライセンスキー" placeholder="MFPRO-XXXX-XXXX-XXXX-XXXX" style="flex:1;min-width:160px;">
           <button class="btn sm" onclick="submitWebLicense()">解放する</button>
         </div>
         <div class="muted" id="webLicenseMsg"></div>
@@ -1033,10 +1035,10 @@ if(MF_LANG==='en') document.documentElement.lang = 'en';
       <div class="rotrow">
         <div class="rothead">
           <b>角度</b>
-          <input type="number" class="inp" id="pA" step="1" min="0" max="359">°
+          <input type="number" class="inp" id="pA" aria-label="角度" step="1" min="0" max="359">°
           <label class="snaplbl"><input type="checkbox" id="snapRot" checked>15°刻み</label>
         </div>
-        <input type="range" id="pASlider" class="rotslider" min="0" max="359" step="1" value="0">
+        <input type="range" id="pASlider" aria-label="角度" class="rotslider" min="0" max="359" step="1" value="0">
         <div class="rotbtns">
           <button class="btn sm ghost" onclick="rotateBy(-45)" title="反時計回り45°">⟲45°</button>
           <button class="btn sm ghost" onclick="rotateBy(-15)" title="反時計回り15°">⟲15°</button>
@@ -1462,7 +1464,9 @@ const I18N_EN = {
 "緑": "Green",
 "保存": "Save",
 "MiseFits Pro で次の機能が解放されます。": "MiseFits Pro unlocks the following:",
-"買い切り／サブスクではありません・登録不要": "One-time payment · not a subscription · no account needed",
+"買い切り／サブスクではありません・登録不要": "One-time payment incl. GST/VAT · not a subscription · no account needed",
+"ライセンスキー": "License key",
+"＋PDF": "+PDF",
 "自由形状エディタ（斜め壁・変形物件を頂点単位で作成）": "Free-shape editor (angled walls and irregular rooms, vertex by vertex)",
 "面積トレース（囲んだ範囲の実寸面積を自動計算）": "Area trace (real area of any outlined region)",
 "メモ機能（キャンバスに付箋を貼って残す）": "Notes (pin sticky notes on the canvas)",
@@ -1470,7 +1474,7 @@ const I18N_EN = {
 "実寸スケール印刷（1:20〜1:200で出力）": "True-scale printing (1:20 to 1:200)",
 "什器ライブラリ拡張（建築要素・設備など60点以上）": "Extended fixture library (60+ doors, columns, equipment and more)",
 "詳しく見る": "Learn more",
-"購入後に表示されるライセンスキーで、そのまま解放できます（同じキーで最大5台まで）。": "Unlock right away with the license key shown after purchase (one key works on up to 5 devices). ",
+"購入後に表示されるライセンスキーで、そのまま解放できます（同じキーで最大5台まで）。": "Unlock right away with the license key shown after purchase (one key works on up to 5 devices). Secure checkout by Stripe — your receipt and card statement show LINK.COM*. ",
 "すでにキーをお持ちの方": "Already have a key?",
 "プライバシー・免責": "Privacy & disclaimer",
 "ここ企画": "Koko Kikaku",
@@ -1497,7 +1501,9 @@ const I18N_EN = {
 "次: パーツを追加": "Next: add parts",
 "次: 縮尺を設定": "Next: set the scale",
 "席 {n}": "{n} seats",
+"席 {n}#one": "1 seat",
 "パーツ {n}": "{n} parts",
+"パーツ {n}#one": "1 part",
 "図面が大きく端末に自動保存できません。JSONで保存してください": "The plan is too large to auto-save on this device. Please save as JSON.",
 "自動保存できません": "Auto-save unavailable",
 "このシートを削除しますか？（配置した什器も消えます）": "Delete this sheet? (Its fixtures will be deleted too.)",
@@ -1584,6 +1590,7 @@ const I18N_EN = {
 "計測線をクリアしました": "Measurement lines cleared",
 "削除するパーツがありません": "There are no parts to delete",
 "このシートに配置した {n} 個のパーツをすべて削除しますか？\n（Ctrl+Z で元に戻せます）": "Delete all {n} parts on this sheet?\n(You can undo with Ctrl+Z.)",
+"このシートに配置した {n} 個のパーツをすべて削除しますか？\n（Ctrl+Z で元に戻せます）#one": "Delete the 1 part on this sheet?\n(You can undo with Ctrl+Z.)",
 "配置をすべて削除しました（Ctrl+Z で戻せます）": "All parts deleted (Ctrl+Z to undo)",
 "プロジェクトを保存しました": "Project saved",
 "シート": "Sheet",
@@ -1784,7 +1791,8 @@ const I18N_EN = {
 };
 Object.keys(I18N_EN).forEach(k=>{ I18N_EN[k] = I18N_EN[k].replace(/%PRICE%/g, PRO_PRICE_EN); });
 function t(s, v){
-  let r = (MF_LANG==='en' && Object.prototype.hasOwnProperty.call(I18N_EN, s)) ? I18N_EN[s] : s;
+  const key = (MF_LANG==='en' && v && v.n===1 && Object.prototype.hasOwnProperty.call(I18N_EN, s+'#one')) ? s+'#one' : s;
+  let r = (MF_LANG==='en' && Object.prototype.hasOwnProperty.call(I18N_EN, key)) ? I18N_EN[key] : s;
   if(v) r = r.replace(/\{(\w+)\}/g, (m,k)=> Object.prototype.hasOwnProperty.call(v,k) ? v[k] : m);
   return r;
 }
@@ -1822,8 +1830,8 @@ if(MF_LANG==='en'){
   document.title = t('MiseFits｜2Dの間取り・店舗レイアウトシミュレーター（無料・登録不要）');
   const md = document.querySelector('meta[name="description"]');
   if(md) md.setAttribute('content', I18N_EN.__META_DESC__);
-  const cn = document.querySelector('link[rel="canonical"]');
-  if(cn) cn.setAttribute('href', 'https://misefits.kokokikaku.com/?lang=en');
+  const mf = document.querySelector('link[rel="manifest"]');
+  if(mf) mf.setAttribute('href', 'manifest-en.webmanifest');
   applyI18nDom(document.body);
 }
 </script>
@@ -3469,7 +3477,7 @@ function measClick(p){
     const mm=Math.round(Math.hypot(p.x-measP1.x,p.y-measP1.y)*mmpp());
     measP1=null; measHover=null;
     document.getElementById('calBanner').textContent=t('📐 計測モード：1点目をクリック（終了はEsc）');
-    showHint(t('計測：{mm} mm',{mm:mm.toLocaleString()}) + (mm<AISLE_TIGHT?t('（通路としては狭めです）'):''));
+    showHint(t('計測：{mm} mm',{mm:mm.toLocaleString(MF_LANG==='en'?'en':'ja')}) + (mm<AISLE_TIGHT?t('（通路としては狭めです）'):''));
   }
   canvas.requestRenderAll();
 }
@@ -3499,7 +3507,7 @@ function drawMeasures(){
     ctx.setLineDash([]);
     ctx.beginPath(); ctx.moveTo(x1-nx,y1-ny); ctx.lineTo(x1+nx,y1+ny);
     ctx.moveTo(x2-nx,y2-ny); ctx.lineTo(x2+nx,y2+ny); ctx.stroke();
-    const txt=mm>=1000? `${mm.toLocaleString()} mm (${(mm/1000).toFixed(2)} m)` : `${mm} mm`;
+    const txt=mm>=1000? `${mm.toLocaleString(MF_LANG==='en'?'en':'ja')} mm (${(mm/1000).toFixed(2)} m)` : `${mm} mm`;
     ctx.font='bold 12px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
     const w=ctx.measureText(txt).width+14;
     const cx=(x1+x2)/2, cy=(y1+y2)/2;
@@ -4189,7 +4197,9 @@ function sharePayload(){
   return {
     title:t('MiseFits | かんたん店舗レイアウトシミュレーター'),
     text:t('ExcelやWordより気軽に、お店や施設のレイアウトを実寸で試せるMiseFits。'),
-    url:location.origin.includes('127.0.0.1') || location.origin.includes('localhost')
+    url:MF_LANG==='en'
+      ? 'https://misefits.kokokikaku.com/en/'
+      : location.origin.includes('127.0.0.1') || location.origin.includes('localhost')
       ? 'https://misefits.kokokikaku.com/'
       : location.href
   };

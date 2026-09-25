@@ -9,6 +9,7 @@
 <link rel="canonical" href="https://misefits.kokokikaku.com/privacy.html">
 <link rel="alternate" hreflang="ja" href="https://misefits.kokokikaku.com/privacy.html">
 <link rel="alternate" hreflang="en" href="https://misefits.kokokikaku.com/en/privacy.html">
+<link rel="alternate" hreflang="x-default" href="https://misefits.kokokikaku.com/en/privacy.html">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com; font-src 'self' data:; connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta property="og:type" content="article">
@@ -103,7 +104,8 @@
   var GA_ID = 'G-W0Y7GMPVRK';   /* MiseFits プロパティの測定ID */
   if(!GA_ID) return;
   try{ if(localStorage.getItem('misefitsAnalyticsOptOut')==='1'){ window['ga-disable-'+GA_ID]=true; return; } }catch(e){}
-  if(navigator.doNotTrack==='1'||window.doNotTrack==='1') return;
+  if(navigator.doNotTrack==='1'||window.doNotTrack==='1'||navigator.globalPrivacyControl===true) return;
+  try{ if(String(Intl.DateTimeFormat().resolvedOptions().timeZone).indexOf('Europe/')===0) return; }catch(e){}   /* EU/UK の同意バナー導入までは送らない */
   window.dataLayer=window.dataLayer||[];
   window.gtag=function(){window.dataLayer.push(arguments);};
   window.gtag('js', new Date());
@@ -160,7 +162,7 @@
       <li>Googleアナリティクスは、閲覧されたページ、参照元、おおまかな地域、ブラウザや端末の種類などの情報を、<strong>Cookieを用いて匿名で収集</strong>します。</li>
       <li>収集される情報に、氏名・住所・電話番号・メールアドレスなど、<strong>個人を特定できる情報は含まれません</strong>。IPアドレスは匿名化した状態で扱います。</li>
       <li><strong>読み込んだ図面や配置したレイアウトの内容は、解析の対象外です</strong>。これらが送信されることは一切ありません。</li>
-      <li>ブラウザの「Do Not Track（トラッキング拒否）」設定が有効な場合、解析は読み込まれません。</li>
+      <li>ブラウザの「Do Not Track（トラッキング拒否）」または「Global Privacy Control」の設定が有効な場合、またはブラウザのタイムゾーンが欧州（EU・英国・スイスなど）の場合、解析は読み込まれません。</li>
       <li>収集された情報はGoogleのプライバシーポリシーに基づいて管理されます。詳細は <a href="https://policies.google.com/privacy?hl=ja" target="_blank" rel="noopener">Googleのプライバシーポリシー</a> および <a href="https://policies.google.com/technologies/partner-sites?hl=ja" target="_blank" rel="noopener">Googleのサービスを使用するサイトやアプリから収集した情報のGoogleによる使用</a> をご確認ください。</li>
     </ul>
 
