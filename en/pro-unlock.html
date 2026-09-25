@@ -97,7 +97,7 @@ function trackEvent(name, params){
 
     <div id="noClaimNote" class="warn" style="display:none;">
       <b>Your key will arrive by email</b>
-      This browser didn't start the checkout, so we can't show the key here. It has been emailed to the address you used at checkout. Paste it under “MiseFits Pro” in the app's side panel to unlock.
+      This page is only for returning from checkout, so there is no order to show here. If you have bought MiseFits Pro, your key was emailed to the address you used at checkout — paste it under “MiseFits Pro” in the app's side panel to unlock.
     </div>
   </div>
 </main>
@@ -113,15 +113,15 @@ function trackEvent(name, params){
 </footer>
 
 <script>
-/* Lemon Squeezy 購入後のリダイレクト先。アプリ（または en/ の料金欄）が決済前に localStorage へ保存した
-   claim を使って、Cloud Functions の claimLicense からキーを受け取る。ロジックは日本語版 pro-unlock.html に合わせてある。 */
+/* Stripe Managed Payments の Payment Link で購入した後のリダイレクト先。
+   Payment Link の完了後URLを en/pro-unlock.html?session_id={CHECKOUT_SESSION_ID} にしておくと、
+   日本語版 pro-unlock.html と同じ issueLicense でキーを受け取れる。 */
 (function(){
   var FUNCTIONS_BASE = 'https://us-central1-misefits.cloudfunctions.net';
   var PRICE_USD = 19;
   var WEB_LICENSE_STORAGE_KEY = 'misefitsWebLicense';
   var WEB_DEVICE_STORAGE_KEY = 'misefitsDeviceId';
-  var claim = '';
-  try{ claim = localStorage.getItem('misefitsLsClaim') || ''; }catch(e){}
+  var sessionId = new URLSearchParams(location.search).get('session_id') || '';
 
   var $ = function(id){ return document.getElementById(id); };
   var loading=$('loading'), result=$('result'), successNote=$('successNote'), errorNote=$('errorNote'),
@@ -139,15 +139,16 @@ function trackEvent(name, params){
       return id;
     }catch(e){ return ''; }
   }
+  // 決済完了の計測。リロードで二重計上しないよう、session_id 単位で1回だけ送る。
   function trackPurchaseOnce(){
-    var flag = 'misefitsPurchaseTracked:' + claim;
+    var flag = 'misefitsPurchaseTracked:' + sessionId;
     try{ if(localStorage.getItem(flag)==='1') return; }catch(e){}
-    trackEvent('purchase', { transaction_id: 'ls-' + claim, value: PRICE_USD, currency: 'USD',
-      items: [{ item_id:'misefits_pro', item_name:'MiseFits Pro', price:PRICE_USD, quantity:1 }] });
+    trackEvent('purchase', { transaction_id: sessionId, value: PRICE_USD, currency: 'USD',
+      items: [{ item_id:'misefits_pro_en', item_name:'MiseFits Pro (EN)', price:PRICE_USD, quantity:1 }] });
     try{ localStorage.setItem(flag, '1'); }catch(e){}
   }
 
-  if(!/^[a-z0-9]{16,64}$/.test(claim)){
+  if(!sessionId){
     loading.style.display = 'none';
     $('fetchingLine').style.display = 'none';
     noClaimNote.style.display = 'block';
@@ -161,7 +162,7 @@ function trackEvent(name, params){
     trackPurchaseOnce();
   }
   function pollForKey(left){
-    fetch(FUNCTIONS_BASE + '/claimLicense?claim=' + encodeURIComponent(claim))
+    fetch(FUNCTIONS_BASE + '/issueLicense?session_id=' + encodeURIComponent(sessionId))
       .then(function(r){ return r.ok ? r.json() : { found:false }; })
       .catch(function(){ return { found:false }; })
       .then(function(data){
@@ -186,7 +187,7 @@ function trackEvent(name, params){
       .then(function(r){ return r.json(); })
       .then(function(data){
         if(data && data.valid){
-          try{ localStorage.setItem(WEB_LICENSE_STORAGE_KEY, key); localStorage.removeItem('misefitsLsClaim'); }catch(e){}
+          try{ localStorage.setItem(WEB_LICENSE_STORAGE_KEY, key); }catch(e){}
           trackEvent('license_unlock_success', { location: 'pro_unlock_en' });
           unlockMsg.textContent = 'Unlocked. Opening MiseFits…';
           location.href = '../?lang=en';

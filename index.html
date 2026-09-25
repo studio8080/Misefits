@@ -2053,7 +2053,7 @@ document.addEventListener('message', handleNativeMessage); // WebView実装差�
 // 本番のStripe決済リンク。本番モードのPayment Linkを作成したらここに入れる
 // （テストモードのリンクは公開版に置かないこと）。空のあいだはキー入力欄へ誘導する。
 const PRO_PURCHASE_URL_JA = 'https://buy.stripe.com/cNi7sEb0eg2g7HtcOv9R600';
-// 英語版（海外向け）は Lemon Squeezy の Checkout。ストアの本番化後にURLを入れる。
+// 英語版（海外向け）は Stripe Managed Payments（US$19）の Payment Link。作成後にURLを入れる。
 // 空のあいだは購入ボタンを出さず、ロック機能に触れたらキー入力欄へ案内する（従来の挙動）。
 const PRO_PURCHASE_URL_EN = '';
 const PRO_PURCHASE_URL = MF_LANG==='en' ? PRO_PURCHASE_URL_EN : PRO_PURCHASE_URL_JA;
@@ -2113,18 +2113,7 @@ function closeProModal(){ document.getElementById('proModalBackdrop').classList.
 function proceedToProPurchase(){
   trackEvent('pro_buy_click', { feature: proModalFeature, location: 'app_modal' });
   closeProModal();
-  window.open(MF_LANG==='en' ? lemonCheckoutUrl() : PRO_PURCHASE_URL, '_blank', 'noopener');
-}
-// Lemon Squeezy は購入完了ページへ注文IDを渡さないので、ランダムな claim を作って
-// checkout[custom][claim] で持たせる。完了ページ（en/pro-unlock.html）は同じ claim でキーを受け取る。
-function lemonCheckoutUrl(){
-  let claim='';
-  try{
-    const buf=new Uint8Array(16); crypto.getRandomValues(buf);
-    claim=Array.from(buf, b=>b.toString(16).padStart(2,'0')).join('');
-    localStorage.setItem('misefitsLsClaim', claim);
-  }catch(e){}
-  return PRO_PURCHASE_URL_EN + (PRO_PURCHASE_URL_EN.indexOf('?')<0 ? '?' : '&') + 'checkout%5Bcustom%5D%5Bclaim%5D=' + claim;
+  window.open(PRO_PURCHASE_URL, '_blank', 'noopener');
 }
 
 /* ================= Web版の買い切りライセンス（MiseFits Pro・¥1,480） =================

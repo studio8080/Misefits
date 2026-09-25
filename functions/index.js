@@ -19,6 +19,16 @@ const stripeSecretKey = defineSecret('STRIPE_SECRET_KEY');
 const stripeWebhookSecret = defineSecret('STRIPE_WEBHOOK_SECRET');
 // Price IDは秘匿情報ではないので通常のパラメータとして扱う（誤発行防止用・任意）
 const stripePriceId = defineString('STRIPE_PRICE_ID', { default: '' });
+// 英語版（海外向け）の Price ID。Stripe Managed Payments（MoR は Link, LLC）で US$19 で売る商品。
+// 同じ Stripe アカウント・同じ webhook で受けるので、どちらの Price に一致したかで控えメールの言語を決める。
+// 片方でも設定されていれば、どちらにも一致しない決済はキーを出さずに捨てる（MenuFits の決済を拾わないため）。
+const stripePriceIdEn = defineString('STRIPE_PRICE_ID_EN', { default: '' });
+// Managed Payments が越境販売の間接税を処理する国（docs.stripe.com/payments/managed-payments/tax-compliance、
+// 2026-09-25 時点）。これ以外の国（例：UAE）からの英語版の注文は、税務がこちらの責任になるので
+// licenses に outsideMpTax を立ててログに残す。見つけたら返金して案内する運用（AGENTS.md）。
+const MP_TAX_COUNTRIES = new Set(('CM EG GH KE NG UG ZA ZM ZW AM AU AZ BN GE HK ID IL IN JP KG KR KW KZ LA MO MY NP NZ '
+  + 'PH QA SA SG TH TJ TR TW VN AL BY CH GB GI IS LI MD NO RS UA AT BE BG CY CZ DE DK EE ES FI FR GR HR HU IE IT '
+  + 'LT LU LV MT NL PL PT RO SE SI SK BB BM KY MX VG CA US').split(' '));
 
 // ライセンスキーの控えメール。購入完了ページを閉じてしまった人がキーを失わないようにする。
 // ホスト名とポートは非個人情報なので通常のパラメータ（functions/.env）。
@@ -30,16 +40,6 @@ const smtpPort = defineString('SMTP_PORT', { default: '465' });
 const smtpUser = defineSecret('SMTP_USER');
 const mailFrom = defineSecret('MAIL_FROM');
 const smtpPass = defineSecret('SMTP_PASS');
-
-// 海外向け（英語版）の販売は Lemon Squeezy（Merchant of Record）。各国の VAT/GST は先方が処理する。
-// キーは Stripe 分と同じ MFPRO- 形式で licenses に発行するので、アプリ側の検証経路は1本のまま。
-// 署名用シークレットは Lemon Squeezy の Webhook 設定画面で決めた値を Secret Manager に入れる。
-const lsWebhookSecret = defineSecret('LEMONSQUEEZY_WEBHOOK_SECRET');
-// 対象商品の Product ID（数字）。MenuFits の教訓で、ここが違うと購入が成立してもキーが出ない。
-// 空なら素通しになる（誤ったIDよりはまし、という Stripe 側と同じ非直感的な挙動）。
-const lsProductId = defineString('LEMONSQUEEZY_PRODUCT_ID', { default: '' });
-// テストモードの注文でもキーを出すか。検証中だけ 'true' にし、本番販売の前に必ず 'false' へ戻す。
-const lsAllowTest = defineString('LEMONSQUEEZY_ALLOW_TEST', { default: 'false' });
 
 const ALLOWED_ORIGIN = 'https://misefits.kokokikaku.com';
 const KEY_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; // 0/O/1/I/L等の紛らわしい文字を除いたbase32相当
@@ -143,6 +143,26 @@ exports.stripeWebhook = onRequest(
       return;
     }
 
+    // 返金されたらキーを無効にする（新しい端末では解放できなくなる）。全額返金のときだけ。
+    // Stripe の webhook エンドポイントで charge.refunded も購読しておくこと。
+    if (event.type === 'charge.refunded') {
+      const charge = event.data.object;
+      const pi = typeof charge.payment_intent === 'string' ? charge.payment_intent : charge.payment_intent?.id;
+      if (charge.refunded && pi) {
+        const link = await db.collection('paymentIntents').doc(pi).get();
+        if (link.exists) {
+          await db.collection('licenses').doc(link.data().licenseKey).update({
+            revoked: true,
+            revokedAt: FieldValue.serverTimestamp(),
+          });
+          res.status(200).send('ok (refund recorded)');
+          return;
+        }
+      }
+      res.status(200).send('ignored (no license for this charge)');
+      return;
+    }
+
     if (event.type !== 'checkout.session.completed') {
       res.status(200).send('ignored (unhandled event type)');
       return;
@@ -154,12 +174,18 @@ exports.stripeWebhook = onRequest(
       return;
     }
 
-    // 対象Price IDのみ処理（将来Web版で他の商品を売るようになった場合の誤発行防止）
-    const priceId = stripePriceId.value();
-    if (priceId) {
+    // 対象Price IDのみ処理（MenuFits など同じアカウントの別商品への誤発行防止）。
+    // 日本語版（¥1,480・通常決済）と英語版（US$19・Managed Payments）のどちらに一致したかで言語を決める。
+    const priceJa = stripePriceId.value();
+    const priceEn = stripePriceIdEn.value();
+    let lang = 'ja';
+    if (priceJa || priceEn) {
       const lineItems = await stripe.checkout.sessions.listLineItems(session.id, { limit: 10 });
-      const matches = lineItems.data.some((li) => li.price && li.price.id === priceId);
-      if (!matches) {
+      const has = (id) => !!id && lineItems.data.some((li) => li.price && li.price.id === id);
+      if (has(priceEn)) {
+        lang = 'en';
+      } else if (!has(priceJa)) {
+        console.warn('checkout for an unrelated price ignored', session.id);
         res.status(200).send('ignored (unrelated price)');
         return;
       }
@@ -175,20 +201,32 @@ exports.stripeWebhook = onRequest(
 
     const key = generateLicenseKey();
     const email = session.customer_details?.email ?? null;
+    const paymentIntent = typeof session.payment_intent === 'string' ? session.payment_intent : null;
+    const country = session.customer_details?.address?.country || null;
+    const outsideMpTax = lang === 'en' && !!country && !MP_TAX_COUNTRIES.has(country);
+    if (outsideMpTax) console.warn('English order from a country outside Managed Payments tax coverage', session.id, country);
     await db.collection('licenses').doc(key).set({
       email,
       sessionId: session.id,
+      paymentIntent,
+      lang,
+      country,
+      ...(outsideMpTax ? { outsideMpTax: true } : {}),
       createdAt: FieldValue.serverTimestamp(),
     });
     await sessionRef.set({
       licenseKey: key,
       createdAt: FieldValue.serverTimestamp(),
     });
+    // 返金（charge.refunded）からキーを引けるようにしておく
+    if (paymentIntent) {
+      await db.collection('paymentIntents').doc(paymentIntent).set({ licenseKey: key });
+    }
 
     // キーの控えをメールで送る。失敗してもwebhookは成功扱いにする
     // （ここで500を返すとStripeが再送し、sessionRefの重複ガードで二度と送れなくなる）。
     try {
-      const result = await sendLicenseMail(email, key);
+      const result = await sendLicenseMail(email, key, lang);
       await db.collection('licenses').doc(key).update(
         result.sent
           ? { mailSentAt: FieldValue.serverTimestamp() }
@@ -237,8 +275,8 @@ exports.verifyLicense = onRequest({ cors: [ALLOWED_ORIGIN] }, async (req, res) =
     res.status(200).json({ valid: false });
     return;
   }
-  // 返金されたキー（Lemon Squeezy の order_refunded で立てる）は新しい端末では解放させない。
-  // 既に解放済みの端末は localStorage で動き続ける（アカウント無しの設計上、遡って止める手段は持たない）。
+  // 返金されたキーは新しい端末では解放させない。既に解放済みの端末は localStorage で動き続ける
+  // （アカウント無しの設計上、遡って止める手段は持たない）。
   if (doc.data().revoked) {
     res.status(200).json({ valid: false, reason: 'revoked' });
     return;
@@ -258,125 +296,6 @@ exports.verifyLicense = onRequest({ cors: [ALLOWED_ORIGIN] }, async (req, res) =
   }
   await ref.update({ devices: FieldValue.arrayUnion(device) });
   res.status(200).json({ valid: true });
-});
-
-// ---- Lemon Squeezy（英語版・海外向け） ----
-// 購入完了ページ（en/pro-unlock.html）は Stripe の session_id のような識別子を受け取れないため、
-// アプリ側で作ったランダムな claim を checkout[custom][claim] で渡し、webhook の custom_data で受け取る。
-const CLAIM_RE = /^[a-z0-9]{16,64}$/;
-
-function verifyLsSignature(req, secret) {
-  const sig = String(req.headers['x-signature'] || '');
-  if (!sig || !secret || !req.rawBody) return false;
-  const digest = crypto.createHmac('sha256', secret).update(req.rawBody).digest('hex');
-  const a = Buffer.from(digest, 'utf8');
-  const b = Buffer.from(sig, 'utf8');
-  return a.length === b.length && crypto.timingSafeEqual(a, b);
-}
-
-exports.lemonSqueezyWebhook = onRequest(
-  { secrets: [lsWebhookSecret, smtpUser, mailFrom, smtpPass] },
-  async (req, res) => {
-    if (!verifyLsSignature(req, lsWebhookSecret.value())) {
-      res.status(400).send('signature verification failed');
-      return;
-    }
-    const body = req.body || {};
-    const meta = body.meta || {};
-    const order = body.data || {};
-    const attrs = order.attributes || {};
-    const orderId = String(order.id || '');
-    if (!orderId || order.type !== 'orders') {
-      res.status(200).send('ignored (not an order)');
-      return;
-    }
-
-    if (meta.event_name === 'order_refunded') {
-      const ls = await db.collection('lsOrders').doc(orderId).get();
-      if (ls.exists) {
-        await db.collection('licenses').doc(ls.data().licenseKey).update({
-          revoked: true,
-          revokedAt: FieldValue.serverTimestamp(),
-        });
-      }
-      res.status(200).send('ok (refund recorded)');
-      return;
-    }
-    if (meta.event_name !== 'order_created') {
-      res.status(200).send('ignored (unhandled event type)');
-      return;
-    }
-    if (attrs.status !== 'paid') {
-      res.status(200).send('ignored (not paid)');
-      return;
-    }
-    if (attrs.test_mode && lsAllowTest.value() !== 'true') {
-      // 本番で黙って捨てると気づけないので、ログには必ず残す
-      console.warn('Lemon Squeezy test-mode order ignored', orderId);
-      res.status(200).send('ignored (test mode)');
-      return;
-    }
-    const productId = lsProductId.value();
-    const item = attrs.first_order_item || {};
-    if (productId && String(item.product_id) !== productId) {
-      console.warn('Lemon Squeezy order for another product ignored', orderId, item.product_id);
-      res.status(200).send('ignored (unrelated product)');
-      return;
-    }
-
-    // 再送に備えて、同じ注文には1回だけ発行する
-    const orderRef = db.collection('lsOrders').doc(orderId);
-    if ((await orderRef.get()).exists) {
-      res.status(200).send('already processed');
-      return;
-    }
-
-    const key = generateLicenseKey();
-    const email = attrs.user_email || null;
-    await db.collection('licenses').doc(key).set({
-      email,
-      source: 'lemonsqueezy',
-      lsOrderId: orderId,
-      testMode: !!attrs.test_mode,
-      createdAt: FieldValue.serverTimestamp(),
-    });
-    await orderRef.set({ licenseKey: key, createdAt: FieldValue.serverTimestamp() });
-
-    const claim = String((meta.custom_data || {}).claim || '');
-    if (CLAIM_RE.test(claim)) {
-      await db.collection('lsClaims').doc(claim).set({ licenseKey: key, createdAt: FieldValue.serverTimestamp() });
-    }
-
-    // Stripe 側と同じく、メールの失敗で webhook を落とさない（再送されると重複ガードで二度と送れない）
-    try {
-      const result = await sendLicenseMail(email, key, 'en');
-      await db.collection('licenses').doc(key).update(
-        result.sent ? { mailSentAt: FieldValue.serverTimestamp() } : { mailSkipped: result.reason }
-      );
-    } catch (err) {
-      console.error('license mail failed', err);
-      await db.collection('licenses').doc(key)
-        .update({ mailError: String((err && err.message) || err) })
-        .catch(() => {});
-    }
-
-    res.status(200).send('ok');
-  }
-);
-
-// 購入完了ページがキーを受け取るための読み取り専用API（issueLicense の Lemon Squeezy 版）
-exports.claimLicense = onRequest({ cors: [ALLOWED_ORIGIN] }, async (req, res) => {
-  const claim = String(req.query.claim || '');
-  if (!CLAIM_RE.test(claim)) {
-    res.status(400).json({ error: 'invalid claim' });
-    return;
-  }
-  const doc = await db.collection('lsClaims').doc(claim).get();
-  if (!doc.exists) {
-    res.status(404).json({ found: false });
-    return;
-  }
-  res.status(200).json({ found: true, key: doc.data().licenseKey });
 });
 
 // MenuFits（menufits.kokokikaku.com）の買い切り販売。別売り・別コレクション・別Webhook。

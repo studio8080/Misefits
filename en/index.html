@@ -260,7 +260,7 @@ function trackEvent(name, params){
         <div class="soon" id="proSoon">Checkout for the English version is opening soon. Everything free already works — start planning now.</div>
       </div>
     </div>
-    <div class="note">Prices are in US dollars. Local taxes (VAT/GST) are calculated at checkout by our reseller, Lemon Squeezy, which handles payment and tax as the merchant of record. See our <a href="terms.html">terms and refund policy</a>.</div>
+    <div class="note">Prices are in US dollars. Checkout is run by Stripe, and your order is sold through Link, LLC (Stripe's reseller), which is the merchant of record and handles local taxes such as GST and VAT. See our <a href="terms.html">terms and refund policy</a>.</div>
   </section>
 
   <section class="blk" id="faq">
@@ -304,7 +304,7 @@ function trackEvent(name, params){
   <p class="legalnote">Sizes, seat counts and aisle colours in MiseFits are planning estimates, not design values. They do not confirm compliance with building, fire, accessibility or health regulations, which vary by country and city. Confirm your final layout with a qualified local professional.</p>
 </footer>
 <script>
-/* Pro の購入ボタン。英語版は Lemon Squeezy の Checkout に、アプリと同じ claim を付けて送る。
+/* Pro の購入ボタン。英語版は Stripe Managed Payments の Payment Link。
    PRO_PURCHASE_URL_EN は index.html と同じ値にそろえること（空のあいだはボタンを出さない）。 */
 (function(){
   var PRO_PURCHASE_URL_EN = '';
@@ -312,14 +312,8 @@ function trackEvent(name, params){
   if(!PRO_PURCHASE_URL_EN) return;
   btn.style.display = ''; soon.style.display = 'none';
   btn.addEventListener('click', function(){
-    var claim = '';
-    try{
-      var buf = new Uint8Array(16); crypto.getRandomValues(buf);
-      for(var i=0;i<buf.length;i++) claim += ('0'+buf[i].toString(16)).slice(-2);
-      localStorage.setItem('misefitsLsClaim', claim);
-    }catch(e){}
     trackEvent('pro_buy_click', { feature:'landing', location:'en_pricing' });
-    window.open(PRO_PURCHASE_URL_EN + (PRO_PURCHASE_URL_EN.indexOf('?')<0 ? '?' : '&') + 'checkout%5Bcustom%5D%5Bclaim%5D=' + claim, '_blank', 'noopener');
+    window.open(PRO_PURCHASE_URL_EN, '_blank', 'noopener');
   });
 })();
 </script>

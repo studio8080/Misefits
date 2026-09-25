@@ -77,7 +77,7 @@ ${rows}
 const chips = sections.map((s) => `<a href="#${s.id}">${esc(s.name)}<span>${s.count}</span></a>`).join('\n      ');
 const faq = [
   ['Where do these sizes come from?', 'They are the default sizes of the parts in MiseFits — typical sizes used for planning. Real products vary by manufacturer, so check the model you intend to buy and overwrite the width and depth in the app.'],
-  ['Why millimetres?', 'Floor plans in Australia, Singapore, the UAE, the UK and most of the world are drawn in millimetres. Inches are shown rounded to the nearest whole inch for reference only.'],
+  ['Why millimetres?', 'Floor plans in Australia, New Zealand, Singapore, the UK and most of the world are drawn in millimetres. Inches are shown rounded to the nearest whole inch for reference only.'],
   ['What does “Pro” mean?', `Items marked Pro are part of MiseFits Pro (US$19 one-time). The other ${'${FREE}'} items are free to use.`],
   ['Do these sizes include clearance around the item?', 'No. They are the footprint of the item itself. Leave room for chairs to pull out, doors to open and people to pass — measure the gaps with the aisle tool in the app.'],
 ];

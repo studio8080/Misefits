@@ -133,10 +133,10 @@ firebase functions:log --only menufitsStripeWebhook --project misefits
 
 ### 英語版（海外向け）— 2026-09-25 追加
 
-**対象**：第1弾はメートル法の英語圏（AU・SG・UAE・NZ）。英国・アイルランド・カナダは、GA4 の同意バナーを
-入れてから（英国は GA4 に同意が必要。EU も同様）。米国はインチ表記の対応が要るので後回し。
-**価格**：US$19 の買い切り（日本語版の ¥1,480 とは別売り・別決済）。地域別の値下げは後から
-Lemon Squeezy の割引コード（ParityDeals 等）で足す想定。
+**対象**：第1弾は **オーストラリア・シンガポール・ニュージーランド**（メートル法の英語圏で、MP が税を処理する国）。
+UAE は MP が税を処理しないので外した。英国・アイルランド・カナダは、GA4 の同意バナーを入れてから
+（英国は GA4 に同意が必要。EU も同様）。米国はインチ表記の対応が要るので後回し。
+**価格**：US$19 の買い切り（日本語版の ¥1,480 とは別売り・別決済）。地域別の値下げは後から Stripe のプロモーションコードで足す想定。
 
 **アプリ本体（`index.html`）は同じファイルのまま英語でも表示する。フォークしない。**
 
@@ -161,37 +161,42 @@ Lemon Squeezy の割引コード（ParityDeals 等）で足す想定。
 - **広告（A8）は英語ページに出さない**（A8 は国内専用）。英語圏の候補は Amazon の各国版（.com.au / .sg / .ae）・
   Nisbets（Awin・英愛）。日本在住で登録できるかは申請して確かめる。
 
-**決済：Lemon Squeezy（Merchant of Record）**。各国の VAT/GST の計算・納付は先方が行う。
+**決済：Stripe Managed Payments（MP）**。2026-09-25 に Lemon Squeezy から方針変更（Lemon Squeezy は
+MP への統合を進めており、後で移行する二度手間を避けるため）。販売者（Merchant of Record）は **Link, LLC**
+（Stripe の再販事業者・米国）で、対応国の VAT/GST の計算・徴収・申告・納付は Stripe が行う。
 
-- アプリの購入ボタン → `lemonCheckoutUrl()` がランダムな claim を作って localStorage（`misefitsLsClaim`）に置き、
-  `checkout[custom][claim]` を付けて Checkout を開く → webhook（`lemonSqueezyWebhook`）が **Stripe 分と同じ
-  `MFPRO-` 形式のキー**を `licenses` に発行し、`lsClaims/{claim}` に紐づけ、英語の控えメールを送る →
-  購入後のリダイレクト先 `en/pro-unlock.html` が `claimLicense?claim=` でキーを受け取る。
-  **アプリ側の検証経路（`verifyLicense`）は日英で1本のまま。**
-- `order_refunded` で `licenses/{key}.revoked = true`。以後そのキーは新しい端末で解放できない
-  （解放済みの端末は動き続ける。アカウント無しの設計上、遡って止める手段はない）。
+- **日本語版（¥1,480・通常の Stripe 決済）はそのまま。** 英語版だけ、MP を有効にした別の商品（US$19）と
+  Payment Link で売る。同じ Stripe アカウント・同じ `stripeWebhook` で受け、`STRIPE_PRICE_ID`（日本語版）と
+  `STRIPE_PRICE_ID_EN`（英語版）のどちらに一致したかで控えメールの言語を決める。キーは同じ `MFPRO-` 形式で、
+  **アプリ側の検証経路（`verifyLicense`）は日英で1本**。
+- Payment Link の完了後URLは `https://misefits.kokokikaku.com/en/pro-unlock.html?session_id={CHECKOUT_SESSION_ID}`。
+  日本語版と同じ `issueLicense` でキーを受け取る。
+- 返金：webhook エンドポイントで **`charge.refunded` も購読**しておくと、全額返金で `licenses/{key}.revoked = true`
+  になり、以後そのキーは新しい端末で解放できない（`paymentIntents/{pi}` からキーを引く。日本語版の返金にも効く）。
+  MP では Link のサポートが客の返金依頼を受け、**48時間以内に返事がないと Stripe が承認なしに返金することがある**。
+  ダッシュボードのサポート用メールアドレスを常に最新にしておく。
+- **MP が税を処理しない国**（UAE など。一覧は `functions/index.js` の `MP_TAX_COUNTRIES`、出典は Stripe の
+  tax-compliance ドキュメント）からの英語版の注文は、税務がこちらの責任になる。webhook が `licenses` に
+  `outsideMpTax: true` を立て、ログに警告を出すので、**見つけたら返金して案内する**（規約 en/terms.html に明記済み）。
+- **MP は日本の事業者の国内販売（日本の客）の消費税を扱わない。** 英語版で日本の客が買った分は国内の課税売上として
+  日本語版の売上と同じく自分で扱う。
 - 決済URL `PRO_PURCHASE_URL_EN` は **`index.html` と `en/index.html` の2か所**にある。空のあいだは
   購入ボタンを出さない（ロック機能に触れるとキー入力欄へ案内する従来の挙動になる）。変更時は両方そろえる。
-- **Lemon Squeezy の新規登録は、Stripe Managed Payments（MP）へ案内される可能性がある**（2026-09 時点で
-  登録入口が Stripe の「事業について教えて」フォームに変わっている）。MP になった場合は Stripe の Checkout
-  なので、既存の `stripeWebhook` を別の Price ID でも通すように直せばよい。**ただし MP は日本国内の客への
-  販売の消費税を扱わない**（国内販売の申告は自分で行う）。
+- MP の決済画面はカスタムドメイン非対応。客の明細は `LINK.COM* <明細書表記>`、領収書は Link から届く。
 
-**開通手順（人がやること）**
+**開通手順**
 
-1. Lemon Squeezy でストアを作る（本人確認あり・通常2〜3営業日）。商品「MiseFits Pro」US$19・単発。
-   商品のリダイレクト先（Confirmation の Button link）を `https://misefits.kokokikaku.com/en/pro-unlock.html` にする。
-2. Webhook を作る：URL `https://us-central1-misefits.cloudfunctions.net/lemonSqueezyWebhook`、
-   イベント `order_created` と `order_refunded`、署名用シークレットを決める。
-3. **`firebase functions:secrets:set LEMONSQUEEZY_WEBHOOK_SECRET --project misefits` を先にやる。**
-   このシークレットが存在しないと、**functions 全体のデプロイが失敗する**（MenuFits の修正も出せなくなる）。
-4. `functions/.env` の `LEMONSQUEEZY_PRODUCT_ID` に商品IDを入れ、テスト中だけ `LEMONSQUEEZY_ALLOW_TEST=true`。
-   `firebase deploy --only functions --project misefits`。
-5. テストモードで購入 → `en/pro-unlock.html` にキーが出る → アプリで解放できる → 返金で `revoked` になる、を確認。
-6. `LEMONSQUEEZY_ALLOW_TEST=false` に戻してデプロイ。本番の Checkout URL を `PRO_PURCHASE_URL_EN`（2か所）に入れて push。
+1. Stripe ダッシュボードで Managed Payments を有効にする（対象：日本の事業者も可。デジタル商品のみ）。
+2. 商品「MiseFits Pro (English)」US$19・単発、税コードはデジタル商品（ソフトウェア）を選ぶ。
+   Managed Payments を有効にした Payment Link を作り、完了後URLを上記の `session_id` 付きURLにする。
+3. `functions/.env` の `STRIPE_PRICE_ID_EN` にその Price ID を入れる。
+4. 既存の webhook エンドポイント（`stripeWebhook`）の購読イベントに `charge.refunded` を足す。
+5. `firebase deploy --only functions:stripeWebhook,functions:verifyLicense --project misefits`。
+6. テスト（少額の本番購入 → 返金でもよい）で、キー表示・英語メール・アプリでの解放・返金後の `revoked` を確認。
+7. Payment Link のURLを `PRO_PURCHASE_URL_EN`（2か所）に入れて push。
 
-**税務**：MoR 経由の売上は海外法人（Lemon Squeezy）への販売で、日本の消費税は**不課税**として扱う
-（2026-09-25 に本人が確認済み）。所得税・法人税の売上には入る。
+**税務**：MP 経由の売上は海外法人（Link, LLC）への販売で、日本の消費税は**不課税**として扱う
+（2026-09-25 に本人が確認済み。Lemon Squeezy 経由と同じ整理）。所得税・法人税の売上には入る。
 
 ### アクセス解析（GA4）
 
