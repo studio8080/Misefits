@@ -253,7 +253,7 @@ exports.stripeWebhook = onRequest(
   }
 );
 
-exports.issueLicense = onRequest({ cors: [ALLOWED_ORIGIN] }, async (req, res) => {
+exports.issueLicense = onRequest({ cors: [ALLOWED_ORIGIN], maxInstances: 5 }, async (req, res) => {
   const sessionId = req.query.session_id;
   if (!sessionId) {
     res.status(400).json({ error: 'missing session_id' });
@@ -271,7 +271,7 @@ exports.issueLicense = onRequest({ cors: [ALLOWED_ORIGIN] }, async (req, res) =>
 // 未知のデバイスは空きがあれば devices 配列に登録（＝1枠消費）、上限超過なら
 // {valid:false, reason:'device_limit'} を返す。device無しの呼び出し（旧クライアント）は
 // 存在チェックのみ行い枠を消費しない（後方互換）。
-exports.verifyLicense = onRequest({ cors: [ALLOWED_ORIGIN] }, async (req, res) => {
+exports.verifyLicense = onRequest({ cors: [ALLOWED_ORIGIN], maxInstances: 5 }, async (req, res) => {
   const key = String(req.query.key || '').trim().toUpperCase();
   const device = String(req.query.device || '').slice(0, 64);
   if (!key) {

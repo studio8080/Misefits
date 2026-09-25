@@ -103,12 +103,6 @@ if(MF_LANG==='en') document.documentElement.lang = 'en';
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"
   integrity="sha384-sLpuECXYCB5TUyTbC06pftm/rgurDambREZmV4eRHwEqJzCQtU6lxI2Ve00z4XW5"
   crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"
-  integrity="sha384-/1qUCSGwTur9vjf/z9lmu/eCUYbpOTgSjmpbMQZ1/CtX2v/WcAIKqRv+U1DUCG6e"
-  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
-  integrity="sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk"
-  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <style>
   :root{
     --bg:#eef1f5; --panel:#ffffff; --line:#dfe4ec; --ink:#242933; --sub:#667085;
@@ -1085,8 +1079,8 @@ if(MF_LANG==='en') document.documentElement.lang = 'en';
 </div>
 
 <div class="modal-backdrop" id="shapeModalBackdrop">
-  <div class="modal">
-    <div class="modal-head"><b>白紙シートを作成</b>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="shapeModalTitle">
+    <div class="modal-head"><b id="shapeModalTitle">白紙シートを作成</b>
       <button class="phbtn" onclick="closeShapeModal()" aria-label="閉じる">✕</button>
     </div>
 
@@ -1163,8 +1157,8 @@ if(MF_LANG==='en') document.documentElement.lang = 'en';
 
 <!-- Pro: メモの編集モーダル -->
 <div class="modal-backdrop" id="memoModalBackdrop">
-  <div class="modal">
-    <div class="modal-head"><b>メモを編集</b>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="memoModalTitle">
+    <div class="modal-head"><b id="memoModalTitle">メモを編集</b>
       <button class="phbtn" onclick="closeMemoEditor()" aria-label="閉じる">✕</button>
     </div>
     <label class="memo-label" for="memoText">内容（改行できます）</label>
@@ -1185,8 +1179,8 @@ if(MF_LANG==='en') document.documentElement.lang = 'en';
 
 <!-- Pro: 購入前の説明モーダル。何が解放されるか・買い切りである点を見せてから決済ページへ送る。 -->
 <div class="modal-backdrop" id="proModalBackdrop">
-  <div class="modal">
-    <div class="modal-head"><b>MiseFits Pro</b>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="proModalTitle">
+    <div class="modal-head"><b id="proModalTitle">MiseFits Pro</b>
       <button class="phbtn" onclick="closeProModal()" aria-label="閉じる">✕</button>
     </div>
     <p class="pro-modal-lead" id="proModalLead">MiseFits Pro で次の機能が解放されます。</p>
@@ -1838,6 +1832,36 @@ if(MF_LANG==='en'){
 <script>
 /* ================= サンプル図面データ（100DPI, 実寸 6.35 mm/px = 1:25） ================= */
 const SAMPLES = {};
+
+/* ================= PDF 系ライブラリの遅延読み込み =================
+   pdf.js（PDF読込）と jsPDF（PDF出力）は起動に不要なので、起動後のアイドル時間にバックグラウンドで読む。
+   使う時点で未読込なら待ってから続ける。SRI はここで付ける（URL とハッシュは以前の script タグと同じ）。
+   テスト用に CDN を vendor/ へ差し替える sed（AGENTS.md）は、この URL 文字列にもそのまま効く。 */
+const LAZY_LIBS = {
+  pdfjs: { src:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
+           integrity:'sha384-/1qUCSGwTur9vjf/z9lmu/eCUYbpOTgSjmpbMQZ1/CtX2v/WcAIKqRv+U1DUCG6e',
+           ready:()=>!!window.pdfjsLib,
+           init:()=>{ pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; } },
+  jspdf: { src:'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
+           integrity:'sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk',
+           ready:()=>!!(window.jspdf && window.jspdf.jsPDF) },
+};
+const lazyLibPromises = {};
+function loadLib(name){
+  const lib = LAZY_LIBS[name];
+  if(lib.ready()) return Promise.resolve();
+  if(lazyLibPromises[name]) return lazyLibPromises[name];
+  lazyLibPromises[name] = new Promise((resolve, reject)=>{
+    const s = document.createElement('script');
+    s.src = lib.src;
+    if(!/^vendor\//.test(lib.src)){ s.integrity = lib.integrity; s.crossOrigin = 'anonymous'; }
+    s.referrerPolicy = 'no-referrer';
+    s.onload = ()=>{ try{ if(lib.init) lib.init(); }catch(e){} lib.ready() ? resolve() : reject(new Error(name+' not ready')); };
+    s.onerror = ()=>{ delete lazyLibPromises[name]; reject(new Error(name+' failed to load')); };
+    document.head.appendChild(s);
+  });
+  return lazyLibPromises[name];
+}
 const SAMPLE_MMPP = 6.35; // 25.4/100*25
 
 /* ================= 什器ライブラリ =================
@@ -2209,8 +2233,9 @@ window.addEventListener('load', ()=>{
   fabric.Object.prototype.set({ transparentCorners:false, cornerColor:'#0066cc', cornerStyle:'circle',
       borderColor:'#0066cc', cornerSize:9, padding:2, borderScaleFactor:1.4 });
   fabric.Object.prototype.touchCornerSize = 32; // タッチ操作用の大きめハンドル
-  if (window['pdfjsLib']) pdfjsLib.GlobalWorkerOptions.workerSrc =
-      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  // PDF 系ライブラリは起動後に読む（最初の描画を遅らせない）
+  const warmLibs=()=>{ loadLib('pdfjs').catch(()=>{}); loadLib('jspdf').catch(()=>{}); };
+  if('requestIdleCallback' in window) requestIdleCallback(warmLibs, {timeout:3000}); else setTimeout(warmLibs, 1500);
 
   canvas = new fabric.Canvas('c', { selection:true, preserveObjectStacking:true, backgroundColor:'#ffffff' });
   // タップしやすいよう当たり判定に余裕（タッチは大きめ）
@@ -2438,7 +2463,10 @@ function handleImageFile(file, name){
 }
 
 async function handlePdfFile(file){
-  if(!window.pdfjsLib){ showHint(t('PDFの読み込みに必要なライブラリを読み込めませんでした（オンライン環境が必要です）'), 5000); return; }
+  if(!window.pdfjsLib){
+    try{ await loadLib('pdfjs'); }
+    catch(e){ showHint(t('PDFの読み込みに必要なライブラリを読み込めませんでした（オンライン環境が必要です）'), 5000); return; }
+  }
   const hadExisting = project.sheets.length>0;     // 既に図面がある状態への追加か
   try{
     const buf=await file.arrayBuffer();
@@ -3973,7 +4001,10 @@ function exportPDF(){
 }
 // PDFを組み立てて cb(blob, filename) に渡す（出力と共有で共通）
 function buildPDF(cb){
-  if(!window.jspdf || !window.jspdf.jsPDF){ showHint(t('PDFライブラリの読み込みに失敗しました（オンライン環境が必要）')); return; }
+  if(!window.jspdf || !window.jspdf.jsPDF){
+    loadLib('jspdf').then(()=>buildPDF(cb)).catch(()=>showHint(t('PDFライブラリの読み込みに失敗しました（オンライン環境が必要）')));
+    return;
+  }
   const fmt=(document.getElementById('paperSize')||{}).value || 'a4';
   const denom=selectedScaleDenom();
   if(denom){
