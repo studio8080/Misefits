@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free Restaurant Floor Plan Maker — trace your PDF plan at real size | MiseFits</title>
+<meta name="description" content="Plan a restaurant, café or shop layout on your own floor plan. Load the PDF from your landlord or architect, set the scale from one known length, and drag tables and kitchen equipment at real size. Seat count, aisle check, m² and sq ft. Free, no sign-up.">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://misefits.kokokikaku.com/en/">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com; font-src 'self' data:; connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MiseFits">
+<meta property="og:title" content="Free Restaurant Floor Plan Maker — trace your PDF plan at real size">
+<meta property="og:description" content="Load your floor plan PDF, set the scale, and drag tables and kitchen equipment at real size. Seat count, aisle check, m² and sq ft. Free, no sign-up.">
+<meta property="og:url" content="https://misefits.kokokikaku.com/en/">
+<meta property="og:image" content="https://misefits.kokokikaku.com/assets/misefits-ogp.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_AU">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Free Restaurant Floor Plan Maker | MiseFits">
+<meta name="twitter:description" content="Trace your PDF floor plan at real size and try table layouts. Seat count, aisle check, m² and sq ft. Free, no sign-up.">
+<meta name="twitter:image" content="https://misefits.kokokikaku.com/assets/misefits-ogp.jpg">
+<meta name="theme-color" content="#0066cc">
+<link rel="icon" href="../assets/misefits-favicon.png">
+<link rel="apple-touch-icon" href="../assets/misefits-icon.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "MiseFits",
+      "url": "https://misefits.kokokikaku.com/?lang=en",
+      "applicationCategory": "DesignApplication",
+      "operatingSystem": "Any (web browser)",
+      "inLanguage": "en",
+      "description": "Browser-based 2D floor plan and store layout planner. Load a PDF or image floor plan, calibrate the scale, and place restaurant, retail and office fixtures at real size.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "publisher": { "@type": "Organization", "name": "Koko Kikaku", "url": "https://kokokikaku.com/" }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        { "@type": "Question", "name": "Is MiseFits free?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Loading plans, setting the scale, placing fixtures, measuring aisles, seat counts and PNG/PDF export are free with no sign-up. MiseFits Pro is an optional one-time purchase that adds extra tools." } },
+        { "@type": "Question", "name": "Do I need to create an account?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. MiseFits runs in your browser. Your work is saved on your own device, and you can save a project file (JSON) to continue later." } },
+        { "@type": "Question", "name": "Is my floor plan uploaded anywhere?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. Plans and layouts are processed only inside your browser and are never sent to our servers." } },
+        { "@type": "Question", "name": "Can I see areas in square feet?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. In the English version, every area is shown in both m² and sq ft, so you can compare a layout with a listing quoted per square foot." } },
+        { "@type": "Question", "name": "Is it a subscription?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. MiseFits Pro is a one-time payment of US$19. One license key works on up to five devices." } }
+      ]
+    }
+  ]
+}
+</script>
+<style>
+  :root{
+    --bg:#eef1f5; --panel:#ffffff; --line:#dfe4ec; --ink:#242933; --sub:#667085;
+    --accent:#0066cc; --accent2:#004f9f; --accent-soft:#e8f2ff; --sun:#ffb545; --mint:#2a9d8f;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;scroll-padding-top:86px;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);
+    line-height:1.7;-webkit-text-size-adjust:100%;}
+  a{color:var(--accent);}
+  .page-top{position:sticky;top:0;z-index:20;height:72px;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:14px;padding:0 18px;box-shadow:0 1px 14px rgba(25,33,46,.07);}
+  .brand{display:flex;align-items:center;gap:12px;min-width:0;text-decoration:none;}
+  .brand-icon{width:46px;height:46px;border-radius:14px;object-fit:contain;flex:0 0 auto;
+    filter:drop-shadow(0 9px 18px rgba(0,80,160,.19));}
+  .brand-name{font-family:Arial Rounded MT Bold,Arial,sans-serif;font-weight:900;font-size:25px;letter-spacing:.015em;color:#102033;line-height:1;}
+  .brand-name .fit{color:var(--accent);font-style:italic;letter-spacing:-.01em;}
+  .brand-name .dot{display:inline-block;width:8px;height:8px;margin-left:5px;border-radius:999px;background:var(--sun);
+    vertical-align:top;transform:translateY(4px);}
+  .brand small{display:block;color:var(--sub);font-weight:700;font-size:11.5px;line-height:1.35;margin-top:3px;}
+  .top-sp{flex:1;}
+  .btn{display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:#fff;border:1px solid var(--accent);
+    border-radius:9px;padding:10px 16px;font-size:13px;font-weight:800;text-decoration:none;white-space:nowrap;cursor:pointer;font-family:inherit;}
+  .btn:hover{background:var(--accent2);border-color:var(--accent2);}
+  .btn.outline{background:#fff;color:var(--accent);}
+  .btn.outline:hover{background:var(--accent-soft);}
+  .btn.pop{background:var(--sun);border-color:var(--sun);color:#3b2600;}
+  .btn.pop:hover{background:#f5a524;border-color:#f5a524;}
+  main{max-width:900px;margin:0 auto;padding:26px 18px 60px;}
+  .hero{background:linear-gradient(145deg,#ffffff,#f6faff 60%,#fff8ec);border:1px solid var(--line);border-radius:18px;
+    padding:32px 28px;box-shadow:0 12px 30px rgba(25,33,46,.07);}
+  .kicker{display:inline-flex;align-items:center;gap:7px;color:var(--accent);background:var(--accent-soft);
+    border:1px solid #cfe4ff;border-radius:999px;padding:5px 11px;font-size:11.5px;font-weight:800;margin-bottom:13px;}
+  h1{font-size:30px;line-height:1.3;margin-bottom:12px;}
+  .lead{font-size:15px;color:#3d4654;}
+  .hero .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;}
+  .ticks{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
+  .ticks span{font-size:12px;font-weight:800;color:#1f6f63;background:#e9f7f4;border:1px solid #c6ebe4;border-radius:999px;padding:4px 10px;}
+  section.blk{margin-top:26px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px 26px 22px;
+    box-shadow:0 6px 18px rgba(25,33,46,.05);}
+  section.blk > h2{font-size:20px;line-height:1.4;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--line);}
+  section.blk h3{font-size:15px;margin:18px 0 6px;}
+  section.blk p{font-size:14px;color:#3d4654;margin-bottom:11px;}
+  section.blk ul{font-size:14px;color:#3d4654;margin:0 0 12px 20px;}
+  section.blk li{margin-bottom:6px;}
+  section.blk strong{color:var(--ink);}
+  ol.steps{list-style:none;margin:0;padding:0;counter-reset:st;}
+  ol.steps li{position:relative;padding:0 0 14px 38px;counter-increment:st;font-size:14px;color:#3d4654;}
+  ol.steps li::before{content:counter(st);position:absolute;left:0;top:1px;width:25px;height:25px;border-radius:8px;
+    background:var(--accent);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:900;}
+  ol.steps li b{color:var(--ink);}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:6px;}
+  .card{border:1px solid var(--line);border-radius:12px;padding:14px 15px;background:#fbfcfe;}
+  .card b{display:block;font-size:14px;margin-bottom:4px;}
+  .card span{font-size:13px;color:#3d4654;}
+  .plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:8px;}
+  .plan{border:1px solid var(--line);border-radius:14px;padding:18px;background:#fbfcfe;}
+  .plan.pro{border-color:#ffd38a;background:linear-gradient(160deg,#fffaf0,#ffffff);}
+  .plan h3{margin:0 0 4px;font-size:16px;}
+  .plan .price{font-size:26px;font-weight:900;margin:4px 0 2px;}
+  .plan .price small{font-size:12px;color:var(--sub);font-weight:700;margin-left:4px;}
+  .plan ul{margin:10px 0 14px 18px;font-size:13.5px;}
+  .soon{font-size:12.5px;color:#8a5200;background:#fff6e6;border:1px solid #ffe0b0;border-radius:10px;padding:9px 11px;}
+  .note{margin-top:14px;background:#f7f9fc;border:1px solid var(--line);border-left:3px solid var(--sun);
+    border-radius:0 10px 10px 0;padding:12px 14px;font-size:13px;color:#3d4654;}
+  details.qa{margin-top:10px;border:1px solid var(--line);border-radius:12px;background:#fbfcfe;padding:0 15px;}
+  details.qa[open]{padding-bottom:13px;background:#fff;}
+  details.qa summary{cursor:pointer;padding:12px 0;font-size:14px;font-weight:800;list-style:none;line-height:1.55;}
+  details.qa summary::-webkit-details-marker{display:none;}
+  details.qa summary::before{content:"Q";display:inline-grid;place-items:center;width:20px;height:20px;margin-right:9px;
+    border-radius:6px;background:var(--accent);color:#fff;font-size:11px;font-weight:900;vertical-align:1px;}
+  details.qa p{font-size:14px;color:#3d4654;margin:4px 0 0;}
+  .rel{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:6px;}
+  .rel a{display:block;text-decoration:none;color:var(--ink);border:1px solid var(--line);border-radius:12px;
+    padding:13px 15px;background:#fbfcfe;font-size:13.5px;font-weight:800;line-height:1.5;}
+  .rel a:hover{border-color:#9fcbff;background:#f4f9ff;}
+  .rel a span{display:block;font-size:12px;color:var(--sub);font-weight:600;margin-top:4px;}
+  .cta{margin-top:30px;background:linear-gradient(145deg,#e9f3ff,#ffffff 65%,#fff6e6);border:1px solid #cfe4ff;
+    border-radius:18px;padding:26px 24px;text-align:center;}
+  .cta h2{font-size:21px;margin-bottom:8px;}
+  .cta p{font-size:14px;color:#3d4654;margin-bottom:16px;}
+  footer{background:#fbfcfe;border-top:1px solid var(--line);padding:20px 18px 28px;}
+  .foot-in{max-width:900px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;font-size:12px;color:var(--sub);}
+  .foot-in b{color:var(--ink);font-size:13px;}
+  .foot-in a{font-weight:800;text-decoration:none;}
+  .foot-in .sp{flex:1;}
+  .legalnote{max-width:900px;margin:10px auto 0;font-size:11px;color:#7a8494;line-height:1.6;}
+  @media (max-width:720px){
+    .page-top{height:60px;padding:0 12px;gap:9px;}
+    .brand-icon{width:36px;height:36px;border-radius:11px;}
+    .brand-name{font-size:20px;}
+    .brand small{display:none;}
+    .btn{padding:9px 12px;font-size:12.5px;}
+    main{padding:18px 12px 44px;}
+    .hero{padding:22px 17px;border-radius:15px;}
+    h1{font-size:23px;}
+    section.blk{padding:18px 15px;border-radius:14px;}
+    .cta{padding:20px 16px;}
+  }
+</style>
+<script>
+/* アクセス解析（GA4）。日本語ページと同じローダー。オプトアウトと Do Not Track を尊重する。 */
+(function(){
+  var GA_ID = 'G-W0Y7GMPVRK';   /* MiseFits プロパティの測定ID */
+  if(!GA_ID) return;
+  try{ if(localStorage.getItem('misefitsAnalyticsOptOut')==='1'){ window['ga-disable-'+GA_ID]=true; return; } }catch(e){}
+  if(navigator.doNotTrack==='1'||window.doNotTrack==='1') return;
+  window.dataLayer=window.dataLayer||[];
+  window.gtag=function(){window.dataLayer.push(arguments);};
+  window.gtag('js', new Date());
+  window.gtag('config', GA_ID, {anonymize_ip:true});
+  var s=document.createElement('script');
+  s.async=true; s.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(GA_ID);
+  document.head.appendChild(s);
+})();
+function trackEvent(name, params){
+  try{ if(typeof window.gtag==='function') window.gtag('event', name, params||{}); }catch(e){}
+}
+</script>
+</head>
+<body>
+<header class="page-top">
+  <a class="brand" href="./" aria-label="MiseFits home">
+    <img class="brand-icon" src="../assets/misefits-icon.png" alt="" width="46" height="46">
+    <span>
+      <span class="brand-name"><span class="mise">Mise</span><span class="fit">Fits</span><span class="dot"></span></span>
+      <small>Floor plan &amp; store layout planner</small>
+    </span>
+  </a>
+  <span class="top-sp"></span>
+  <a class="btn outline" href="#pricing">Pricing</a>
+  <a class="btn" href="../?lang=en">Open the app</a>
+</header>
+
+<main>
+  <div class="hero">
+    <div class="kicker">Free · no sign-up · runs in your browser</div>
+    <h1>Plan your restaurant layout on your real floor plan</h1>
+    <p class="lead">Load the floor plan PDF from your landlord, agent or architect. Set the scale from one length you know, then drag tables, counters and kitchen equipment at real size. See how many seats fit and whether the aisles are wide enough, before you sign a lease or brief a designer.</p>
+    <div class="row">
+      <a class="btn" href="../?lang=en" onclick="trackEvent('en_open_app',{location:'hero'})">Start planning — free</a>
+      <a class="btn outline" href="#how-to">How it works</a>
+    </div>
+    <div class="ticks"><span>✓ Trace over your PDF plan</span><span>✓ Seat count</span><span>✓ Aisle width check</span><span>✓ m² and sq ft</span></div>
+  </div>
+
+  <section class="blk" id="why">
+    <h2>Built for the stage before the architect</h2>
+    <p>Spreadsheets and slide shapes are painful for layouts, and full CAD is too much when you only want to know whether twelve tables fit. MiseFits sits in between: a lightweight planner that works on top of the plan you already have.</p>
+    <div class="grid">
+      <div class="card"><b>Your plan, at real size</b><span>Import a PDF or photo of the plan and calibrate it from a single dimension line. Everything you place is then true to scale in millimetres.</span></div>
+      <div class="card"><b>Seats and areas, live</b><span>The summary counts seats from each table's capacity and shows fixture area, floor area and coverage — in m² and sq ft.</span></div>
+      <div class="card"><b>Aisle check</b><span>Measure between any two points. Lines turn red under 600 mm, orange under 900 mm and green from 900 mm, as a quick visual guide.</span></div>
+      <div class="card"><b>140+ fixtures ready to drop</b><span>Restaurant tables, booths, counters, kitchen equipment, retail shelving, salon chairs, office desks and more. Every size can be edited.</span></div>
+      <div class="card"><b>Private by design</b><span>Your plans never leave your device. No account, nothing uploaded — work is auto-saved in your browser.</span></div>
+      <div class="card"><b>Share and print</b><span>Export PNG or PDF, print, or send an image straight from your phone's share menu.</span></div>
+    </div>
+  </section>
+
+  <section class="blk" id="how-to">
+    <h2>How it works</h2>
+    <ol class="steps">
+      <li><b>Load a plan or start blank.</b> Open the app and choose “From a plan” to load a PDF or image (the first page of a PDF is used). No plan yet? Choose “From scratch” and enter the room size in mm — rectangle, L-shape or U-shape.</li>
+      <li><b>Set the scale.</b> Click “Set scale by clicking 2 points”, click both ends of a dimension you know (a wall, a door, a dimension line) and type the real length in mm. From then on, everything on the sheet is measured at real size.</li>
+      <li><b>Place fixtures.</b> Pick a category in the side panel and click a part to add it, or drag it onto the canvas. Tap a fixture to change its width, depth or angle. Parts snap to walls and to each other with pink guide lines.</li>
+      <li><b>Check aisles and seats.</b> Press <b>M</b> (or 📐 Measure) and click two points. The Summary panel shows seats, fixture area, floor area and coverage.</li>
+      <li><b>Save and export.</b> Save the project as JSON to keep editing later, or export PNG/PDF. The grid is never printed.</li>
+    </ol>
+    <div class="note"><b>Tip:</b> calibrate on the longest dimension you can find. A small clicking error on a short door width becomes a big error across the whole room.</div>
+  </section>
+
+  <section class="blk" id="pricing">
+    <h2>Pricing</h2>
+    <div class="plans">
+      <div class="plan">
+        <h3>Free</h3>
+        <div class="price">US$0</div>
+        <ul>
+          <li>PDF / image plans and blank sheets</li>
+          <li>Scale calibration and real-size fixtures</li>
+          <li>Seat count, areas in m² and sq ft</li>
+          <li>Aisle measuring</li>
+          <li>PNG / PDF export and printing (fit to page)</li>
+        </ul>
+        <a class="btn outline" href="../?lang=en">Open the app</a>
+      </div>
+      <div class="plan pro">
+        <h3>MiseFits Pro</h3>
+        <div class="price">US$19<small>one-time · not a subscription</small></div>
+        <ul>
+          <li>Free-shape editor for angled walls and irregular rooms</li>
+          <li>Area trace — real area of any outlined region</li>
+          <li>60+ extra fixtures: doors, columns, stairs, booths, kitchen equipment</li>
+          <li>True-scale printing (1:20 to 1:200) and 4× resolution export</li>
+          <li>Sticky notes on the plan</li>
+          <li>One key for up to 5 devices, no account</li>
+        </ul>
+        <button class="btn pop" id="buyPro" type="button" style="display:none;">Buy MiseFits Pro — US$19</button>
+        <div class="soon" id="proSoon">Checkout for the English version is opening soon. Everything free already works — start planning now.</div>
+      </div>
+    </div>
+    <div class="note">Prices are in US dollars. Local taxes (VAT/GST) are calculated at checkout by our reseller, Lemon Squeezy, which handles payment and tax as the merchant of record. See our <a href="terms.html">terms and refund policy</a>.</div>
+  </section>
+
+  <section class="blk" id="faq">
+    <h2>FAQ</h2>
+    <details class="qa"><summary>Is MiseFits free?</summary><p>Yes. Loading plans, setting the scale, placing fixtures, measuring aisles, seat counts and PNG/PDF export are free, with no sign-up and no watermark. MiseFits Pro is an optional one-time purchase that adds extra tools.</p></details>
+    <details class="qa"><summary>Do I need to create an account?</summary><p>No. MiseFits runs in your browser. Your work is auto-saved on your own device, and you can save a project file (JSON) to continue later or on another computer.</p></details>
+    <details class="qa"><summary>Is my floor plan uploaded anywhere?</summary><p>No. Plans and layouts are processed only inside your browser and are never sent to our servers. See the <a href="privacy.html">privacy policy</a>.</p></details>
+    <details class="qa"><summary>Can I see areas in square feet?</summary><p>Yes. In the English version every area is shown in both m² and sq ft, so you can compare a layout with a listing quoted per square foot. Lengths are entered and shown in millimetres.</p></details>
+    <details class="qa"><summary>Does it tell me whether my layout meets building or fire codes?</summary><p>No. Seat counts and aisle colours are planning estimates. Accessibility, egress and fire requirements depend on your country, city and type of business — always confirm the final layout with a local architect, certifier or authority.</p></details>
+    <details class="qa"><summary>Is Pro a subscription?</summary><p>No. MiseFits Pro is a one-time payment of US$19. Your license key is shown after checkout and emailed to you; one key works on up to five devices (counted per browser).</p></details>
+  </section>
+
+  <section class="blk">
+    <h2>Guides</h2>
+    <div class="rel">
+      <a href="restaurant-floor-plan.html">Restaurant floor plans<span>Seats, tables, aisles and the kitchen balance</span></a>
+      <a href="fixture-sizes.html">Fixture &amp; equipment sizes<span>140+ tables, counters and kitchen items in mm</span></a>
+      <a href="../?lang=en">Open the planner<span>Free, in your browser</span></a>
+    </div>
+  </section>
+
+  <div class="cta">
+    <h2>Try your layout in five minutes</h2>
+    <p>Load your plan, set the scale, and start moving tables around.</p>
+    <a class="btn" href="../?lang=en" onclick="trackEvent('en_open_app',{location:'cta'})">Open MiseFits — free</a>
+  </div>
+</main>
+
+<footer>
+  <div class="foot-in">
+    <b>MiseFits</b>
+    <span class="sp"></span>
+    <a href="../?lang=en">App</a>
+    <a href="restaurant-floor-plan.html">Restaurant floor plans</a>
+    <a href="fixture-sizes.html">Fixture sizes</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="terms.html">Terms &amp; refunds</a>
+    <a href="../?lang=ja" hreflang="ja">日本語</a>
+    <span>Made by Koko Kikaku, Japan</span>
+  </div>
+  <p class="legalnote">Sizes, seat counts and aisle colours in MiseFits are planning estimates, not design values. They do not confirm compliance with building, fire, accessibility or health regulations, which vary by country and city. Confirm your final layout with a qualified local professional.</p>
+</footer>
+<script>
+/* Pro の購入ボタン。英語版は Lemon Squeezy の Checkout に、アプリと同じ claim を付けて送る。
+   PRO_PURCHASE_URL_EN は index.html と同じ値にそろえること（空のあいだはボタンを出さない）。 */
+(function(){
+  var PRO_PURCHASE_URL_EN = '';
+  var btn = document.getElementById('buyPro'), soon = document.getElementById('proSoon');
+  if(!PRO_PURCHASE_URL_EN) return;
+  btn.style.display = ''; soon.style.display = 'none';
+  btn.addEventListener('click', function(){
+    var claim = '';
+    try{
+      var buf = new Uint8Array(16); crypto.getRandomValues(buf);
+      for(var i=0;i<buf.length;i++) claim += ('0'+buf[i].toString(16)).slice(-2);
+      localStorage.setItem('misefitsLsClaim', claim);
+    }catch(e){}
+    trackEvent('pro_buy_click', { feature:'landing', location:'en_pricing' });
+    window.open(PRO_PURCHASE_URL_EN + (PRO_PURCHASE_URL_EN.indexOf('?')<0 ? '?' : '&') + 'checkout%5Bcustom%5D%5Bclaim%5D=' + claim, '_blank', 'noopener');
+  });
+})();
+</script>
+</body>
+</html>

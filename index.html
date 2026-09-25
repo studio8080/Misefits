@@ -1489,6 +1489,7 @@ const I18N_EN = {
 "このキーは上限の5台で使用中のため解放できません。端末の入れ替え（リセット）をご希望の場合はお問い合わせください。": "This key is already in use on 5 devices (the limit). Contact us if you need to reset your devices.",
 "無効なキーです。入力内容をご確認ください。": "Invalid key. Please check what you entered.",
 "確認に失敗しました。通信環境をご確認のうえ再度お試しください。": "Couldn't verify the key. Check your connection and try again.",
+"このキーは返金済みのため使用できません。": "This key was refunded and can no longer be used.",
 "ラベル": "Label",
 "PDFを読み込みますか？\nOK: PDF / キャンセル: 画像": "Load a PDF?\nOK: PDF / Cancel: image",
 "未校正": "Not calibrated",
@@ -2112,7 +2113,18 @@ function closeProModal(){ document.getElementById('proModalBackdrop').classList.
 function proceedToProPurchase(){
   trackEvent('pro_buy_click', { feature: proModalFeature, location: 'app_modal' });
   closeProModal();
-  window.open(PRO_PURCHASE_URL, '_blank', 'noopener');
+  window.open(MF_LANG==='en' ? lemonCheckoutUrl() : PRO_PURCHASE_URL, '_blank', 'noopener');
+}
+// Lemon Squeezy は購入完了ページへ注文IDを渡さないので、ランダムな claim を作って
+// checkout[custom][claim] で持たせる。完了ページ（en/pro-unlock.html）は同じ claim でキーを受け取る。
+function lemonCheckoutUrl(){
+  let claim='';
+  try{
+    const buf=new Uint8Array(16); crypto.getRandomValues(buf);
+    claim=Array.from(buf, b=>b.toString(16).padStart(2,'0')).join('');
+    localStorage.setItem('misefitsLsClaim', claim);
+  }catch(e){}
+  return PRO_PURCHASE_URL_EN + (PRO_PURCHASE_URL_EN.indexOf('?')<0 ? '?' : '&') + 'checkout%5Bcustom%5D%5Bclaim%5D=' + claim;
 }
 
 /* ================= Web版の買い切りライセンス（MiseFits Pro・¥1,480） =================
@@ -2173,6 +2185,9 @@ function submitWebLicense(){
         updateWebProUI();
         trackEvent('license_unlock_success', { location: 'app' });
         showHint(t('MiseFits Proを解放しました'), 3000);
+      }else if(data && data.reason === 'revoked'){
+        trackEvent('license_unlock_fail', { reason: 'revoked', location: 'app' });
+        if(msg) msg.textContent = t('このキーは返金済みのため使用できません。');
       }else if(data && data.reason === 'device_limit'){
         trackEvent('license_unlock_fail', { reason: 'device_limit', location: 'app' });
         if(msg) msg.textContent = t('このキーは上限の5台で使用中のため解放できません。端末の入れ替え（リセット）をご希望の場合はお問い合わせください。');

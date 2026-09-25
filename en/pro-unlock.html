@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thank you — your MiseFits Pro key | MiseFits</title>
+<meta name="robots" content="noindex,nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com; font-src 'self' data:; connect-src 'self' https://us-central1-misefits.cloudfunctions.net https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#0066cc">
+<link rel="icon" href="../assets/misefits-favicon.png">
+<style>
+  :root{ --bg:#eef1f5; --line:#dfe4ec; --ink:#242933; --sub:#667085; --accent:#0066cc; --accent2:#004f9f; --sun:#ffb545; }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.7;}
+  a{color:var(--accent);}
+  .page-top{height:64px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;padding:0 18px;}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+  .brand img{width:40px;height:40px;border-radius:12px;}
+  .brand-name{font-family:Arial Rounded MT Bold,Arial,sans-serif;font-weight:900;font-size:22px;color:#102033;}
+  .brand-name .fit{color:var(--accent);font-style:italic;}
+  .top-sp{flex:1;}
+  .btn{display:inline-flex;align-items:center;justify-content:center;background:var(--accent);color:#fff;border:1px solid var(--accent);border-radius:9px;padding:10px 16px;font-size:14px;font-weight:800;text-decoration:none;cursor:pointer;font-family:inherit;}
+  .btn:disabled{opacity:.6;cursor:default;}
+  .btn.outline{background:#fff;color:var(--accent);}
+  main{max-width:680px;margin:0 auto;padding:30px 18px 60px;}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:26px 24px;box-shadow:0 10px 26px rgba(25,33,46,.06);}
+  h1{font-size:24px;margin-bottom:8px;}
+  .card > p{font-size:14.5px;color:#3d4654;}
+  .state{margin-top:16px;font-size:14px;color:var(--sub);}
+  .keybox{margin-top:18px;}
+  .keybox code{display:block;font-family:ui-monospace,Consolas,monospace;font-size:20px;font-weight:800;letter-spacing:.04em;text-align:center;
+    background:#f4f7fb;border:1px dashed #b8c4d6;border-radius:12px;padding:16px 10px;word-break:break-all;}
+  .keyrow{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:14px;}
+  .unlock-msg{margin-top:10px;font-size:13.5px;text-align:center;color:#1f6f63;}
+  .unlock-msg.ng{color:#b42318;}
+  .good,.warn{margin-top:18px;border-radius:12px;padding:14px 16px;font-size:14px;}
+  .good{background:#e9f7f4;border:1px solid #c6ebe4;}
+  .warn{background:#fff6e6;border:1px solid #ffe0b0;}
+  .good b,.warn b{display:block;margin-bottom:4px;}
+  footer{border-top:1px solid var(--line);background:#fbfcfe;padding:18px;margin-top:20px;}
+  .foot-in{max-width:680px;margin:0 auto;display:flex;flex-wrap:wrap;gap:10px 18px;font-size:12px;color:var(--sub);}
+  .foot-in a{font-weight:800;text-decoration:none;}
+</style>
+<script>
+(function(){
+  var GA_ID = 'G-W0Y7GMPVRK';
+  if(!GA_ID) return;
+  try{ if(localStorage.getItem('misefitsAnalyticsOptOut')==='1'){ window['ga-disable-'+GA_ID]=true; return; } }catch(e){}
+  if(navigator.doNotTrack==='1'||window.doNotTrack==='1') return;
+  window.dataLayer=window.dataLayer||[];
+  window.gtag=function(){window.dataLayer.push(arguments);};
+  window.gtag('js', new Date());
+  window.gtag('config', GA_ID, {anonymize_ip:true});
+  var s=document.createElement('script');
+  s.async=true; s.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(GA_ID);
+  document.head.appendChild(s);
+})();
+function trackEvent(name, params){
+  try{ if(typeof window.gtag==='function') window.gtag('event', name, params||{}); }catch(e){}
+}
+</script>
+</head>
+<body>
+<header class="page-top">
+  <a class="brand" href="./"><img src="../assets/misefits-icon.png" alt="" width="40" height="40"><span class="brand-name">Mise<span class="fit">Fits</span></span></a>
+  <span class="top-sp"></span>
+  <a class="btn" href="../?lang=en">Open the app</a>
+</header>
+
+<main>
+  <div class="card">
+    <h1>Thank you for your purchase</h1>
+    <p>Your MiseFits Pro payment is complete.<span id="fetchingLine"> We're fetching your license key…</span></p>
+
+    <div id="loading" class="state">Checking… (it can take a few seconds for the payment to arrive)</div>
+
+    <div id="result" class="keybox" style="display:none;">
+      <code id="licenseKey">-</code>
+      <div class="keyrow">
+        <button class="btn" id="unlockBtn" type="button">Unlock on this device and open MiseFits</button>
+        <button class="btn outline" id="copyBtn" type="button">Copy key</button>
+      </div>
+      <div class="unlock-msg" id="unlockMsg"></div>
+    </div>
+
+    <div id="successNote" class="good" style="display:none;">
+      <b>Next steps</b>
+      Press “Unlock on this device” to open MiseFits with Pro turned on. <strong>Copy the key and keep it</strong> — we've also emailed it to you. To use Pro on another device, open MiseFits there and paste the key under “MiseFits Pro” in the side panel (up to 5 devices).
+    </div>
+
+    <div id="errorNote" class="warn" style="display:none;">
+      <b>We can't find your key yet</b>
+      The payment may still be processing. Your key is also sent to the email address you used at checkout — please check your inbox (and spam folder). If it doesn't arrive within a few minutes, contact us via <a href="https://kokokikaku.com/" target="_blank" rel="noopener">kokokikaku.com</a> with that email address.
+      <div class="keyrow" style="justify-content:flex-start;"><button class="btn outline" id="retryBtn" type="button">Check again</button></div>
+    </div>
+
+    <div id="noClaimNote" class="warn" style="display:none;">
+      <b>Your key will arrive by email</b>
+      This browser didn't start the checkout, so we can't show the key here. It has been emailed to the address you used at checkout. Paste it under “MiseFits Pro” in the app's side panel to unlock.
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="foot-in">
+    <b>MiseFits</b>
+    <a href="./">Home</a>
+    <a href="../?lang=en">App</a>
+    <a href="terms.html">Terms &amp; refunds</a>
+    <a href="privacy.html">Privacy</a>
+  </div>
+</footer>
+
+<script>
+/* Lemon Squeezy 購入後のリダイレクト先。アプリ（または en/ の料金欄）が決済前に localStorage へ保存した
+   claim を使って、Cloud Functions の claimLicense からキーを受け取る。ロジックは日本語版 pro-unlock.html に合わせてある。 */
+(function(){
+  var FUNCTIONS_BASE = 'https://us-central1-misefits.cloudfunctions.net';
+  var PRICE_USD = 19;
+  var WEB_LICENSE_STORAGE_KEY = 'misefitsWebLicense';
+  var WEB_DEVICE_STORAGE_KEY = 'misefitsDeviceId';
+  var claim = '';
+  try{ claim = localStorage.getItem('misefitsLsClaim') || ''; }catch(e){}
+
+  var $ = function(id){ return document.getElementById(id); };
+  var loading=$('loading'), result=$('result'), successNote=$('successNote'), errorNote=$('errorNote'),
+      noClaimNote=$('noClaimNote'), licenseKeyEl=$('licenseKey'), copyBtn=$('copyBtn'), retryBtn=$('retryBtn'),
+      unlockBtn=$('unlockBtn'), unlockMsg=$('unlockMsg');
+
+  function webDeviceId(){
+    try{
+      var id = localStorage.getItem(WEB_DEVICE_STORAGE_KEY);
+      if(!id){
+        var buf = new Uint8Array(16); crypto.getRandomValues(buf);
+        id = 'dev-'; for(var j=0;j<buf.length;j++) id += ('0'+buf[j].toString(16)).slice(-2);
+        localStorage.setItem(WEB_DEVICE_STORAGE_KEY, id);
+      }
+      return id;
+    }catch(e){ return ''; }
+  }
+  function trackPurchaseOnce(){
+    var flag = 'misefitsPurchaseTracked:' + claim;
+    try{ if(localStorage.getItem(flag)==='1') return; }catch(e){}
+    trackEvent('purchase', { transaction_id: 'ls-' + claim, value: PRICE_USD, currency: 'USD',
+      items: [{ item_id:'misefits_pro', item_name:'MiseFits Pro', price:PRICE_USD, quantity:1 }] });
+    try{ localStorage.setItem(flag, '1'); }catch(e){}
+  }
+
+  if(!/^[a-z0-9]{16,64}$/.test(claim)){
+    loading.style.display = 'none';
+    $('fetchingLine').style.display = 'none';
+    noClaimNote.style.display = 'block';
+    return;
+  }
+
+  function showKey(key){
+    loading.style.display = 'none'; errorNote.style.display = 'none';
+    licenseKeyEl.textContent = key;
+    result.style.display = 'block'; successNote.style.display = 'block';
+    trackPurchaseOnce();
+  }
+  function pollForKey(left){
+    fetch(FUNCTIONS_BASE + '/claimLicense?claim=' + encodeURIComponent(claim))
+      .then(function(r){ return r.ok ? r.json() : { found:false }; })
+      .catch(function(){ return { found:false }; })
+      .then(function(data){
+        if(data && data.found && data.key) showKey(data.key);
+        else if(left > 0) setTimeout(function(){ pollForKey(left - 1); }, 2000);
+        else { loading.style.display = 'none'; errorNote.style.display = 'block'; }
+      });
+  }
+
+  copyBtn.addEventListener('click', function(){
+    if(!navigator.clipboard) return;
+    navigator.clipboard.writeText(licenseKeyEl.textContent).then(function(){
+      copyBtn.textContent = 'Copied'; setTimeout(function(){ copyBtn.textContent = 'Copy key'; }, 1500);
+    }).catch(function(){});
+  });
+
+  unlockBtn.addEventListener('click', function(){
+    var key = (licenseKeyEl.textContent || '').trim().toUpperCase();
+    if(!key || key === '-') return;
+    unlockBtn.disabled = true; unlockMsg.className = 'unlock-msg'; unlockMsg.textContent = 'Unlocking…';
+    fetch(FUNCTIONS_BASE + '/verifyLicense?key=' + encodeURIComponent(key) + '&device=' + encodeURIComponent(webDeviceId()))
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        if(data && data.valid){
+          try{ localStorage.setItem(WEB_LICENSE_STORAGE_KEY, key); localStorage.removeItem('misefitsLsClaim'); }catch(e){}
+          trackEvent('license_unlock_success', { location: 'pro_unlock_en' });
+          unlockMsg.textContent = 'Unlocked. Opening MiseFits…';
+          location.href = '../?lang=en';
+          return;
+        }
+        var reason = (data && data.reason) === 'device_limit' ? 'device_limit' : 'invalid';
+        trackEvent('license_unlock_fail', { reason: reason, location: 'pro_unlock_en' });
+        unlockBtn.disabled = false; unlockMsg.className = 'unlock-msg ng';
+        unlockMsg.textContent = reason === 'device_limit'
+          ? 'This key is already in use on 5 devices. Contact us if you need to reset your devices.'
+          : 'Couldn’t unlock in this browser. Copy the key and paste it under “MiseFits Pro” in the app.';
+      })
+      .catch(function(){
+        trackEvent('license_unlock_fail', { reason: 'network', location: 'pro_unlock_en' });
+        unlockBtn.disabled = false; unlockMsg.className = 'unlock-msg ng';
+        unlockMsg.textContent = 'Network error. Check your connection and try again.';
+      });
+  });
+
+  retryBtn.addEventListener('click', function(){
+    errorNote.style.display = 'none'; loading.style.display = 'block'; pollForKey(8);
+  });
+  pollForKey(8); // 2秒間隔で最大約16秒
+})();
+</script>
+</body>
+</html>

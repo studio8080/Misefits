@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Restaurant Floor Plan: Seats, Table Sizes and Aisle Widths | MiseFits</title>
+<meta name="description" content="Plan a restaurant or café floor plan to real size: work out how many seats fit your floor area, check table, booth and kitchen equipment sizes in mm, and measure aisle widths on your landlord's PDF. Free, no sign-up.">
+<meta name="keywords" content="restaurant floor plan,restaurant layout planner,restaurant seating layout,restaurant table sizes,restaurant aisle width,how many seats restaurant,cafe floor plan,MiseFits">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://misefits.kokokikaku.com/en/restaurant-floor-plan.html">
+<link rel="alternate" hreflang="en" href="https://misefits.kokokikaku.com/en/restaurant-floor-plan.html">
+<link rel="alternate" hreflang="ja" href="https://misefits.kokokikaku.com/layout-restaurant.html">
+<link rel="alternate" hreflang="x-default" href="https://misefits.kokokikaku.com/en/restaurant-floor-plan.html">
+<!-- This page lives under /en/, so 'self' already covers ../assets/. The CSP is kept identical to the Japanese landing pages. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.a8.net; font-src 'self' data:; connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="MiseFits">
+<meta property="og:title" content="Restaurant floor plan: fit your seats, then check the aisles | MiseFits">
+<meta property="og:description" content="A practical method for seat count, table and kitchen equipment sizes in mm, and aisle widths — planned to real size on your own floor plan.">
+<meta property="og:url" content="https://misefits.kokokikaku.com/en/restaurant-floor-plan.html">
+<meta property="og:image" content="https://misefits.kokokikaku.com/assets/misefits-ogp.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_AU">
+<meta property="og:locale:alternate" content="ja_JP">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Restaurant floor plan: fit your seats, then check the aisles | MiseFits">
+<meta name="twitter:description" content="A practical method for seat count, table and kitchen equipment sizes in mm, and aisle widths — planned to real size on your own floor plan.">
+<meta name="twitter:image" content="https://misefits.kokokikaku.com/assets/misefits-ogp.jpg">
+<meta name="theme-color" content="#0066cc">
+<link rel="icon" href="../assets/misefits-favicon.png">
+<link rel="apple-touch-icon" href="../assets/misefits-icon.png">
+<link rel="manifest" href="../manifest.webmanifest">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "headline": "Restaurant floor plan: fit your seats, then check the aisles",
+      "description": "Plan a restaurant or café floor plan to real size: work out how many seats fit your floor area, check table, booth and kitchen equipment sizes in mm, and measure aisle widths on your landlord's PDF.",
+      "inLanguage": "en",
+      "datePublished": "2026-09-25",
+      "mainEntityOfPage": "https://misefits.kokokikaku.com/en/restaurant-floor-plan.html",
+      "image": "https://misefits.kokokikaku.com/assets/misefits-ogp.jpg",
+      "author": {
+        "@type": "Organization",
+        "name": "Koko Kikaku",
+        "url": "https://kokokikaku.com/"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Koko Kikaku",
+        "url": "https://kokokikaku.com/"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Is MiseFits free?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Loading a plan, setting the scale, placing furniture and equipment, measuring aisles, counting seats and exporting PNG or PDF are all free. An optional one-time Pro upgrade adds extra fixtures, area tracing and true-scale printing, among other tools."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do I need to create an account?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. MiseFits runs in your browser with no sign-up, and your plan is processed and auto-saved on your own device. To move a project to another device, save it as JSON and open it there."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I import the floor plan my landlord or agent sent me?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Load the PDF (the first page is used) or a JPG/PNG, then set the scale by clicking both ends of a dimension you know and typing its length in mm. If the plan is on a later PDF page, export that page as an image first."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I see the area in square feet?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. In English mode, areas are shown in m² with sq ft in brackets, so you can compare directly with a listing quoted in sq ft. Lengths are entered in millimetres."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I print the plan to scale?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "True-scale printing (1:20 to 1:200) is part of MiseFits Pro, a one-time purchase of US$19 with no subscription. The free version exports PNG and PDF fitted to the page."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How many devices can I use Pro on?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "One Pro license key works on up to 5 devices, such as your laptop, tablet and phone."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "MiseFits",
+          "item": "https://misefits.kokokikaku.com/en/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Restaurant floor plan",
+          "item": "https://misefits.kokokikaku.com/en/restaurant-floor-plan.html"
+        }
+      ]
+    }
+  ]
+}
+</script>
+<style>
+  :root{
+    --bg:#eef1f5; --panel:#ffffff; --line:#dfe4ec; --ink:#242933; --sub:#667085;
+    --accent:#0066cc; --accent2:#004f9f; --accent-soft:#e8f2ff; --sun:#ffb545; --mint:#2a9d8f;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;scroll-padding-top:86px;}
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--ink);
+    line-height:1.7;-webkit-text-size-adjust:100%;}
+  a{color:var(--accent);}
+
+  .page-top{position:sticky;top:0;z-index:20;height:72px;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:14px;padding:0 18px;box-shadow:0 1px 14px rgba(25,33,46,.07);}
+  .brand{display:flex;align-items:center;gap:12px;min-width:0;text-decoration:none;}
+  .brand-icon{width:46px;height:46px;border-radius:14px;object-fit:contain;flex:0 0 auto;
+    filter:drop-shadow(0 9px 18px rgba(0,80,160,.19));}
+  .brand-name{font-family:Arial Rounded MT Bold,Arial,sans-serif;
+    font-weight:900;font-size:25px;letter-spacing:.015em;color:#102033;line-height:1;}
+  .brand-name .fit{color:var(--accent);font-style:italic;letter-spacing:-.01em;}
+  .brand-name .dot{display:inline-block;width:8px;height:8px;margin-left:5px;border-radius:999px;background:var(--sun);
+    vertical-align:top;transform:translateY(4px);}
+  .brand small{display:block;color:var(--sub);font-weight:700;font-size:11.5px;line-height:1.35;margin-top:3px;}
+  .top-sp{flex:1;}
+  .btn{display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:#fff;border:1px solid var(--accent);
+    border-radius:9px;padding:10px 16px;font-size:13px;font-weight:800;text-decoration:none;white-space:nowrap;}
+  .btn:hover{background:var(--accent2);border-color:var(--accent2);}
+  .btn.outline{background:#fff;color:var(--accent);}
+  .btn.outline:hover{background:var(--accent-soft);}
+
+  main{max-width:900px;margin:0 auto;padding:26px 18px 60px;}
+  .crumb{font-size:11.5px;color:var(--sub);margin-bottom:16px;}
+  .crumb a{text-decoration:none;font-weight:700;}
+  .hero{background:linear-gradient(145deg,#ffffff,#f6faff 60%,#fff8ec);border:1px solid var(--line);border-radius:18px;
+    padding:28px 26px;box-shadow:0 12px 30px rgba(25,33,46,.07);}
+  .kicker{display:inline-flex;align-items:center;gap:7px;color:var(--accent);background:var(--accent-soft);
+    border:1px solid #cfe4ff;border-radius:999px;padding:5px 11px;font-size:11.5px;font-weight:800;margin-bottom:13px;}
+  h1{font-size:30px;line-height:1.3;margin-bottom:12px;letter-spacing:-.01em;}
+  .lead{font-size:15px;color:#3d4654;}
+  .hero .btn{margin-top:18px;white-space:normal;text-align:center;}
+
+  .toc{margin-top:20px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px;}
+  .toc h2{font-size:12px;color:var(--sub);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;}
+  .toc ol{margin:0;padding-left:19px;font-size:14px;}
+  .toc li{margin-bottom:5px;}
+  .toc a{text-decoration:none;font-weight:700;}
+
+  section.blk{margin-top:26px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px 26px 22px;
+    box-shadow:0 6px 18px rgba(25,33,46,.05);}
+  section.blk > h2{font-size:20px;line-height:1.4;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--line);}
+  section.blk h3{font-size:16px;margin:20px 0 8px;}
+  section.blk p{font-size:14.5px;color:#3d4654;margin-bottom:11px;}
+  section.blk ul,section.blk ol{font-size:14.5px;color:#3d4654;margin:0 0 12px 20px;}
+  section.blk li{margin-bottom:6px;}
+  section.blk strong{color:var(--ink);}
+  code{font-family:ui-monospace,Consolas,monospace;background:#f1f4f8;border:1px solid var(--line);border-radius:4px;padding:0 4px;font-size:.92em;}
+
+  /* size table */
+  .dim-wrap{overflow-x:auto;margin:14px 0 6px;border:1px solid var(--line);border-radius:12px;}
+  table.dim{border-collapse:separate;border-spacing:0;width:100%;min-width:560px;font-size:13.5px;background:#fff;}
+  .dim th,.dim td{padding:9px 13px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;}
+  .dim th{background:#f4f7fb;font-size:12px;color:var(--sub);white-space:nowrap;}
+  .dim td.num{font-family:ui-monospace,Consolas,monospace;white-space:nowrap;}
+  .dim td.num small{display:block;color:var(--sub);font-size:11.5px;}
+  .dim tr:last-child td{border-bottom:0;}
+  .dim .grp td{background:#f8fafc;color:var(--sub);font-size:11.5px;font-weight:900;letter-spacing:.05em;text-transform:uppercase;}
+  .pro-tag{display:inline-block;background:#fff6e6;color:#8a5200;border:1px solid #ffe0b0;border-radius:5px;
+    padding:0 5px;font-size:10px;font-weight:900;vertical-align:1px;margin-left:5px;}
+  .dim-note{font-size:12.5px;color:var(--sub);line-height:1.7;}
+
+  /* aisle colour bands */
+  .bands{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0;}
+  .band{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fbfcfe;font-size:13.5px;color:#3d4654;}
+  .band b{display:flex;align-items:center;gap:8px;color:var(--ink);font-size:14px;margin-bottom:4px;}
+  .band i{display:inline-block;width:14px;height:14px;border-radius:4px;flex:0 0 auto;}
+
+  /* steps */
+  ol.steps{list-style:none;margin:0;padding:0;counter-reset:st;}
+  ol.steps li{position:relative;padding:0 0 14px 38px;counter-increment:st;font-size:14.5px;color:#3d4654;}
+  ol.steps li::before{content:counter(st);position:absolute;left:0;top:1px;width:25px;height:25px;border-radius:8px;
+    background:var(--accent);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:900;}
+  ol.steps li b{color:var(--ink);}
+
+  .note{margin-top:14px;background:#f7f9fc;border:1px solid var(--line);border-left:3px solid var(--sun);
+    border-radius:0 10px 10px 0;padding:12px 14px;font-size:13.5px;color:#3d4654;}
+  .note b{color:var(--ink);}
+
+  details.qa{margin-top:10px;border:1px solid var(--line);border-radius:12px;background:#fbfcfe;padding:0 15px;}
+  details.qa[open]{padding-bottom:13px;background:#fff;}
+  details.qa summary{cursor:pointer;padding:12px 0;font-size:14.5px;font-weight:800;list-style:none;line-height:1.5;}
+  details.qa summary::-webkit-details-marker{display:none;}
+  details.qa summary::before{content:"Q";display:inline-grid;place-items:center;width:20px;height:20px;margin-right:9px;
+    border-radius:6px;background:var(--accent);color:#fff;font-size:11px;font-weight:900;vertical-align:1px;}
+  details.qa p{font-size:14.5px;color:#3d4654;margin:4px 0 0;}
+
+  .rel{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:6px;}
+  .rel a{display:block;text-decoration:none;color:var(--ink);border:1px solid var(--line);border-radius:12px;
+    padding:13px 15px;background:#fbfcfe;font-size:14px;font-weight:800;line-height:1.45;}
+  .rel a:hover{border-color:#9fcbff;background:#f4f9ff;}
+  .rel a span{display:block;font-size:12.5px;color:var(--sub);font-weight:600;margin-top:4px;}
+
+  .cta{margin-top:30px;background:linear-gradient(145deg,#e9f3ff,#ffffff 65%,#fff6e6);border:1px solid #cfe4ff;
+    border-radius:18px;padding:26px 24px;text-align:center;}
+  .cta h2{font-size:21px;margin-bottom:8px;}
+  .cta p{font-size:14.5px;color:#3d4654;margin-bottom:16px;}
+  .cta .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+
+  footer{background:#fbfcfe;border-top:1px solid var(--line);padding:20px 18px 28px;}
+  .foot-in{max-width:900px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;
+    font-size:12px;color:var(--sub);}
+  .foot-in b{color:var(--ink);font-size:13px;}
+  .foot-in a{font-weight:800;text-decoration:none;}
+  .foot-in .sp{flex:1;}
+  .legalnote{max-width:900px;margin:10px auto 0;font-size:11px;color:#7a8494;line-height:1.6;}
+
+  @media (max-width:720px){
+    .page-top{height:60px;padding:0 12px;gap:9px;}
+    .brand-icon{width:36px;height:36px;border-radius:11px;}
+    .brand-name{font-size:20px;}
+    .brand small{display:none;}
+    .btn{padding:9px 12px;font-size:12.5px;}
+    main{padding:18px 12px 44px;}
+    .hero{padding:20px 17px;border-radius:15px;}
+    h1{font-size:23px;}
+    section.blk{padding:18px 15px;border-radius:14px;}
+    .bands{grid-template-columns:1fr;}
+    .cta{padding:20px 16px;}
+  }
+  @media (max-width:420px){
+    .page-top .btn.outline{display:none;}
+  }
+
+</style>
+<script>
+/* Analytics (GA4). Nothing is sent while the measurement ID is empty.
+   Respects the opt-out setting (privacy page) and Do Not Track. */
+(function(){
+  var GA_ID = 'G-W0Y7GMPVRK';   /* MiseFits property measurement ID */
+  if(!GA_ID) return;
+  try{ if(localStorage.getItem('misefitsAnalyticsOptOut')==='1'){ window['ga-disable-'+GA_ID]=true; return; } }catch(e){}
+  if(navigator.doNotTrack==='1'||window.doNotTrack==='1') return;
+  window.dataLayer=window.dataLayer||[];
+  window.gtag=function(){window.dataLayer.push(arguments);};
+  window.gtag('js', new Date());
+  window.gtag('config', GA_ID, {anonymize_ip:true});
+  var s=document.createElement('script');
+  s.async=true; s.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(GA_ID);
+  document.head.appendChild(s);
+})();
+</script>
+</head>
+<body>
+<header class="page-top">
+  <a class="brand" href="./" aria-label="MiseFits home">
+    <img class="brand-icon" src="../assets/misefits-icon.png" alt="" width="46" height="46">
+    <span>
+      <span class="brand-name"><span class="mise">Mise</span><span class="fit">Fits</span><span class="dot"></span></span>
+      <small>Real-size floor plan planner for shops &amp; restaurants</small>
+    </span>
+  </a>
+  <span class="top-sp"></span>
+  <a class="btn outline" href="fixture-sizes.html">Fixture sizes</a>
+  <a class="btn" href="../?lang=en">Open the app</a>
+</header>
+
+<main>
+  <nav class="crumb" aria-label="Breadcrumb"><a href="./">MiseFits</a> / Restaurant floor plan</nav>
+
+  <div class="hero">
+    <div class="kicker">Planning guide / Restaurants &amp; cafés</div>
+    <h1>Restaurant floor plan: fit your seats, then check the aisles</h1>
+    <p class="lead">Every extra seat narrows an aisle somewhere. This guide gives you a practical way to go from floor area to seat count, the real sizes of common tables and kitchen equipment, and a quick way to test your layout to scale on the plan your landlord or agent sent you.</p>
+    <a class="btn" href="../?lang=en">Try it in MiseFits (free, no sign-up)</a>
+  </div>
+
+  <nav class="toc">
+    <h2>On this page</h2>
+    <ol>
+      <li><a href="#basic">Seats and aisles are one decision</a></li>
+      <li><a href="#seats">From floor area to seat count: a method</a></li>
+      <li><a href="#area">Square metres, square feet and rent</a></li>
+      <li><a href="#dim">Table, booth and kitchen equipment sizes</a></li>
+      <li><a href="#aisles">Aisle widths: how to check them</a></li>
+      <li><a href="#steps">Planning your layout in MiseFits</a></li>
+      <li><a href="#pitfall">Common mistakes</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ol>
+  </nav>
+
+  <section class="blk" id="basic">
+    <h2>Seats and aisles are one decision</h2>
+    <p>Most arguments about a restaurant floor plan come down to one trade-off: <strong>seats versus circulation</strong>. Add a table for four and some path gets tighter. Widen the path to the kitchen pass and you lose covers.</p>
+    <p>The trade-off only means something <strong>at real size</strong>. "It looks a bit tight" isn't a decision, and taping out every option in an empty tenancy takes an afternoon per layout. MiseFits is a browser-based restaurant layout planner where every table, stool and fridge is drawn at its true size in millimetres over your own floor plan, so you can move things, measure the gap and try the next idea a minute later.</p>
+  </section>
+
+  <section class="blk" id="seats">
+    <h2>From floor area to seat count: a method</h2>
+    <p>"Square metres per seat" figures online vary widely by concept, and none of them know your columns, your door or where the plumbing comes in. A more reliable way to answer "how many seats will this restaurant hold?" is to test it on the plan.</p>
+    <h3>1. Measure the space you can actually seat</h3>
+    <p>Start from the area on the listing and take out what you can't put tables on: the entry, toilets, stairs, columns and the path to the exit. What is left is your <strong>candidate dining area</strong>, which you can measure directly on a scaled plan.</p>
+    <h3>2. Set aside the kitchen and back-of-house as an assumption</h3>
+    <p>Pick a working split between front and back-of-house. Treat it as <strong>your own planning assumption, not a rule</strong>: a café plating pastries needs far less kitchen than a restaurant with a hot line and a dish pit. Then test it by placing the equipment you actually need and checking someone can work in front of each item. If it doesn't fit, move the line, not the equipment.</p>
+    <h3>3. Try two or three layouts and compare</h3>
+    <p>Fill the dining area a few different ways: mostly tables for two, mostly tables for four, or a wall counter with fewer tables. MiseFits counts seats as you place furniture (a counter counts one seat per 600 mm) so you can compare options side by side. The most seats isn't automatically the winner; pick the layout where service still flows.</p>
+    <div class="note"><b>Your seat count is a planning number.</b> The number of patrons you are allowed to serve is set by your local building, fire and health authorities, and it can depend on toilets, exits and ventilation as well as floor area. Use the count to compare layouts, then confirm the final figure with your architect, certifier or council.</div>
+  </section>
+
+  <section class="blk" id="area">
+    <h2>Square metres, square feet and rent</h2>
+    <p>Depending on where you are leasing, the listing may not use the unit you plan in. Commercial listings in <strong>Singapore, the UAE and the UK</strong> are commonly quoted in square feet, and rent is often given per sq ft. In <strong>Australia and New Zealand</strong>, listings and rent are usually quoted in square metres.</p>
+    <p>The conversion is simple: <strong>1 m² = 10.764 sq ft</strong>. A shop measuring 9 m × 12 m is 108 m², or about 1,163 sq ft. If rent is quoted per sq ft, multiply it by 10.764 to get the rate per m², which makes it easy to compare with another listing or with the rent you had budgeted per seat.</p>
+    <p>You don't have to do this by hand. <strong>In English mode, MiseFits shows every area in m² with sq ft alongside</strong>, both for the sheet and for any area you trace. Lengths and fixture sizes stay in millimetres, the unit most fit-out drawings use.</p>
+  </section>
+
+  <section class="blk" id="dim">
+    <h2>Table, booth and kitchen equipment sizes</h2>
+    <p>These are the default sizes in the MiseFits fixture library. Real products vary by manufacturer, so once you have chosen a specific table or fridge, type its width and depth in mm in the app to override the default. Inches are rounded to the nearest whole inch.</p>
+<div class="dim-wrap">
+<table class="dim">
+<thead><tr><th>Fixture</th><th>Size in mm (inches)</th><th>What to watch when placing it</th></tr></thead>
+<tbody>
+<tr class="grp"><td colspan="3">Dining</td></tr>
+<tr><td>Table for 2</td><td class="num">600 × 700<small>(24 × 28 in)</small></td><td>Chair pull-out space is not included; allow room on both sides</td></tr>
+<tr><td>Table for 4</td><td class="num">1200 × 700<small>(47 × 28 in)</small></td><td>Seating someone at the short end changes the clearance you need</td></tr>
+<tr><td>Table for 6<span class="pro-tag">PRO</span></td><td class="num">1800 × 800<small>(71 × 31 in)</small></td><td>Its length can push chairs into the main aisle</td></tr>
+<tr><td>Round table for 2</td><td class="num">Ø600<small>(Ø24 in)</small></td><td>No corners, so it's easy to walk around in tight spots</td></tr>
+<tr><td>Round table for 4</td><td class="num">Ø900<small>(Ø35 in)</small></td><td>Takes more aisle than a square table of the same capacity</td></tr>
+<tr><td>Counter seating</td><td class="num">1800 × 450<small>(71 × 18 in)</small></td><td>Against a wall it needs an aisle on one side only; counted as 1 seat per 600 mm</td></tr>
+<tr><td>Booth for 4<span class="pro-tag">PRO</span></td><td class="num">1400 × 1600<small>(55 × 63 in)</small></td><td>Outer size including the bench seats; plan it against a wall</td></tr>
+<tr><td>Square stool / Round stool</td><td class="num">450 × 450 / Ø450<small>(18 × 18 / Ø18 in)</small></td><td>Place chairs separately to show them pulled out</td></tr>
+<tr><td>High chair<span class="pro-tag">PRO</span></td><td class="num">400 × 400<small>(16 × 16 in)</small></td><td>Plan where it's used and where it's stored</td></tr>
+<tr class="grp"><td colspan="3">Counter &amp; service</td></tr>
+<tr><td>Cash desk</td><td class="num">900 × 600<small>(35 × 24 in)</small></td><td>Include the space where people queue to pay</td></tr>
+<tr><td>POS terminal<span class="pro-tag">PRO</span></td><td class="num">600 × 500<small>(24 × 20 in)</small></td><td>Staff need standing room behind it</td></tr>
+<tr><td>Drink station</td><td class="num">1200 × 600<small>(47 × 24 in)</small></td><td>Self-serve sits on the guest path; staff-only sits on the service path</td></tr>
+<tr><td>Beer tap<span class="pro-tag">PRO</span></td><td class="num">500 × 500<small>(20 × 20 in)</small></td><td>Allow access for changing kegs</td></tr>
+<tr class="grp"><td colspan="3">Kitchen &amp; plumbing</td></tr>
+<tr><td>Sink / Double sink</td><td class="num">600 × 600 / 1200 × 600<small>(24 × 24 / 47 × 24 in)</small></td><td>How many bowls you need depends on your menu and local health rules</td></tr>
+<tr><td>Range / burners</td><td class="num">600 × 600<small>(24 × 24 in)</small></td><td>The cook's back needs a clear path behind it</td></tr>
+<tr><td>Refrigerator / Freezer</td><td class="num">700 × 700<small>(28 × 28 in)</small></td><td>Check which way the door swings and how far it opens</td></tr>
+<tr><td>Worktable</td><td class="num">900 × 600<small>(35 × 24 in)</small></td><td>If two people work facing each other, measure the gap between them</td></tr>
+<tr><td>Fryer<span class="pro-tag">PRO</span></td><td class="num">450 × 600<small>(18 × 24 in)</small></td><td>Tied to the exhaust position and oil delivery and removal</td></tr>
+<tr><td>Oven<span class="pro-tag">PRO</span></td><td class="num">800 × 750<small>(31 × 30 in)</small></td><td>Many models have a large drop-down door</td></tr>
+<tr><td>Ice machine<span class="pro-tag">PRO</span></td><td class="num">700 × 600<small>(28 × 24 in)</small></td><td>Needs water supply and a drain nearby</td></tr>
+<tr><td>Dishwasher<span class="pro-tag">PRO</span></td><td class="num">600 × 650<small>(24 × 26 in)</small></td><td>Should sit at the end of the dirty-dish return path</td></tr>
+<tr><td>Range hood<span class="pro-tag">PRO</span></td><td class="num">1500 × 800<small>(59 × 31 in)</small></td><td>Check from above that it covers the burners and fryer</td></tr>
+<tr><td>Grease trap<span class="pro-tag">PRO</span></td><td class="num">600 × 400<small>(24 × 16 in)</small></td><td>Leave room to lift the lid for cleaning</td></tr>
+<tr><td>Hand sink / Toilet</td><td class="num">400 × 350 / 500 × 800<small>(16 × 14 / 20 × 31 in)</small></td><td>Kitchen and guest hand-washing may need to be separate</td></tr>
+</tbody>
+</table>
+</div>
+    <p class="dim-note">Sizes are the outer footprint of the item itself. <strong>They don't include room to pull out a chair, open a door or stand in front of the equipment.</strong> Items marked PRO are in the Pro fixture library. The full list of fixtures across every business type is on the <a href="fixture-sizes.html">fixture size list</a>.</p>
+  </section>
+
+  <section class="blk" id="aisles">
+    <h2>Aisle widths: how to check them</h2>
+    <p>An aisle is only as wide as its narrowest point, and that point is usually a chair back, not a table edge. So measure <strong>with the chairs pulled out</strong>, at every pinch point between the door, the tables, the counter and the kitchen pass.</p>
+    <p>MiseFits colours each measurement so you can spot tight spots at a glance. These bands are the app's rule of thumb for layout checking, not a regulation:</p>
+    <div class="bands">
+      <div class="band"><b><i style="background:#e63946"></i>Red: under 600 mm</b>Tight. Treat it as a gap between things, not as a walkway.</div>
+      <div class="band"><b><i style="background:#f0900f"></i>Orange: under 900 mm</b>Narrow. Look again if staff and guests both use it.</div>
+      <div class="band"><b><i style="background:#1f8f7d"></i>Green: 900 mm or more</b>The app's comfortable band. Main routes and passing points may still need more.</div>
+    </div>
+    <p>Focus on the busiest paths: kitchen pass to the furthest table, the counter queue, and the way to the toilets. Where staff carrying plates pass guests, one person's width is not enough.</p>
+    <div class="note"><b>Legal requirements vary.</b> Accessibility and fire egress requirements (exit widths, accessible routes and wheelchair circulation) differ by country, state and council, for example under Australia's National Construction Code (NCC), Singapore's SCDF Fire Code or Dubai Civil Defence regulations. MiseFits does not check compliance. Confirm the required widths for your premises with a local architect, building certifier or the relevant authority before you commit to a fit-out.</div>
+  </section>
+
+  <section class="blk" id="steps">
+    <h2>Planning your layout in MiseFits</h2>
+    <ol class="steps">
+      <li><b>Load your floor plan or start blank.</b> Load the PDF or image your landlord or agent sent you (for a PDF, the first page is used). No plan yet? Choose "New blank" and enter the width and depth in mm.</li>
+      <li><b>Calibrate the scale from one known dimension.</b> Use "Set scale", click the two ends of a length you trust, such as the shopfront width, and type it in mm. Everything after this depends on it, so use the longest reliable dimension you have.</li>
+      <li><b>Place the kitchen first.</b> From "Kitchen &amp; plumbing", place your equipment and check there is working space in front of each item.</li>
+      <li><b>Fill the dining area.</b> From "Restaurant &amp; café", place tables, counters and booths. Drag to move, use the handles to rotate, or type exact sizes.</li>
+      <li><b>Measure the aisles.</b> Press <code>M</code> (or use Measure) and click two points. If a gap shows red, drop a table or turn it and measure again.</li>
+      <li><b>Check seats and area.</b> The Summary panel counts seats and shows area in m² and sq ft. Put each option on its own sheet to compare.</li>
+      <li><b>Share it.</b> Export PNG or PDF, or print, for your partner, builder or landlord. "Save (JSON)" lets you keep editing later.</li>
+    </ol>
+    <div class="note"><b>Want the area of one zone?</b> With Pro you can trace around the dining room or kitchen on the plan and get its area in m² and sq ft, a quick check on the front/back split you assumed.</div>
+  </section>
+
+  <section class="blk" id="pitfall">
+    <h2>Common mistakes</h2>
+    <h3>Forgetting the chairs</h3>
+    <p>Tables laid out edge to edge look fine until someone pushes a chair back into the aisle. Place chairs separately, pulled out, and measure from those.</p>
+    <h3>Calibrating from a short or doubtful dimension</h3>
+    <p>Set the scale from a "900 mm" door that is really 820 mm and every measurement is out by the same proportion. Use a long, clearly dimensioned wall, then check a second known length.</p>
+    <h3>One path doing every job</h3>
+    <p>If guests, servers and dirty plates share a single aisle, they will meet in the middle. Keep it wide enough to pass along its whole length, or give people somewhere to step aside.</p>
+    <h3>Ignoring door swings and the queue</h3>
+    <p>Entry, toilet and fridge doors all need space to open. Plan where two or three people will wait at the counter, too, or the line ends up at the door.</p>
+  </section>
+
+  <section class="blk" id="faq">
+    <h2>FAQ</h2>
+    <details class="qa"><summary>Is MiseFits free?</summary>
+      <p>Yes. Loading a plan, setting the scale, placing furniture and equipment, measuring aisles, counting seats and exporting PNG or PDF are all free. An optional one-time Pro upgrade adds extra fixtures, area tracing and true-scale printing, among other tools.</p>
+    </details>
+    <details class="qa"><summary>Do I need to create an account?</summary>
+      <p>No. MiseFits runs in your browser with no sign-up, and your plan is processed and auto-saved on your own device. To move a project to another device, save it as JSON and open it there.</p>
+    </details>
+    <details class="qa"><summary>Can I import the floor plan my landlord or agent sent me?</summary>
+      <p>Yes. Load the PDF (the first page is used) or a JPG/PNG, then set the scale by clicking both ends of a dimension you know and typing its length in mm. If the plan is on a later PDF page, export that page as an image first.</p>
+    </details>
+    <details class="qa"><summary>Can I see the area in square feet?</summary>
+      <p>Yes. In English mode, areas are shown in m² with sq ft in brackets, so you can compare directly with a listing quoted in sq ft. Lengths are entered in millimetres.</p>
+    </details>
+    <details class="qa"><summary>Can I print the plan to scale?</summary>
+      <p>True-scale printing (1:20 to 1:200) is part of MiseFits Pro, a one-time purchase of US$19 with no subscription. The free version exports PNG and PDF fitted to the page.</p>
+    </details>
+    <details class="qa"><summary>How many devices can I use Pro on?</summary>
+      <p>One Pro license key works on up to 5 devices, such as your laptop, tablet and phone.</p>
+    </details>
+  </section>
+
+  <section class="blk">
+    <h2>Related pages</h2>
+    <div class="rel">
+      <a href="fixture-sizes.html">Fixture size list<span>Width × depth in mm for every fixture in the library</span></a>
+      <a href="./">MiseFits in English<span>What the app does and how it works</span></a>
+      <a href="../?lang=en">Open the app<span>Start planning on your own floor plan, free</span></a>
+    </div>
+  </section>
+
+  <div class="cta">
+    <h2>Try your floor plan at real size</h2>
+    <p>Load a plan, set the scale, place tables and kitchen equipment, measure aisles, count seats and export PNG or PDF, all free and with no sign-up.</p>
+    <div class="row">
+      <a class="btn" href="../?lang=en">Open MiseFits</a>
+      <a class="btn outline" href="fixture-sizes.html">See fixture sizes</a>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <div class="foot-in">
+    <b>MiseFits</b>
+    <span>Your floor plans are processed only in your browser</span>
+    <span class="sp"></span>
+    <a href="./">MiseFits home</a>
+    <a href="../?lang=en">App</a>
+    <a href="fixture-sizes.html">Fixture sizes</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="terms.html">Terms</a>
+    <span>Produced by Koko Kikaku</span>
+    <a href="https://kokokikaku.com/" target="_blank" rel="noopener">kokokikaku.com</a>
+  </div>
+  <p class="legalnote"><strong>Disclaimer.</strong> The sizes on this page are the default values in the MiseFits fixture library and general starting points for planning. Actual product sizes, required aisle and exit widths, and patron numbers depend on your premises, your type of business, your equipment and the rules where you operate. MiseFits is a tool for rough planning; the sizes, areas and seat counts it shows do not guarantee that a fit-out is buildable or compliant. Always confirm building, fire, accessibility and food safety requirements with a qualified architect, building certifier or builder and the relevant local authority.</p>
+</footer>
+
+</body>
+</html>

@@ -31,6 +31,9 @@ layout-classroom.html  … 業種別ガイド：学習塾・教室・オフィ�
 aisle-width.html       … 寸法ガイド：通路幅と什器のすき間。
 madori-2d.html         … 集客ページ：2Dの間取りシミュレーション（幅×奥行きだけで検討する層向け）。
 fixture-sizes.html     … 什器・設備の寸法一覧（LIBRARY から自動生成。手で数値を書かない）。
+overseas-store.html    … 集客ページ：日系の海外出店（現地の図面・坪／m²／sq ft の換算）。日本語。
+en/             … 英語版（海外向け）の静的ページ。詳しくは下の「英語版（海外向け）」。
+scripts/build-en-fixture-sizes.js … en/fixture-sizes.html を LIBRARY と I18N_EN から生成する。
 privacy.html    … プライバシーポリシー・免責事項（解析のオプトアウトUIを含む）。
 pro-unlock.html … 買い切りStripe決済後のリダイレクト先（ライセンスキー表示）。
 404.html        … カスタム404（GitHub Pages が自動で使用）。
@@ -127,6 +130,68 @@ firebase functions:log --only menufitsStripeWebhook --project misefits
 `STRIPE_WEBHOOK_SECRET_MENUFITS` は同日に v2→v3→v4 と7分間で3回差し替えられており、
 署名検証で難儀した形跡がある。MenuFits はまだ販売実績ゼロなので実害は出ていないが、
 **最初の購入が来る前に、Stripeのライブ画面から鍵を取り直して set→deploy し、テスト購入で通すこと。**
+
+### 英語版（海外向け）— 2026-09-25 追加
+
+**対象**：第1弾はメートル法の英語圏（AU・SG・UAE・NZ）。英国・アイルランド・カナダは、GA4 の同意バナーを
+入れてから（英国は GA4 に同意が必要。EU も同様）。米国はインチ表記の対応が要るので後回し。
+**価格**：US$19 の買い切り（日本語版の ¥1,480 とは別売り・別決済）。地域別の値下げは後から
+Lemon Squeezy の割引コード（ParityDeals 等）で足す想定。
+
+**アプリ本体（`index.html`）は同じファイルのまま英語でも表示する。フォークしない。**
+
+- 表示言語は head の `MF_LANG`。`?lang=en` か、以前に英語を選んだ記録（localStorage の `misefitsLang`）が
+  あるときだけ英語。**ブラウザの言語設定で自動切替しないこと**（Googlebot は英語環境でレンダリングするので、
+  日本語トップが英語で索引される）。
+- 文言は日本語の原文をキーにした辞書 `I18N_EN` から `t('原文', {差し込み})` で引く。日本語表示では原文を
+  そのまま返すので、**日本語の表示は1文字も変わらない**。静的HTMLは `applyI18nDom()` がテキストノードと
+  title / aria-label / placeholder を差し替える。
+- **UIの文言を足したら `I18N_EN` にも英訳を足す**（無いと英語画面に日本語がそのまま出る）。JSの文言は
+  `t()` で包む。関数の中で `t` という名前のローカル変数を作らないこと（`t()` が隠れて動かなくなる）。
+- 英語でだけ差し替えるリンクは `data-href-en`、片方の言語だけに出す要素は `class="only-ja"` / `class="only-en"`。
+- 什器名・カテゴリ名は英語表示のときだけ `LIBRARY` を書き換える（検索は日本語名でも当たる）。
+- 面積は英語表示で **m² と sq ft を併記**（`areaNum()` / `areaStr()`）。シンガポール・UAE・英国などの
+  テナント募集は sq ft で出るため。長さは mm のまま。
+- 英語の静的ページは `en/`：`index.html`（トップ・使い方・料金・FAQ）/ `restaurant-floor-plan.html` /
+  `fixture-sizes.html`（**生成物。`node scripts/build-en-fixture-sizes.js` で作り直す。手で直さない**）/
+  `privacy.html` / `terms.html`（返金は購入から14日以内なら理由を問わず全額。豪州消費者法では
+  「返金不可」の表示自体が問題になりうるため、日本語版の特商法表記とは方針が違う）/ `pro-unlock.html`。
+- 対になる日英ページには相互に hreflang を張っている（トップ、飲食店ガイド、寸法一覧、プライバシー）。
+  片方だけ張っても効かないので、ページを足すときは両方に書く。
+- **広告（A8）は英語ページに出さない**（A8 は国内専用）。英語圏の候補は Amazon の各国版（.com.au / .sg / .ae）・
+  Nisbets（Awin・英愛）。日本在住で登録できるかは申請して確かめる。
+
+**決済：Lemon Squeezy（Merchant of Record）**。各国の VAT/GST の計算・納付は先方が行う。
+
+- アプリの購入ボタン → `lemonCheckoutUrl()` がランダムな claim を作って localStorage（`misefitsLsClaim`）に置き、
+  `checkout[custom][claim]` を付けて Checkout を開く → webhook（`lemonSqueezyWebhook`）が **Stripe 分と同じ
+  `MFPRO-` 形式のキー**を `licenses` に発行し、`lsClaims/{claim}` に紐づけ、英語の控えメールを送る →
+  購入後のリダイレクト先 `en/pro-unlock.html` が `claimLicense?claim=` でキーを受け取る。
+  **アプリ側の検証経路（`verifyLicense`）は日英で1本のまま。**
+- `order_refunded` で `licenses/{key}.revoked = true`。以後そのキーは新しい端末で解放できない
+  （解放済みの端末は動き続ける。アカウント無しの設計上、遡って止める手段はない）。
+- 決済URL `PRO_PURCHASE_URL_EN` は **`index.html` と `en/index.html` の2か所**にある。空のあいだは
+  購入ボタンを出さない（ロック機能に触れるとキー入力欄へ案内する従来の挙動になる）。変更時は両方そろえる。
+- **Lemon Squeezy の新規登録は、Stripe Managed Payments（MP）へ案内される可能性がある**（2026-09 時点で
+  登録入口が Stripe の「事業について教えて」フォームに変わっている）。MP になった場合は Stripe の Checkout
+  なので、既存の `stripeWebhook` を別の Price ID でも通すように直せばよい。**ただし MP は日本国内の客への
+  販売の消費税を扱わない**（国内販売の申告は自分で行う）。
+
+**開通手順（人がやること）**
+
+1. Lemon Squeezy でストアを作る（本人確認あり・通常2〜3営業日）。商品「MiseFits Pro」US$19・単発。
+   商品のリダイレクト先（Confirmation の Button link）を `https://misefits.kokokikaku.com/en/pro-unlock.html` にする。
+2. Webhook を作る：URL `https://us-central1-misefits.cloudfunctions.net/lemonSqueezyWebhook`、
+   イベント `order_created` と `order_refunded`、署名用シークレットを決める。
+3. **`firebase functions:secrets:set LEMONSQUEEZY_WEBHOOK_SECRET --project misefits` を先にやる。**
+   このシークレットが存在しないと、**functions 全体のデプロイが失敗する**（MenuFits の修正も出せなくなる）。
+4. `functions/.env` の `LEMONSQUEEZY_PRODUCT_ID` に商品IDを入れ、テスト中だけ `LEMONSQUEEZY_ALLOW_TEST=true`。
+   `firebase deploy --only functions --project misefits`。
+5. テストモードで購入 → `en/pro-unlock.html` にキーが出る → アプリで解放できる → 返金で `revoked` になる、を確認。
+6. `LEMONSQUEEZY_ALLOW_TEST=false` に戻してデプロイ。本番の Checkout URL を `PRO_PURCHASE_URL_EN`（2か所）に入れて push。
+
+**税務（税理士に確認すること）**：MoR 経由の売上は海外法人（Lemon Squeezy）への販売になり、日本の消費税は
+不課税または輸出免税になりうる。どちらで扱うかで課税売上高の判定が変わる。
 
 ### アクセス解析（GA4）
 
