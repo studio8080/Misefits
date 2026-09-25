@@ -197,14 +197,18 @@ MP への統合を進めており、後で移行する二度手間を避ける�
 
 **2026-09-25 の開通時に分かったこと**
 
-- **misefits プロジェクトには別リポジトリの関数も同居している**（`zenginponStripeWebhook`＝全銀ポン、asia-northeast1）。
-  このリポジトリから `firebase deploy --only functions` を丸ごと実行すると、ここに無い関数の削除を求められる。
-  **必ず `--only functions:stripeWebhook,functions:verifyLicense` のように関数名を指定してデプロイする。**
+- **misefits プロジェクトには別リポジトリの関数も同居している**（全銀ポン：`zenginponStripeWebhook` /
+  `zenginponLicense`、asia-northeast1）。全銀ポンは codebase `zenginpon` に分けてあるので、デプロイは
+  `repos/zengin-pon` から `firebase deploy --only functions:zenginpon --project misefits`。
+  こちらからは念のため `--only functions:stripeWebhook,functions:verifyLicense` のように関数名を指定する
+  （MenuFits の関数は Stripe の鍵のバージョンまで一緒に切り替わるので、巻き込まない）。
 - `SMTP_PASS` は全銀ポン・MenuFits・MiseFits の3関数で共有している。`secrets:set` の最後に出る
   「再デプロイして古いバージョンを破棄するか」には **`n`** と答え、MiseFits の関数だけ個別にデプロイする。
 - `SMTP_PASS` は **Google のアプリ パスワード（16桁）**でないと送れない（通常のパスワードだと 534-5.7.9）。
-  v4・v5 は失敗、**v6 で送信を確認**（2026-09-25）。全銀ポン・MenuFits は古いバージョンのままなので、そちらの
-  メールが送れているかは未確認。v5 には通常のパスワードが入っているので、破棄と Google パスワードの変更を検討する。
+  v2・v4・v5 は失敗、**v6 で送信を確認**（2026-09-25）。同日に MiseFits（`stripeWebhook`）と全銀ポンは v6 で再デプロイ済み。
+  **MenuFits（`menufitsStripeWebhook`）は v2 のままで、控えメールは 9/1 から失敗している**
+  （再デプロイすると Stripe の鍵も未検証の最新版 v4 に切り替わるため、テスト購入とセットで行う）。
+  v5 には通常のパスワードが入っているので、破棄と Google パスワードの変更を検討する。
 - テスト購入は本番の Payment Link で行い、請求先を**オーストラリア**にして全額返金した。控えメールの再テストは、
   Firestore の `sessions/{cs_live_…}` を消してから Stripe の Webhook 画面で「再送する」を使った
   （**再送できるのは直近の送信試行だけ**）。再送すると別のキーが発行されるので、最後に `charge.refunded` も再送して無効化する。
