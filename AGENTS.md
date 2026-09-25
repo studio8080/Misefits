@@ -190,8 +190,8 @@ Lemon Squeezy の割引コード（ParityDeals 等）で足す想定。
 5. テストモードで購入 → `en/pro-unlock.html` にキーが出る → アプリで解放できる → 返金で `revoked` になる、を確認。
 6. `LEMONSQUEEZY_ALLOW_TEST=false` に戻してデプロイ。本番の Checkout URL を `PRO_PURCHASE_URL_EN`（2か所）に入れて push。
 
-**税務（税理士に確認すること）**：MoR 経由の売上は海外法人（Lemon Squeezy）への販売になり、日本の消費税は
-不課税または輸出免税になりうる。どちらで扱うかで課税売上高の判定が変わる。
+**税務**：MoR 経由の売上は海外法人（Lemon Squeezy）への販売で、日本の消費税は**不課税**として扱う
+（2026-09-25 に本人が確認済み）。所得税・法人税の売上には入る。
 
 ### アクセス解析（GA4）
 
