@@ -1909,10 +1909,12 @@ const LIBRARY = [
   ]},
   // Pro: バリアフリー・法令チェック用。φ1500の転回スペースは車椅子基準の定番確認。
   { cat:"バリアフリー・設備", color:"#fef3c7", items:[
-    { key:"wheelchair_turn", name:"車椅子転回 φ1500", shape:"circle", w:1500, d:1500, color:"#fcd34d", pro:true },
-    { key:"toilet_multi", name:"多目的トイレ", shape:"rect", w:2000, d:2000, color:"#cfd4db", pro:true },
-    { key:"handrail", name:"手すり", shape:"rect", w:1200, d:60, color:"#cbd5e1", pro:true },
-    { key:"slope", name:"スロープ", shape:"rect", w:1200, d:2000, color:"#d6d3d1", pro:true },
+    // 2026-09-25：バリアフリーの4点（車椅子転回・多目的トイレ・手すり・スロープ）は無料に変更。
+    // 誰でも配慮を確かめられるようにするため（海外向けの点検での指摘も受けて）。設備の3点は Pro のまま。
+    { key:"wheelchair_turn", name:"車椅子転回 φ1500", shape:"circle", w:1500, d:1500, color:"#fcd34d" },
+    { key:"toilet_multi", name:"多目的トイレ", shape:"rect", w:2000, d:2000, color:"#cfd4db" },
+    { key:"handrail", name:"手すり", shape:"rect", w:1200, d:60, color:"#cbd5e1" },
+    { key:"slope", name:"スロープ", shape:"rect", w:1200, d:2000, color:"#d6d3d1" },
     { key:"fire_ext", name:"消火器", shape:"rect", w:250, d:250, color:"#ef4444", pro:true },
     { key:"distribution_board", name:"分電盤", shape:"rect", w:600, d:200, color:"#a8a29e", pro:true },
     { key:"aircon_out", name:"室外機", shape:"rect", w:900, d:350, color:"#9ca3af", pro:true },
