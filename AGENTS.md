@@ -239,7 +239,9 @@ MP への統合を進めており、後で移行する二度手間を避ける�
       `pr-manage-pub.a8.net` は直接開くと「セッション切れ」になる。メディア管理画面（`media-console.a8.net/home`）で
       `window.open` を同じタブへの遷移に差し替えてから「広告掲載URL管理」をクリックすると、同じタブでセッションが張られ、
       その後は `program-detail?programId=…` を直接開ける。
-- [ ] **英語ページの運営者表示**：氏名・住所を載せるか（バーチャルオフィスにするか）は未決定。
+- [x] **英語ページの運営者表示**：`Koko Kikaku … operated by Mika Takeda`＋`studio@kokokikaku.com` を規約とプライバシーに掲載（2026-09-25）。
+- [ ] **バーチャルオフィスの住所**：契約したら en/terms.html の Provider 欄と en/privacy.html 冒頭の
+      「postal address is available on request」を実際の住所に差し替える。**自宅住所は載せない**（本人の判断）。電話番号も載せない。
 - [ ] **英国・EU の販売開始**：保留（同意バナーと GDPR 第27条の代理人が必要）。それまでは販売見合わせ・GA 非送信のまま。
 - [ ] MenuFits の英語版ができたら、日本語版・英語版まとめてテスト購入（`menufits` リポジトリの HANDOFF-FROM-MISEFITS-20260925.md）。
 - [x] アクセシビリティ（2026-09-25）：ブラウザ拡大を許可（キャンバス上は `touch-action:none` と独自ピンチのまま）、
