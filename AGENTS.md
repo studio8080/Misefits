@@ -249,7 +249,8 @@ MP への統合を進めており、後で移行する二度手間を避ける�
 - [x] **DMARC の追加（kokokikaku.com）**：2026-09-25 に Squarespace で TXT `_dmarc` を追加済み（種別 TXT は本人が選択）。控えメールの迷惑メール判定対策。
       Squarespace の DNS に TXT `_dmarc` = `v=DMARC1; p=none; rua=mailto:studio@kokokikaku.com` を**本人が**追加する
       （会社ドメインで `mikan@` の再認証が要る。種別の選択は人がやる、という CLAUDE.md の注意どおり）。
-- [ ] MenuFits の英語版ができたら、日本語版・英語版まとめてテスト購入（`menufits` リポジトリの HANDOFF-FROM-MISEFITS-20260925.md）。
+- [x] MenuFits の英語版（US$19・Managed Payments）：2026-09-25 に公開し、日本語版・英語版ともテスト購入→返金まで通過
+      （MenuFits 側の AGENTS.md「通し確認」。決済処理は `functions/menufits.js` の `637e0cb`）。
 - [x] アクセシビリティ（2026-09-25）：ブラウザ拡大を許可（キャンバス上は `touch-action:none` と独自ピンチのまま）、
       コントラスト 4.5:1 未満を解消（削除ボタン・ON 状態・LINE・ロック中の Pro 什器）、矢印キーで10mm移動（Shift で100mm）・N で順に選択。
 
