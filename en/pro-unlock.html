@@ -92,6 +92,10 @@ function trackEvent(name, params){
       Press “Unlock on this device” to open MiseFits with Pro turned on. <strong>Copy the key and keep it</strong> — we've also emailed it to you. To use Pro on another device, open MiseFits there and paste the key under “MiseFits Pro” in the side panel (up to 5 devices).
     </div>
 
+    <div id="expiredNote" class="warn" style="display:none;">
+      <b>This link has expired</b>
+      For security, keys can be shown on this page for 30 days after purchase. Your key is in the email you received at checkout (check your spam folder too). If you can't find it, email <a href="mailto:studio@kokokikaku.com">studio@kokokikaku.com</a> from the address you used to buy.
+    </div>
     <div id="errorNote" class="warn" style="display:none;">
       <b>We can't find your key yet</b>
       The payment may still be processing. Your key is also sent to the email address you used at checkout — please check your inbox (and spam folder). If it doesn't arrive within a few minutes, email <a href="mailto:studio@kokokikaku.com">studio@kokokikaku.com</a> with that email address.
@@ -167,10 +171,11 @@ function trackEvent(name, params){
   }
   function pollForKey(left){
     fetch(FUNCTIONS_BASE + '/issueLicense?session_id=' + encodeURIComponent(sessionId))
-      .then(function(r){ return r.ok ? r.json() : { found:false }; })
+      .then(function(r){ return r.json().catch(function(){ return { found:false }; }); })
       .catch(function(){ return { found:false }; })
       .then(function(data){
         if(data && data.found && data.key) showKey(data.key);
+        else if(data && data.reason === 'expired'){ loading.style.display = 'none'; $('fetchingLine').style.display = 'none'; $('expiredNote').style.display = 'block'; }
         else if(left > 0) setTimeout(function(){ pollForKey(left - 1); }, 2000);
         else { loading.style.display = 'none'; errorNote.style.display = 'block'; }
       });

@@ -108,6 +108,19 @@ function licenseMailBody(key) {
 
 // 送信できなくてもキー発行自体は成功しているので、ここで例外を投げない。
 // 結果は licenses/{key} に記録して、問い合わせ時に追えるようにする。
+// 要対応の注文（販売しない地域・MP が税を扱わない国・日本からの英語版購入）を運営者に知らせる。
+// 失敗しても webhook は成功扱いにする（呼び出し側で catch）。
+async function sendAdminAlert(subject, text) {
+  const host = smtpHost.value();
+  const user = smtpUser.value();
+  const from = mailFrom.value();
+  const pass = smtpPass.value();
+  if (!host || !user || !from || !pass) return;
+  const port = Number(smtpPort.value()) || 465;
+  const transporter = nodemailer.createTransport({ host, port, secure: port === 465, auth: { user, pass } });
+  await transporter.sendMail({ from, to: 'studio@kokokikaku.com', subject, text });
+}
+
 async function sendLicenseMail(to, key, lang = 'ja') {
   const host = smtpHost.value();
   const user = smtpUser.value();
@@ -214,6 +227,8 @@ exports.stripeWebhook = onRequest(
     const notYetOffered = lang === 'en' && !!country && EN_NOT_YET_OFFERED.has(country);
     if (outsideMpTax) console.warn('English order from a country outside Managed Payments tax coverage', session.id, country);
     if (notYetOffered) console.warn('English order from a country where Pro is not yet offered (refund it)', session.id, country);
+    // MP は日本の事業者の国内販売の消費税を扱わないので、英語版を日本から買った分は国内の課税売上として計上する
+    const domesticJp = lang === 'en' && country === 'JP';
     await db.collection('licenses').doc(key).set({
       email,
       sessionId: session.id,
@@ -222,12 +237,25 @@ exports.stripeWebhook = onRequest(
       country,
       ...(outsideMpTax ? { outsideMpTax: true } : {}),
       ...(notYetOffered ? { notYetOffered: true } : {}),
+      ...(domesticJp ? { domesticJp: true } : {}),
       createdAt: FieldValue.serverTimestamp(),
     });
     await sessionRef.set({
       licenseKey: key,
       createdAt: FieldValue.serverTimestamp(),
     });
+    if (outsideMpTax || notYetOffered || domesticJp) {
+      const why = [
+        outsideMpTax && 'Managed Payments が税を扱わない国 → 返金して案内する',
+        notYetOffered && '販売を見合わせている地域（EU/EEA・英国・スイス） → 返金して案内する',
+        domesticJp && '日本からの英語版購入 → 国内の課税売上として計上する',
+      ].filter(Boolean).join('\n');
+      await sendAdminAlert(`[MiseFits] 要対応の注文（${country}）`,
+        `${why}\n\nsession: ${session.id}\npayment_intent: ${paymentIntent}\nlicense: ${key}\n` +
+        `Stripe: https://dashboard.stripe.com/payments/${paymentIntent}`)
+        .catch((err) => console.error('admin alert failed', err));
+    }
+
     // 返金（charge.refunded）からキーを引けるようにしておく
     if (paymentIntent) {
       await db.collection('paymentIntents').doc(paymentIntent).set({ licenseKey: key });
@@ -260,6 +288,11 @@ exports.issueLicense = onRequest({ cors: [ALLOWED_ORIGIN], maxInstances: 5 }, as
     res.status(400).json({ error: 'missing session_id' });
     return;
   }
+  // Firestore のドキュメントIDとして不正な値（/ を含む・長すぎる）で 500 にならないよう、形式を先に確かめる
+  if (!/^cs_(live|test)_[A-Za-z0-9]{10,200}$/.test(String(sessionId))) {
+    res.status(400).json({ error: 'invalid session_id' });
+    return;
+  }
   const doc = await db.collection('sessions').doc(String(sessionId)).get();
   if (!doc.exists) {
     res.status(404).json({ found: false });
@@ -283,7 +316,8 @@ exports.issueLicense = onRequest({ cors: [ALLOWED_ORIGIN], maxInstances: 5 }, as
 exports.verifyLicense = onRequest({ cors: [ALLOWED_ORIGIN], maxInstances: 5 }, async (req, res) => {
   const key = String(req.query.key || '').trim().toUpperCase();
   const device = String(req.query.device || '').slice(0, 64);
-  if (!key) {
+  // キーは MFPRO-XXXX-XXXX-XXXX-XXXX、端末IDはブラウザが作る dev-＋16進32桁（無しは旧クライアント）
+  if (!/^MFPRO-[A-Z2-9]{4}(-[A-Z2-9]{4}){3}$/.test(key) || (device && !/^dev-[0-9a-f]{32}$/.test(device))) {
     res.status(400).json({ valid: false });
     return;
   }

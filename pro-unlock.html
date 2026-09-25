@@ -132,6 +132,10 @@ function trackEvent(name, params){
       <p>上の「この端末で解放してMiseFitsを開く」を押すと、Proが使える状態のままアプリが開きます。あわせて<strong>キーは必ずコピーして控えてください</strong>（キーが表示されるのはこのページだけです）。別の端末でも使う場合は、その端末でMiseFitsを開き、サイドバーの「MiseFits Pro」欄にこのキーを貼り付けて「解放する」を押してください（同じキーで最大5台まで）。うまくいかないときは<a href="./">MiseFitsを開く</a>から手動でも入力できます。詳しい手順と各機能の使い方は<a href="pro.html">Proガイド</a>をご覧ください。</p>
     </div>
 
+    <div id="expiredNote" class="warn" style="display:none;">
+      <b>このページの表示期限（購入から30日）を過ぎています</b>
+      <p>安全のため、このページでキーを表示できるのは購入から30日間です。キーは購入時にお送りした控えメールでご確認ください（迷惑メールフォルダもご確認ください）。見つからない場合は、購入時のメールアドレスを添えてお問い合わせください。</p>
+    </div>
     <div id="errorNote" class="warn" style="display:none;">
       <b>まだキーが見つかりません</b>
       <p>決済処理の反映に時間がかかっている可能性があります。このページのURLを保存しておけば、後からもう一度開いて確認できます。しばらくしても表示されない場合はお問い合わせください。</p>
@@ -234,7 +238,7 @@ function trackEvent(name, params){
 
   function fetchOnce(){
     return fetch(FUNCTIONS_BASE + '/issueLicense?session_id=' + encodeURIComponent(sessionId))
-      .then(function(res){ return res.ok ? res.json() : { found:false }; })
+      .then(function(res){ return res.json().catch(function(){ return { found:false }; }); })
       .catch(function(){ return { found:false }; });
   }
 
@@ -242,6 +246,9 @@ function trackEvent(name, params){
     fetchOnce().then(function(data){
       if(data && data.found && data.key){
         showKey(data.key);
+      }else if(data && data.reason === 'expired'){
+        loading.style.display = 'none';
+        document.getElementById('expiredNote').style.display = 'block';
       }else if(attemptsLeft > 0){
         setTimeout(function(){ pollForKey(attemptsLeft - 1); }, 1500);
       }else{

@@ -208,7 +208,9 @@ MP への統合を進めており、後で移行する二度手間を避ける�
   v2・v4・v5 は失敗、**v6 で送信を確認**（2026-09-25）。同日に MiseFits（`stripeWebhook`）と全銀ポンは v6 で再デプロイ済み。
   **MenuFits（`menufitsStripeWebhook`）は v2 のままで、控えメールは 9/1 から失敗している**
   （再デプロイすると Stripe の鍵も未検証の最新版 v4 に切り替わるため、テスト購入とセットで行う）。
-  v5 には通常のパスワードが入っているので、破棄と Google パスワードの変更を検討する。
+  v5 は誤登録のため破棄済み（2026-09-25）。
+- **このリポジトリは公開**で、`_config.yml` でサイト配信からは外しているが GitHub 上では読める。**秘密・個人の事情は書かない。**
+  漏えい時の手順は `docs/incident-response.md`。
 - テスト購入は本番の Payment Link で行い、請求先を**オーストラリア**にして全額返金した。控えメールの再テストは、
   Firestore の `sessions/{cs_live_…}` を消してから Stripe の Webhook 画面で「再送する」を使った
   （**再送できるのは直近の送信試行だけ**）。再送すると別のキーが発行されるので、最後に `charge.refunded` も再送して無効化する。
@@ -244,7 +246,7 @@ MP への統合を進めており、後で移行する二度手間を避ける�
 - [x] **英語ページの運営者表示**：`Koko Kikaku … operated by Mika Takeda`＋`studio@kokokikaku.com` を規約とプライバシーに掲載（2026-09-25）。
 - [x] **バーチャルオフィスの住所**（2026-09-25 掲載）：〒600-8846 京都府京都市下京区朱雀宝蔵町44 協栄ビル2階 京都朱雀スタジオ
       → 英語表記 `Kyoei Building 2F (Kyoto Suzaku Studio), 44 Suzaku Hozocho, Shimogyo-ku, Kyoto 600-8846, Japan`（en/terms.html の Provider 欄と en/privacy.html 冒頭）。
-      **自宅住所は載せない**（本人の判断）。電話番号も載せない。日本語の特商法表記は現在「請求があれば開示」のまま。
+      電話番号は載せない。日本語の特商法表記は現在「請求があれば開示」のまま。
 - [ ] **英国・EU の販売開始**：保留（同意バナーと GDPR 第27条の代理人が必要）。それまでは販売見合わせ・GA 非送信のまま。
 - [x] **DMARC の追加（kokokikaku.com）**：2026-09-25 に Squarespace で TXT `_dmarc` を追加済み（種別 TXT は本人が選択）。控えメールの迷惑メール判定対策。
       Squarespace の DNS に TXT `_dmarc` = `v=DMARC1; p=none; rua=mailto:studio@kokokikaku.com` を**本人が**追加する

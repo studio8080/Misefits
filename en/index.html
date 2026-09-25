@@ -37,13 +37,16 @@
     {
       "@type": "WebApplication",
       "name": "MiseFits",
-      "url": "https://misefits.kokokikaku.com/?lang=en",
+      "url": "https://misefits.kokokikaku.com/en/",
       "applicationCategory": "DesignApplication",
       "operatingSystem": "Any (web browser)",
       "inLanguage": "en",
       "description": "Browser-based 2D floor plan and store layout planner. Load a PDF or image floor plan, calibrate the scale, and place restaurant, retail and office fixtures at real size.",
-      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-      "publisher": { "@type": "Organization", "name": "Koko Kikaku", "url": "https://kokokikaku.com/" }
+      "offers": [
+        { "@type": "Offer", "name": "MiseFits (free)", "price": "0", "priceCurrency": "USD" },
+        { "@type": "Offer", "name": "MiseFits Pro (one-time)", "price": "19", "priceCurrency": "USD" }
+      ],
+      "publisher": { "@type": "Organization", "name": "Koko Kikaku", "url": "https://misefits.kokokikaku.com/en/terms.html" }
     },
     {
       "@type": "FAQPage",
@@ -276,7 +279,7 @@ function trackEvent(name, params){
     <details class="qa"><summary>Can I see areas in square feet?</summary><p>Yes. In the English version every area is shown in both m² and sq ft, so you can compare a layout with a listing quoted per square foot. Lengths are entered and shown in millimetres.</p></details>
     <details class="qa"><summary>Does it tell me whether my layout meets building or fire codes?</summary><p>No. Seat counts and aisle colours are planning estimates. Accessibility, egress and fire requirements depend on your country, city and type of business — always confirm the final layout with a local architect, certifier or authority.</p></details>
     <details class="qa"><summary>Is Pro a subscription?</summary><p>No. MiseFits Pro is a one-time payment of US$19. Your license key is shown after checkout and emailed to you; one key works on up to five devices (counted per browser).</p></details>
-    <details class="qa"><summary>Is MiseFits accessible?</summary><p>We aim for WCAG 2.2 AA. You can zoom the page, move a selected part with the arrow keys (10 mm, or 100 mm with Shift), select parts in turn with N, rotate with R and undo with Ctrl+Z. Seat counts and areas are shown as text in the Summary panel. If something doesn't work for you, email <a href="mailto:studio@kokokikaku.com">studio@kokokikaku.com</a> and we will help.</p></details>
+    <details class="qa"><summary>Is MiseFits accessible?</summary><p>We are working towards WCAG 2.2 AA. You can zoom the page, add parts from the library with Tab and Enter, move a selected part with the arrow keys (10 mm, or 100 mm with Shift), select parts in turn with N, rotate with R and undo with Ctrl+Z. Known limitations: calibrating the scale, measuring and tracing outlines still need a mouse or touch. Seat counts and areas are shown as text in the Summary panel. If something doesn't work for you, email <a href="mailto:studio@kokokikaku.com">studio@kokokikaku.com</a> and we will help.</p></details>
   </section>
 
   <section class="blk">
@@ -316,6 +319,9 @@ function trackEvent(name, params){
   var PRO_PURCHASE_URL_EN = 'https://buy.stripe.com/3cI5kw8S68zO5zldSz9R606';
   var btn = document.getElementById('buyPro'), soon = document.getElementById('proSoon');
   if(!PRO_PURCHASE_URL_EN) return;
+  // 売らない地域（EU/EEA・英国・スイス・UAE）では購入ボタンを出さない（アプリの enRegionBlocked と同じ判定）
+  try{ var tz = String(Intl.DateTimeFormat().resolvedOptions().timeZone);
+    if(tz.indexOf('Europe/') === 0 || tz === 'Asia/Dubai'){ soon.textContent = 'MiseFits Pro is not yet available in your region. The free version works everywhere.'; return; } }catch(e){}
   btn.style.display = ''; soon.style.display = 'none';
   btn.addEventListener('click', function(){
     trackEvent('pro_buy_click', { feature:'landing', location:'en_pricing' });

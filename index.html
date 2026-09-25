@@ -714,6 +714,8 @@ if(MF_LANG==='en') document.documentElement.lang = 'en';
   html[lang="en"] .only-ja{display:none !important;}
   html:not([lang="en"]) .only-en{display:none !important;}
   html[lang="en"] body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,"Hiragino Kaku Gothic ProN","Yu Gothic UI",sans-serif;}
+  html[lang="en"] .hero-copy h2, html[lang="en"] .hero-copy p, html[lang="en"] .empty-panel p{word-break:normal;overflow-wrap:break-word;}
+  .part:focus-visible, .cat-h:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
 </style>
 </head>
 <body>
@@ -933,7 +935,7 @@ if(MF_LANG==='en') document.documentElement.lang = 'en';
   <!-- Workspace -->
   <div class="workspace" id="workspace">
     <div class="workspace-watermark brand-name" aria-hidden="true"><span class="mise">Mise</span><span class="fit">Fits</span><span class="dot"></span></div>
-    <div id="c-wrap"><canvas id="c"></canvas></div>
+    <div id="c-wrap"><canvas id="c" role="img" aria-label="図面とレイアウトのキャンバス"></canvas></div>
     <div class="work-status" id="workStatus" aria-live="polite"></div>
 
     <div class="empty" id="emptyState">
@@ -1199,6 +1201,7 @@ if(MF_LANG==='en') document.documentElement.lang = 'en';
       <a class="btn ghost" href="pro.html" data-href-en="en/#pricing" target="_blank" rel="noopener" onclick="trackEvent('pro_detail_click',{feature:proModalFeature})">詳しく見る</a>
       <button class="btn pop" onclick="proceedToProPurchase()">¥1,480で購入する</button>
     </div>
+    <p class="pro-modal-note only-en">By buying you agree to our <a href="en/terms.html" target="_blank" rel="noopener">terms &amp; 14-day refund policy</a>. Not yet available in the EU/EEA, the UK, Switzerland or the UAE.</p>
     <p class="pro-modal-note">購入後に表示されるライセンスキーで、そのまま解放できます（同じキーで最大5台まで）。<button type="button" class="linklike" onclick="closeProModal(); focusLicenseInput();">すでにキーをお持ちの方</button></p>
   </div>
 </div>
@@ -1221,7 +1224,8 @@ if(MF_LANG==='en') document.documentElement.lang = 'en';
         <a class="only-ja" href="tokushoho.html">特商法表記</a>
         <a class="only-en" href="en/terms.html">Terms &amp; refunds</a>
         <a class="only-ja" href="https://menufits.kokokikaku.com/" target="_blank" rel="noopener">姉妹ツール MenuFits（メニュー表）</a>
-        <a href="https://kokokikaku.com/" target="_blank" rel="noopener">ここ企画</a>
+        <a href="https://kokokikaku.com/" data-href-en="en/terms.html" target="_blank" rel="noopener">ここ企画</a>
+        <a class="only-en" href="mailto:studio@kokokikaku.com">Contact</a>
         <a href="?lang=en" data-href-en="?lang=ja">English</a>
       </div>
     </div>
@@ -1229,7 +1233,7 @@ if(MF_LANG==='en') document.documentElement.lang = 'en';
   <div class="foot-share" aria-label="SNSシェア">
     <button class="share-btn primary" type="button" onclick="shareApp()">シェア</button>
     <button class="share-btn" type="button" onclick="shareToX()">X</button>
-    <button class="share-btn line-share" type="button" onclick="shareToLine()">LINE</button>
+    <button class="share-btn line-share only-ja" type="button" onclick="shareToLine()">LINE</button>
     <button class="share-btn" type="button" onclick="copyShareLink()">リンク</button>
   </div>
 </footer>
@@ -1332,6 +1336,7 @@ const I18N_EN = {
 "解放する": "Unlock",
 "✅ MiseFits Proが有効です（このブラウザで解放済み）。": "✅ MiseFits Pro is active in this browser.",
 "メモ": "Notes",
+"メモ#one": "Note",
 "📌 メモを追加": "📌 Add a note",
 "集計": "Summary",
 "出力・印刷": "Export & print",
@@ -1543,7 +1548,11 @@ const I18N_EN = {
 "先に図面を読み込んでください": "Load a plan first",
 "📏 縮尺設定モード：1点目をクリック（キャンセルはEsc）": "📏 Scale mode: click the first point (Esc to cancel)",
 "📏 2点目をクリック": "📏 Click the second point",
-"この2点間の実際の長さを mm で入力してください：": "Enter the real distance between these two points in mm:",
+"この2点間の実際の長さを mm で入力してください（m・cm も可）：": "Enter the real distance between these two points in mm (you can also type m or cm, e.g. 4.5 m):",
+"長さを数字で入力してください（例：1200、1.2m、120cm）": "Please enter a length as a number (e.g. 1200, 1.2 m, 120 cm)",
+"{v} m（{m} mm）のことですか？\nOK：{m} mm として設定 / キャンセル：{v} mm のまま": "Did you mean {v} m ({m} mm)?\nOK: use {m} mm / Cancel: keep {v} mm",
+"横幅 {w} mm × 奥行 {d} mm で作成しますか？（単位は mm です。9 m なら 9000）": "Create a {w} mm × {d} mm sheet? Sizes are in millimetres (9 m = 9000).",
+"図面とレイアウトのキャンバス": "Floor plan and layout canvas",
 "縮尺を設定しました：1px = {v} mm": "Scale set: 1 px = {v} mm",
 "白紙サイズ{shape} <b>外形 {w} × {h} mm</b>": "Blank sheet{shape} <b>outline {w} × {h} mm</b>",
 "（{shape}）": " ({shape})",
@@ -1664,7 +1673,7 @@ const I18N_EN = {
 "ドリンク台": "Drink station",
 "6人テーブル": "Table for 6",
 "ボックス席4人": "Booth for 4",
-"券売機": "Ticket machine",
+"券売機": "Order kiosk / ticket machine",
 "ビールサーバー": "Beer tap",
 "POSレジ": "POS terminal",
 "子供椅子": "High chair",
@@ -1831,6 +1840,18 @@ if(MF_LANG==='en'){
   const mf = document.querySelector('link[rel="manifest"]');
   if(mf) mf.setAttribute('href', 'manifest-en.webmanifest');
   applyI18nDom(document.body);
+  try{
+    if(new URLSearchParams(location.search).get('lang')==='en'){
+      const rb=document.createElement('meta'); rb.name='robots'; rb.content='noindex,follow'; document.head.appendChild(rb);
+    }
+  }catch(e){}
+  const setMeta=(sel,v)=>{ const m=document.querySelector(sel); if(m) m.setAttribute('content', v); };
+  setMeta('meta[property="og:title"]', 'MiseFits — Free Restaurant & Store Floor Plan Maker');
+  setMeta('meta[property="og:description"]', I18N_EN.__META_DESC__);
+  setMeta('meta[property="og:url"]', 'https://misefits.kokokikaku.com/en/');
+  setMeta('meta[property="og:locale"]', 'en_AU');
+  setMeta('meta[name="twitter:title"]', 'MiseFits — Free Restaurant & Store Floor Plan Maker');
+  setMeta('meta[name="twitter:description"]', I18N_EN.__META_DESC__);
 }
 </script>
 <script>
@@ -2084,8 +2105,10 @@ function handleNativeMessage(ev){
     updateWebProUI();
   }
 }
-window.addEventListener('message', handleNativeMessage);
-document.addEventListener('message', handleNativeMessage); // WebView実装差異（Android等）向けの保険
+if(window.ReactNativeWebView){   // iOS アプリ（Expo WebView・凍結中）の中だけで受け付ける
+  window.addEventListener('message', handleNativeMessage);
+  document.addEventListener('message', handleNativeMessage); // WebView実装差異（Android等）向けの保険
+}
 // 本番のStripe決済リンク。本番モードのPayment Linkを作成したらここに入れる
 // （テストモードのリンクは公開版に置かないこと）。空のあいだはキー入力欄へ誘導する。
 const PRO_PURCHASE_URL_JA = 'https://buy.stripe.com/cNi7sEb0eg2g7HtcOv9R600';
@@ -2143,10 +2166,20 @@ function openProModal(feature){
   document.querySelectorAll('#proModalList li').forEach(li=>{
     li.classList.toggle('hit', (li.dataset.f||'').split(' ').indexOf(hit) >= 0);
   });
+  const buy=document.querySelector('#proModalBackdrop .modal-actions .btn.pop');
+  if(buy && enRegionBlocked()){ buy.disabled=true; buy.textContent='Not yet available in your region'; }
   document.getElementById('proModalBackdrop').classList.add('show');
 }
 function closeProModal(){ document.getElementById('proModalBackdrop').classList.remove('show'); }
+// 英語版を売らない地域（EU/EEA・英国・スイス＝GDPR の準備待ち、UAE＝MP が税を扱わない）。
+// 決済での国は Stripe 側でしか分からないので、ここはタイムゾーンでの目安。注文が来たら webhook の印で返金する。
+function enRegionBlocked(){
+  if(MF_LANG!=='en') return false;
+  try{ const tz=String(Intl.DateTimeFormat().resolvedOptions().timeZone); return tz.indexOf('Europe/')===0 || tz==='Asia/Dubai'; }
+  catch(e){ return false; }
+}
 function proceedToProPurchase(){
+  if(enRegionBlocked()){ showHint('MiseFits Pro is not yet available in your region.', 4500); return; }
   trackEvent('pro_buy_click', { feature: proModalFeature, location: 'app_modal' });
   closeProModal();
   window.open(PRO_PURCHASE_URL, '_blank', 'noopener');
@@ -2186,7 +2219,7 @@ function updateWebProUI(){
   const locked = document.getElementById('webProLocked');
   const unlocked = document.getElementById('webProUnlocked');
   const buyBtn = document.getElementById('webProBuyBtn');
-  if(buyBtn) buyBtn.style.display = PRO_PURCHASE_URL ? '' : 'none';   // 本番Payment Link設定後に表示
+  if(buyBtn) buyBtn.style.display = (PRO_PURCHASE_URL && !enRegionBlocked()) ? '' : 'none';   // 本番Payment Link設定後に表示
   const on = hasWebLicense();
   if(locked) locked.style.display = on ? 'none' : '';
   if(unlocked) unlocked.style.display = on ? '' : 'none';
@@ -2272,7 +2305,9 @@ function buildLibrary(){
     const cat=document.createElement('div'); cat.className='cat'+(ci>0?' collapsed':'');
     const h=document.createElement('div'); h.className='cat-h';
     h.innerHTML=`<span>${c.cat}</span><span class="tw">▼</span>`;
-    h.onclick=()=>cat.classList.toggle('collapsed');
+    h.tabIndex=0; h.setAttribute('role','button'); h.setAttribute('aria-expanded', String(ci===0));
+    h.onclick=()=>{ const closed=cat.classList.toggle('collapsed'); h.setAttribute('aria-expanded', String(!closed)); };
+    h.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); e.stopPropagation(); h.onclick(); } };
     const parts=document.createElement('div'); parts.className='parts';
     c.items.forEach(it=>{
       const p=document.createElement('div'); p.className='part'; p.draggable=true;
@@ -2296,6 +2331,8 @@ function buildLibrary(){
       if(locked) p.classList.add('locked');
       p.dataset.search=`${c.cat} ${it.name} ${dim}${it.pro?' pro':''}${it.nameJa?' '+it.nameJa:''}`.toLowerCase();
       p.onclick=()=>addFixture(it.key);
+      p.tabIndex=0; p.setAttribute('role','button');
+      p.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); e.stopPropagation(); addFixture(it.key); } };
       // Pro什器は無料版ではドラッグでも入れられないようにする（クリック経路だけ塞いでも意味がないため）
       p.draggable = !locked;
       p.addEventListener('dragstart',e=>{
@@ -2788,6 +2825,7 @@ function confirmCreateBlankSheet(){
     if(polygonAreaMm(st.verts) <= 0){ showHint(t('形が潰れています。頂点を動かして面積のある形にしてください'), 4000); return; }
   }
   if(!(st.W>0) || !(st.D>0)){ showHint(t('横幅・奥行を正しく入力してください')); return; }
+  if((st.W<100 || st.D<100) && !confirm(t('横幅 {w} mm × 奥行 {d} mm で作成しますか？（単位は mm です。9 m なら 9000）',{w:st.W, d:st.D}))) return;
   if(st.type!=='rect' && st.type!=='free'){
     if(!(st.nw>0) || !(st.nd>0)){ showHint(t('欠けの寸法を正しく入力してください')); return; }
     if(st.nw>=st.W || st.nd>=st.D){ showHint(t('欠けの寸法が全体より大きくなっています。小さくしてください')); return; }
@@ -2820,10 +2858,19 @@ function confirmCreateBlankSheet(){
   showHint(t('白紙レイアウト（{shape}）を作成しました：延べ床 約{a}m²{keep}',{shape:shapeLabel,a:areaNum(realArea,1),keep:keepNote(hadExisting)}), hadExisting?4400:3000);
 }
 
+// 長さの入力を mm に直す。カンマ・空白・全角数字を許し、末尾の m / cm / mm を解釈する（解釈できなければ NaN）
+function parseLengthMm(raw){
+  const s=String(raw==null?'':raw).replace(/[０-９．]/g, c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0))
+    .replace(/ｍ/g,'m').replace(/ｃ/g,'c').replace(/[,\s，、]/g,'').toLowerCase();
+  const m=s.match(/^(\d+(?:\.\d+)?)(mm|cm|m)?$/);
+  if(!m) return NaN;
+  const v=parseFloat(m[1]);
+  return m[2]==='m' ? v*1000 : m[2]==='cm' ? v*10 : v;
+}
 function askPositiveNumber(message, fallback){
   const raw=prompt(message, String(fallback));
   if(raw===null) return null;
-  const n=Math.round(Number(String(raw).replace(/[^\d.]/g,'')));
+  const n=Math.round(parseLengthMm(raw));
   if(!Number.isFinite(n) || n<=0){ showHint(t('1以上の数値(mm)を入力してください')); return null; }
   return n;
 }
@@ -2876,7 +2923,7 @@ function makeMemo(text, color){
   const wpx=MEMO_W_MM/scale;
   const fs=Math.max(wpx*0.11, 9);
   const pad=wpx*0.07;
-  const body=new fabric.Textbox(text||t('メモ'),{
+  const body=new fabric.Textbox(text||t('メモ',{n:1}),{
     width:wpx-pad*2, fontSize:fs, fill:'#3a3320', fontFamily:'inherit', lineHeight:1.35,
     originX:'center', originY:'top', textAlign:'left'
   });
@@ -2888,7 +2935,7 @@ function makeMemo(text, color){
   body.set({ left:-wpx/2+pad, top:-hpx/2+pad });
   body.originX='left';
   const g=new fabric.Group([card, body, pin],{ originX:'center', originY:'center',
-    data:{ kind:'memo', name:t('メモ'), text:text||t('メモ'), color:color||MEMO_COLORS[0] } });
+    data:{ kind:'memo', name:t('メモ',{n:1}), text:text||t('メモ',{n:1}), color:color||MEMO_COLORS[0] } });
   return g;
 }
 
@@ -2975,7 +3022,7 @@ function renderMemoList(){
   if(!list.length){ box.innerHTML='<div class="memo-empty">'+t('まだメモはありません。')+'</div>'; return; }
   box.innerHTML='';
   list.forEach((o,i)=>{
-    const first=((o.data&&o.data.text)||'').split('\n')[0] || t('メモ');
+    const first=((o.data&&o.data.text)||'').split('\n')[0] || t('メモ',{n:1});
     const row=document.createElement('div'); row.className='memo-item';
     const txt=document.createElement('span'); txt.className='mtxt'; txt.textContent=`${i+1}. ${first}`;
     txt.title=t('クリックでその位置へ移動');
@@ -3178,10 +3225,15 @@ function calClick(p){
       selectable:false,evented:false}); canvas.add(calLine); canvas.requestRenderAll();
     const dist=Math.hypot(p.x-calP1.x, p.y-calP1.y);
     setTimeout(()=>{
-      const ans=prompt(t('この2点間の実際の長さを mm で入力してください：'), '1000');
+      const ans=prompt(t('この2点間の実際の長さを mm で入力してください（m・cm も可）：'), '1000');
       if(ans!==null){
-        const mm=parseFloat(ans);
-        if(mm>0 && dist>0){ applyCalibration(mm/dist); }
+        let mm=parseLengthMm(ans);
+        if(!(mm>0)){ showHint(t('長さを数字で入力してください（例：1200、1.2m、120cm）'), 4500); }
+        else{
+          // 「4.5」のように m のつもりで打った値を mm と取り違えないよう確認する
+          if(mm<50 && confirm(t('{v} m（{m} mm）のことですか？\nOK：{m} mm として設定 / キャンセル：{v} mm のまま',{v:mm, m:Math.round(mm*1000)}))) mm=mm*1000;
+          if(dist>0) applyCalibration(mm/dist);
+        }
       }
       endCalibration();
     },30);

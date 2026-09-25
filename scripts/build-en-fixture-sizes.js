@@ -282,6 +282,7 @@ ${faqHtml}
     <a href="restaurant-floor-plan.html">Restaurant floor plans</a>
     <a href="privacy.html">Privacy</a>
     <a href="terms.html">Terms &amp; refunds</a>
+    <a href="mailto:studio@kokokikaku.com">Contact</a>
     <a href="../fixture-sizes.html" hreflang="ja">日本語</a>
   </div>
   <p class="legalnote">Sizes are typical planning values, not manufacturer specifications. Check the product you intend to buy, and confirm clearances and code requirements with a qualified local professional.</p>

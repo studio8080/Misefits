@@ -1,0 +1,18 @@
+# GitHub Pages（Jekyll）で配信しないもの。
+# 内部メモ・関数のソース・作業用スクリプトが misefits.kokokikaku.com から見えていた（2026-09-25 の点検で判明）。
+# リポジトリ自体は公開なので GitHub 上では読める点は変わらない。秘密情報はそもそも書かないこと。
+exclude:
+  - AGENTS.md
+  - HANDOFF.md
+  - README.md
+  - docs
+  - functions
+  - mobile
+  - scripts
+  - "*.py"
+  - firebase.json
+  - firestore.rules
+  - firestore.indexes.json
+  - "assets/*.md"
+  - package.json
+  - package-lock.json
