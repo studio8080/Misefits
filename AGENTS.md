@@ -232,6 +232,8 @@ MP への統合を進めており、後で移行する二度手間を避ける�
 - SEO：英語の組は **`/` ↔ `/en/`**。`/?lang=en` は canonical を `/` のままにして索引させない（JS で canonical を書き換えない）。
   英語表示のときは `manifest-en.webmanifest` に差し替え、共有 URL は `/en/` にする。
 - 購入完了ページは GA に session_id を送らない（`page_location` からクエリを除く）。session_id があれば `issueLicense` でキーを取り出せるため。
+  あわせて `issueLicense` は**購入から30日を過ぎると返さない**（`reason: 'expired'`。控えメールでは引き続き確認できる）。
+  控えメールは `replyTo: studio@kokokikaku.com`。
 
 **残タスク（2026-09-25 時点）**
 
@@ -244,6 +246,9 @@ MP への統合を進めており、後で移行する二度手間を避ける�
       → 英語表記 `Kyoei Building 2F (Kyoto Suzaku Studio), 44 Suzaku Hozocho, Shimogyo-ku, Kyoto 600-8846, Japan`（en/terms.html の Provider 欄と en/privacy.html 冒頭）。
       **自宅住所は載せない**（本人の判断）。電話番号も載せない。日本語の特商法表記は現在「請求があれば開示」のまま。
 - [ ] **英国・EU の販売開始**：保留（同意バナーと GDPR 第27条の代理人が必要）。それまでは販売見合わせ・GA 非送信のまま。
+- [ ] **DMARC の追加（kokokikaku.com）**：SPF・DKIM はあるが DMARC が無い（2026-09-25 確認）。控えメールの迷惑メール判定対策。
+      Squarespace の DNS に TXT `_dmarc` = `v=DMARC1; p=none; rua=mailto:studio@kokokikaku.com` を**本人が**追加する
+      （会社ドメインで `mikan@` の再認証が要る。種別の選択は人がやる、という CLAUDE.md の注意どおり）。
 - [ ] MenuFits の英語版ができたら、日本語版・英語版まとめてテスト購入（`menufits` リポジトリの HANDOFF-FROM-MISEFITS-20260925.md）。
 - [x] アクセシビリティ（2026-09-25）：ブラウザ拡大を許可（キャンバス上は `touch-action:none` と独自ピンチのまま）、
       コントラスト 4.5:1 未満を解消（削除ボタン・ON 状態・LINE・ロック中の Pro 什器）、矢印キーで10mm移動（Shift で100mm）・N で順に選択。

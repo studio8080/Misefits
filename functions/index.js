@@ -125,6 +125,7 @@ async function sendLicenseMail(to, key, lang = 'ja') {
   await transporter.sendMail({
     from,
     to,
+    replyTo: 'studio@kokokikaku.com', // 返信がそのまま問い合わせ窓口に届くように
     subject: lang === 'en' ? 'Your MiseFits Pro license key' : 'MiseFits Pro ライセンスキーのご案内',
     text: lang === 'en' ? licenseMailBodyEn(key) : licenseMailBody(key),
   });
@@ -262,6 +263,14 @@ exports.issueLicense = onRequest({ cors: [ALLOWED_ORIGIN], maxInstances: 5 }, as
   const doc = await db.collection('sessions').doc(String(sessionId)).get();
   if (!doc.exists) {
     res.status(404).json({ found: false });
+    return;
+  }
+  // session_id さえあればキーを取り出せるので、購入完了ページの URL が漏れた場合に備えて期限を設ける。
+  // 期限後もキーは控えメールで確認できる（購入完了ページは「メールをご確認ください」と案内する）。
+  const created = doc.data().createdAt;
+  const ageMs = created && typeof created.toMillis === 'function' ? Date.now() - created.toMillis() : 0;
+  if (ageMs > 30 * 24 * 60 * 60 * 1000) {
+    res.status(404).json({ found: false, reason: 'expired' });
     return;
   }
   res.status(200).json({ found: true, key: doc.data().licenseKey });
