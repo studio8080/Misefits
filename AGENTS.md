@@ -195,6 +195,23 @@ MP への統合を進めており、後で移行する二度手間を避ける�
 6. テスト（少額の本番購入 → 返金でもよい）で、キー表示・英語メール・アプリでの解放・返金後の `revoked` を確認。
 7. Payment Link のURLを `PRO_PURCHASE_URL_EN`（2か所）に入れて push。
 
+**2026-09-25 の開通時に分かったこと**
+
+- **misefits プロジェクトには別リポジトリの関数も同居している**（`zenginponStripeWebhook`＝全銀ポン、asia-northeast1）。
+  このリポジトリから `firebase deploy --only functions` を丸ごと実行すると、ここに無い関数の削除を求められる。
+  **必ず `--only functions:stripeWebhook,functions:verifyLicense` のように関数名を指定してデプロイする。**
+- `SMTP_PASS` は全銀ポン・MenuFits・MiseFits の3関数で共有している。`secrets:set` の最後に出る
+  「再デプロイして古いバージョンを破棄するか」には **`n`** と答え、MiseFits の関数だけ個別にデプロイする。
+- `SMTP_PASS` は **Google のアプリ パスワード（16桁）**でないと送れない（通常のパスワードだと 534-5.7.9）。
+  v4・v5 は失敗、**v6 で送信を確認**（2026-09-25）。全銀ポン・MenuFits は古いバージョンのままなので、そちらの
+  メールが送れているかは未確認。v5 には通常のパスワードが入っているので、破棄と Google パスワードの変更を検討する。
+- テスト購入は本番の Payment Link で行い、請求先を**オーストラリア**にして全額返金した。控えメールの再テストは、
+  Firestore の `sessions/{cs_live_…}` を消してから Stripe の Webhook 画面で「再送する」を使った
+  （**再送できるのは直近の送信試行だけ**）。再送すると別のキーが発行されるので、最後に `charge.refunded` も再送して無効化する。
+- Stripe の公開ビジネス名は **Koko Kikaku**、サポート用メールは **studio@kokokikaku.com**（MP のエスカレーション先）。
+- Stripe の Payment Link：`https://buy.stripe.com/3cI5kw8S68zO5zldSz9R606`（MP 有効・US$19・内税・`txcd_10103001`）。
+  **MP の有効/無効はリンク作成後に変えられない**（変えるならリンクを作り直す）。
+
 **税務**：MP 経由の売上は海外法人（Link, LLC）への販売で、日本の消費税は**不課税**として扱う
 （2026-09-25 に本人が確認済み。Lemon Squeezy 経由と同じ整理）。所得税・法人税の売上には入る。
 
