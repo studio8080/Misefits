@@ -240,8 +240,9 @@ MP への統合を進めており、後で移行する二度手間を避ける�
       `window.open` を同じタブへの遷移に差し替えてから「広告掲載URL管理」をクリックすると、同じタブでセッションが張られ、
       その後は `program-detail?programId=…` を直接開ける。
 - [x] **英語ページの運営者表示**：`Koko Kikaku … operated by Mika Takeda`＋`studio@kokokikaku.com` を規約とプライバシーに掲載（2026-09-25）。
-- [ ] **バーチャルオフィスの住所**：契約したら en/terms.html の Provider 欄と en/privacy.html 冒頭の
-      「postal address is available on request」を実際の住所に差し替える。**自宅住所は載せない**（本人の判断）。電話番号も載せない。
+- [x] **バーチャルオフィスの住所**（2026-09-25 掲載）：〒600-8846 京都府京都市下京区朱雀宝蔵町44 協栄ビル2階 京都朱雀スタジオ
+      → 英語表記 `Kyoei Building 2F (Kyoto Suzaku Studio), 44 Suzaku Hozocho, Shimogyo-ku, Kyoto 600-8846, Japan`（en/terms.html の Provider 欄と en/privacy.html 冒頭）。
+      **自宅住所は載せない**（本人の判断）。電話番号も載せない。日本語の特商法表記は現在「請求があれば開示」のまま。
 - [ ] **英国・EU の販売開始**：保留（同意バナーと GDPR 第27条の代理人が必要）。それまでは販売見合わせ・GA 非送信のまま。
 - [ ] MenuFits の英語版ができたら、日本語版・英語版まとめてテスト購入（`menufits` リポジトリの HANDOFF-FROM-MISEFITS-20260925.md）。
 - [x] アクセシビリティ（2026-09-25）：ブラウザ拡大を許可（キャンバス上は `touch-action:none` と独自ピンチのまま）、
