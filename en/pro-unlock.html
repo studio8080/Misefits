@@ -158,6 +158,7 @@ function trackEvent(name, params){
   function showKey(key){
     loading.style.display = 'none'; errorNote.style.display = 'none';
     licenseKeyEl.textContent = key;
+    $('fetchingLine').style.display = 'none';
     result.style.display = 'block'; successNote.style.display = 'block';
     trackPurchaseOnce();
   }
