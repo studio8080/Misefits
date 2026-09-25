@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MiseFits｜2Dの間取り・店舗レイアウトシミュレーター（無料・登録不要）</title>
 <meta name="description" content="幅と奥行き(mm)を入れるだけの2Dレイアウトシミュレーター。3Dは使いません。PDFや画像の図面、または白紙サイズから、間取りや店舗・施設の配置を実寸で検討できます。ブラウザだけで完結し、無料・登録不要・インストール不要です。">
 <meta name="keywords" content="間取り シミュレーション,2D 間取り,間取り 作成 無料,レイアウトシミュレーター,家具配置 シミュレーション,部屋 レイアウト,幅 奥行き,店舗レイアウト,図面,什器配置,美容室,カフェ,学習塾,クリニック,オフィス,会議室,貸会場,ゲストハウス,ギャラリー,イベントスペース,ここ企画,MiseFits">
@@ -159,7 +159,7 @@ if(MF_LANG==='en') document.documentElement.lang = 'en';
   .page-foot a{color:var(--accent);text-decoration:none;font-weight:800;}
   .foot-share{display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
   .foot-share .share-btn{margin:0;background:#fff;}
-  .foot-share .line-share{background:#06c755;border-color:#06c755;color:#fff;}
+  .foot-share .line-share{background:#00873c;border-color:#00873c;color:#fff;}
 
   /* Sidebar */
   .sidebar{width:304px;flex:0 0 auto;background:var(--panel);border-right:1px solid var(--line);
@@ -197,12 +197,12 @@ if(MF_LANG==='en') document.documentElement.lang = 'en';
   .btn:disabled{opacity:.45;cursor:not-allowed;}
   .btn.outline{background:#fff;color:var(--ink);border:1px solid #ccd1d9;}
   .btn.outline:hover{background:#eef1f5;}
-  .btn.danger{background:var(--danger);}
+  .btn.danger{background:#c62f3b;}
   .btn.ghost{background:#eef1f5;color:var(--ink);}
   .btn.ghost:hover{background:#e2e6ec;}
   .btn.sm{padding:6px 9px;font-size:11.5px;}
   .btn.full{width:100%;}
-  .btn.on{background:var(--ok);color:#fff;}
+  .btn.on{background:#1f7a6f;color:#fff;}
   .btn.pop{background:#fff6e6;color:#7a4a00;border:1px solid #ffd99a;}
   .btn.pop:hover{background:#ffedcc;}
 
@@ -345,9 +345,10 @@ if(MF_LANG==='en') document.documentElement.lang = 'en';
   /* Pro: 什器ライブラリのPRO表示 */
   .pro-badge{display:inline-block;margin-left:4px;padding:0 4px;border-radius:5px;font-size:9px;
     font-weight:800;line-height:14px;vertical-align:middle;background:var(--accent-soft);color:var(--accent);}
-  .part.locked{opacity:.62;}
-  .part.locked .sw{filter:grayscale(.55);}
-  .part.locked .pro-badge{background:#f1f3f7;color:var(--sub);}
+  /* ロック中の Pro 什器は全体を半透明にせず（文字のコントラストが落ちる）、見本の色だけ淡くする */
+  .part.locked{color:#4b5563;}
+  .part.locked .sw{filter:grayscale(.55) opacity(.6);}
+  .part.locked .pro-badge{background:#eef0f4;color:#4b5563;}
 
   /* Pro: メモ機能 */
   .memo-label{display:block;font-size:12px;color:var(--sub);margin-bottom:5px;}
@@ -582,6 +583,7 @@ if(MF_LANG==='en') document.documentElement.lang = 'en';
   #backdrop{display:none;position:fixed;inset:0;background:rgba(20,24,31,.42);z-index:25;}
   #backdrop.show{display:block;}
   #c-wrap, #c-wrap canvas{touch-action:none;}
+  button, .btn, a, input, select, label{touch-action:manipulation;}
 
   /* 狭めのデスクトップ幅では、ヘッダーの操作ボタンが押せるようナビを段階的に畳む */
   @media (max-width:1180px){
@@ -848,7 +850,7 @@ if(MF_LANG==='en') document.documentElement.lang = 'en';
         <button class="btn sm danger" onclick="deleteSel()">削除</button>
         <button class="btn sm danger" onclick="clearFixtures()">すべて削除</button>
       </div>
-      <div class="muted" style="margin-top:8px;">ショートカット: M=計測 / Ctrl+Z=元に戻す / Ctrl+Shift+Z=やり直す / R=15°回転 / Shift+R=逆回転 / [ ]=±15° / Delete=削除 / Ctrl+D=複製 / Space+ドラッグ=画面移動 / ホイール=拡大縮小</div>
+      <div class="muted" style="margin-top:8px;">ショートカット: M=計測 / Ctrl+Z=元に戻す / Ctrl+Shift+Z=やり直す / R=15°回転 / Shift+R=逆回転 / [ ]=±15° / 矢印キー=10mm移動（Shift で100mm） / N=次のパーツを選択（Shift+N で前） / Delete=削除 / Ctrl+D=複製 / Space+ドラッグ=画面移動 / ホイール=拡大縮小</div>
     </div>
 
     <!-- MiseFits Pro（買い切り・Web版のみ。iOSアプリではApple IAP経由のため非表示） -->
@@ -1323,7 +1325,7 @@ const I18N_EN = {
 "背面へ": "Send backward",
 "削除": "Delete",
 "すべて削除": "Delete all",
-"ショートカット: M=計測 / Ctrl+Z=元に戻す / Ctrl+Shift+Z=やり直す / R=15°回転 / Shift+R=逆回転 / [ ]=±15° / Delete=削除 / Ctrl+D=複製 / Space+ドラッグ=画面移動 / ホイール=拡大縮小": "Shortcuts: M = measure / Ctrl+Z = undo / Ctrl+Shift+Z = redo / R = rotate 15° / Shift+R = rotate back / [ ] = ±15° / Delete = delete / Ctrl+D = duplicate / Space+drag = pan / wheel = zoom",
+"ショートカット: M=計測 / Ctrl+Z=元に戻す / Ctrl+Shift+Z=やり直す / R=15°回転 / Shift+R=逆回転 / [ ]=±15° / 矢印キー=10mm移動（Shift で100mm） / N=次のパーツを選択（Shift+N で前） / Delete=削除 / Ctrl+D=複製 / Space+ドラッグ=画面移動 / ホイール=拡大縮小": "Shortcuts: M = measure / Ctrl+Z = undo / Ctrl+Shift+Z = redo / R = rotate 15° / Shift+R = rotate back / [ ] = ±15° / arrow keys = move 10 mm (Shift: 100 mm) / N = select next part (Shift+N: previous) / Delete = delete / Ctrl+D = duplicate / Space+drag = pan / wheel = zoom",
 "自由形状エディタ・PDF/画像トレース・什器ライブラリ拡張・高解像度出力・実寸スケール印刷・メモ機能を解放（買い切り・¥1,480）。無料の機能はこれまでどおりお使いいただけます。": "Unlocks the free-shape editor, area tracing, 60+ extra fixtures, high-resolution export, true-scale printing and notes (one-time %PRICE%). Everything free stays free.",
 "¥1,480で購入する": "Buy for %PRICE%",
 "📘 使い方と購入の流れ": "📘 What you get",
@@ -3790,6 +3792,24 @@ function rotate90(){ const o=canvas.getActiveObject(); if(!o) return; o.rotate((
 function setAngle(a){ const o=canvas.getActiveObject(); if(!o) return;
   a=((a%360)+360)%360; o.rotate(a); o.setCoords(); canvas.requestRenderAll(); updateProps(); autosave(); }
 function rotateBy(delta){ const o=canvas.getActiveObject(); if(!o) return; setAngle(Math.round(o.angle)+delta); }
+// キーボード操作用。移動はドラッグと同じ object:modified を通すので、Undo/自動保存/寸法表示もそのまま効く
+function nudgeSel(dxMm, dyMm){
+  const o=canvas && canvas.getActiveObject(); if(!o || project.active<0) return false;
+  const k=1/mmpp();
+  o.set({ left:o.left+dxMm*k, top:o.top+dyMm*k }); o.setCoords();
+  canvas.requestRenderAll(); canvas.fire('object:modified', { target:o });
+  return true;
+}
+function selectNextPart(dir){
+  if(!canvas || project.active<0) return false;
+  const list=canvas.getObjects().filter(o=>o.selectable!==false && o.visible!==false && o.data);
+  if(!list.length) return false;
+  const cur=list.indexOf(canvas.getActiveObject());
+  const next=list[(cur<0 ? (dir>0?0:list.length-1) : (cur+dir+list.length)%list.length)];
+  canvas.setActiveObject(next); canvas.requestRenderAll();
+  showHint((next.data && next.data.name) || t('オブジェクト'), 1400);
+  return true;
+}
 function bringFwd(){ const o=canvas.getActiveObject(); if(o){ canvas.bringForward(o); autosave(); historyMark(); } }
 function sendBwd(){ const o=canvas.getActiveObject(); if(o){ canvas.sendBackwards(o); autosave(); historyMark(); } }
 
@@ -4297,6 +4317,13 @@ function bindEvents(){
     if(e.key==='r'||e.key==='R'){ if(canvas.getActiveObject()){ rotateBy(e.shiftKey?-15:15); e.preventDefault(); } }
     if(e.key==='['){ if(canvas.getActiveObject()){ rotateBy(-15); e.preventDefault(); } }
     if(e.key===']'){ if(canvas.getActiveObject()){ rotateBy(15); e.preventDefault(); } }
+    // 矢印キーで選択中のパーツを 10mm（Shift で 100mm）動かす
+    const arrows={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]};
+    if(arrows[e.key] && !e.ctrlKey && !e.metaKey && !e.altKey){
+      if(nudgeSel(arrows[e.key][0]*(e.shiftKey?100:10), arrows[e.key][1]*(e.shiftKey?100:10))) e.preventDefault();
+    }
+    // N / Shift+N でパーツを順に選ぶ（マウスを使わずに選択できるように）
+    if(!e.ctrlKey && !e.metaKey && !e.altKey && (e.key==='n'||e.key==='N')){ if(selectNextPart(e.shiftKey?-1:1)) e.preventDefault(); }
   });
   window.addEventListener('keyup',e=>{ if(e.code==='Space'){ spaceDown=false; canvas.defaultCursor='default'; canvas.setCursor('default'); } });
 }
