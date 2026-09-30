@@ -100,8 +100,17 @@ function transformHtml(html) {
     [/<script src="https:\/\/cdnjs\.cloudflare\.com\/ajax\/libs\/jspdf\/2\.5\.1\/jspdf\.umd\.min\.js"[\s\S]*?crossorigin="anonymous" referrerpolicy="no-referrer"><\/script>/, '<script src="vendor/jspdf.umd.min.js"></script>'],
   ];
   for (const [pattern, replacement] of scriptReplacements) {
-    if (!pattern.test(out)) throw new Error(`pattern not found in index.html: ${pattern}`);
-    out = out.replace(pattern, replacement);
+    if (pattern.test(out)) {
+      out = out.replace(pattern, replacement);
+      continue;
+    }
+    // pdf.js / jsPDF はWeb版では必要時に読み込む。遅延読み込みのURLも同梱先へ変換する。
+    const localSrc = replacement.match(/src="([^"]+)"/)[1];
+    const lib = VENDOR_LIBS.find((entry) => `vendor/${entry.out.replace(/\.bin$/, '.js')}` === localSrc);
+    if (!lib || !out.includes(`src:'${lib.url}'`)) {
+      throw new Error(`script or lazy library not found in index.html: ${localSrc}`);
+    }
+    out = out.split(lib.url).join(localSrc);
   }
 
   // 2) pdf.worker のCDN URL文字列 → ローカルパス
