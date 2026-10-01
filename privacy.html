@@ -395,6 +395,11 @@
   .koko-ask-help,.koko-ask-privacy{font-size:12px;margin:8px 0;color:#46505f}.koko-ask-links{border-top:1px solid #d6d9df;padding-top:14px;margin-top:18px;font-size:13px;display:flex;gap:12px;flex-wrap:wrap}.koko-ask-links a{min-height:44px;display:inline-flex;align-items:center;text-underline-offset:3px}.koko-ask-links b{flex-basis:100%}
   .koko-ask-dialog [hidden]{display:none!important}.koko-ask button:focus-visible,.koko-ask-dialog :is(button,a,textarea,summary):focus-visible{outline:3px solid var(--ask-accent);outline-offset:3px}
   .koko-ask-app-trigger{min-height:44px!important;color:var(--ask-accent)!important;border-color:var(--ask-accent)!important}
+  .koko-ask-app-row{margin-top:8px;min-width:0}.koko-ask-app-row .koko-ask-app-trigger{width:100%;white-space:normal!important}
+  .koko-threads-share{display:inline-flex!important;align-items:center;justify-content:center;min-height:40px;padding:8px 14px;border:1px solid currentColor;border-radius:8px;color:inherit!important;background:transparent;font:inherit;font-size:13px;font-weight:700;text-decoration:none!important;line-height:1.3;white-space:nowrap;flex-shrink:0}
+  .koko-threads-share:hover{opacity:.75}.koko-threads-share:focus-visible{outline:3px solid currentColor;outline-offset:3px}
+  .share[data-share] .koko-threads-share{border-radius:999px;border-width:1.5px;background:var(--paper);font-family:var(--jp,inherit);font-weight:900}
+  [data-page-share] .koko-threads-share{background:var(--surface);border-color:var(--line);border-radius:var(--radius-sm);color:var(--ink)!important}
   .koko-ask[data-product=kininarumono],.koko-ask-dialog[data-product=kininarumono]{border-radius:6px;box-shadow:4px 4px 0 #282039}
   .koko-ask[data-product=kininarumono] h2,.koko-ask-dialog[data-product=kininarumono] h2{font-family:var(--jp,inherit);font-weight:900}
   .koko-ask[data-product=company],.koko-ask-dialog[data-product=company]{border-top:4px solid #ff5a3c}
@@ -411,7 +416,7 @@
     const robots = document.querySelector('meta[name="robots"]');
     if (robots && /noindex/i.test(robots.content)) return;
     if (/\/(?:pro-unlock|404|google[^/]*)(?:\.html|\/|$)/i.test(location.pathname)) return;
-    if (document.querySelector('.koko-ask')) return;
+    if (document.querySelector('.koko-ask,.koko-ask-dialog')) return;
     const footer = document.querySelector('footer');
     if (!footer || typeof HTMLDialogElement === 'undefined') return;
     const en = !!product.en && /^en/i.test(document.documentElement.lang);
@@ -457,13 +462,44 @@
     function show(event) { lastTrigger = event.currentTarget; dialog.showModal(); }
     trigger.addEventListener('click', show);
     const help = productId === 'menufits' && document.getElementById('helpBtn');
+    const spaceGuide = productId === 'misefits' && document.querySelector('.sidebar-intro .intro-guide');
     let appTrigger = null;
-    if (help) {
-      appTrigger = element('button', 'btn koko-ask-app-trigger', words.ask);
+    let appRow = null;
+    if (help || spaceGuide) {
+      appTrigger = element('button', (spaceGuide ? 'intro-guide' : 'btn') + ' koko-ask-app-trigger', words.ask);
       appTrigger.type = 'button'; appTrigger.style.cssText = theme;
       appTrigger.setAttribute('aria-haspopup', 'dialog'); appTrigger.setAttribute('aria-controls', dialog.id);
-      help.after(appTrigger); appTrigger.addEventListener('click', show);
+      if (spaceGuide) {
+        appTrigger.style.width = '100%'; spaceGuide.after(appTrigger); root.remove();
+      } else {
+        appRow = element('div', 'koko-ask-app-row'); appRow.append(appTrigger);
+        (help.closest('.row') || help).after(appRow);
+      }
+      appTrigger.addEventListener('click', show);
     }
+    // Share only published references. Never include editor state, query strings or fragments.
+    // Meta's documented web intent opens a composer; the visitor chooses whether to post.
+    function addThreads() {
+      if (typeof document === 'undefined') return;
+      const selectors = { menufits: '.lpshare,.site-sns-share', misefits: '.foot-share,.site-sns-share', pitch: '.share,.tshare,.mshare', kabufits: '[data-page-share]', kininarumono: '.share[data-share]', company: '.site-sns-share' };
+      document.querySelectorAll(selectors[productId]).forEach(bar => {
+        let share = bar.querySelector('.koko-threads-share');
+        if (!share) {
+          share = element('a', 'koko-threads-share', 'Threads');
+          share.target = '_blank'; share.rel = 'noopener noreferrer'; share.referrerPolicy = 'no-referrer';
+          const status = bar.querySelector('[role="status"]');
+          if (status) status.before(share); else bar.append(share);
+        }
+        const intent = new URL('https://www.threads.com/intent/post');
+        intent.searchParams.set('url', cleanUrl(bar.dataset.url || page, product));
+        intent.searchParams.set('text', String(bar.dataset.title || document.querySelector('meta[property="og:title"]')?.content || product.name).slice(0, 280));
+        if (share.href !== intent.href) share.href = intent.href;
+        share.setAttribute('aria-label', en ? 'Share on Threads (opens a new window)' : 'Threadsでシェア（新しいウィンドウで開きます）');
+      });
+    }
+    addThreads();
+    const shareObserver = new MutationObserver(addThreads);
+    if (productId === 'pitch') shareObserver.observe(document.body, { childList: true, subtree: true });
     close.addEventListener('click', () => dialog.close());
     dialog.addEventListener('close', () => lastTrigger.focus());
     copy.addEventListener('click', async () => {
@@ -478,7 +514,9 @@
     const observer = new MutationObserver(() => {
       const nextEn = !!product.en && /^en/i.test(document.documentElement.lang);
       if (nextEn === en) return;
-      observer.disconnect(); dialog.remove(); root.remove(); css.remove(); if (appTrigger) appTrigger.remove(); mount();
+      observer.disconnect(); shareObserver.disconnect(); dialog.remove(); root.remove(); css.remove();
+      if (appRow) appRow.remove(); else if (appTrigger) appTrigger.remove();
+      document.querySelectorAll('.koko-threads-share').forEach(a => a.remove()); mount();
     });
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
   }
