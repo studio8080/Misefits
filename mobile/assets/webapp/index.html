@@ -4304,9 +4304,7 @@ function sharePayload(){
     text:t('ExcelやWordより気軽に、お店や施設のレイアウトを実寸で試せるMiseFits。'),
     url:MF_LANG==='en'
       ? 'https://misefits.kokokikaku.com/en/'
-      : location.origin.includes('127.0.0.1') || location.origin.includes('localhost')
-      ? 'https://misefits.kokokikaku.com/'
-      : location.href
+      : 'https://misefits.kokokikaku.com/'
   };
 }
 async function shareApp(){
