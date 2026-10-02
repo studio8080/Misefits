@@ -126,7 +126,8 @@ async function sendLicenseMail(to, key, lang = 'ja') {
   const user = smtpUser.value();
   const from = mailFrom.value();
   const pass = smtpPass.value();
-  if (!to || !host || !user || !from || !pass) return { sent: false, reason: 'not configured' };
+  if (!to) return { sent: false, reason: 'no email' };
+  if (!host || !user || !from || !pass) return { sent: false, reason: 'not configured' };
 
   const port = Number(smtpPort.value()) || 465;
   const transporter = nodemailer.createTransport({
@@ -170,7 +171,14 @@ exports.stripeWebhook = onRequest(
       if (charge.refunded && pi) {
         const link = await db.collection('paymentIntents').doc(pi).get();
         if (link.exists) {
-          await db.collection('licenses').doc(link.data().licenseKey).update({
+          // 対応表だけ残ってキーが無いと update が NOT_FOUND で落ち、Stripe が3日間再送し続ける
+          const licRef = db.collection('licenses').doc(link.data().licenseKey);
+          if (!(await licRef.get()).exists) {
+            console.error('refund for a missing license', pi);
+            res.status(200).send('ignored (license not found)');
+            return;
+          }
+          await licRef.update({
             revoked: true,
             revokedAt: FieldValue.serverTimestamp(),
           });
@@ -193,13 +201,25 @@ exports.stripeWebhook = onRequest(
       res.status(200).send('ignored (not paid)');
       return;
     }
+    // MiseFits Pro は買い切り。サブスク（全銀ポンなど同じアカウントの別商品）は Stripe に問い合わせる前に除外する
+    if (session.mode && session.mode !== 'payment') {
+      res.status(200).send('ignored (not a one-time payment)');
+      return;
+    }
 
     // 対象Price IDのみ処理（MenuFits など同じアカウントの別商品への誤発行防止）。
     // 日本語版（¥1,480・通常決済）と英語版（US$19・Managed Payments）のどちらに一致したかで言語を決める。
     const priceJa = stripePriceId.value();
     const priceEn = stripePriceIdEn.value();
     let lang = 'ja';
-    if (priceJa || priceEn) {
+    // Price ID が未設定（.env が反映されないデプロイなど）なら、ほかの商品の決済にキーを出さないよう止める。
+    // 500 を返すと Stripe が最大3日間再送するので、その間に設定を直してデプロイすれば取りこぼさない。
+    if (!priceJa && !priceEn) {
+      console.error('STRIPE_PRICE_ID / STRIPE_PRICE_ID_EN are not configured; refusing to issue', session.id);
+      res.status(500).send('price ids not configured');
+      return;
+    }
+    {
       const lineItems = await stripe.checkout.sessions.listLineItems(session.id, { limit: 10 });
       const has = (id) => !!id && lineItems.data.some((li) => li.price && li.price.id === id);
       if (has(priceEn)) {
@@ -211,15 +231,34 @@ exports.stripeWebhook = onRequest(
       }
     }
 
-    // Stripeはwebhookを再送することがあるため、同一セッションへの重複発行を防ぐ
+    // Stripe は webhook を再送したり、同時に2回送ったりする。sessions/{id} を create（既にあれば失敗）で
+    // 先に確保して、同じ決済にキーを2本出さない。途中で失敗した場合は、再送のときに確保済みのキーで
+    // 続きから処理する（キーの記録・返金用の対応表・控えメール）。
     const sessionRef = db.collection('sessions').doc(session.id);
-    const existing = await sessionRef.get();
-    if (existing.exists) {
+    let key = generateLicenseKey();
+    let resumed = false;
+    let claimedAt = 0;
+    try {
+      await sessionRef.create({ licenseKey: key, claimedAt: Date.now(), createdAt: FieldValue.serverTimestamp() });
+    } catch (err) {
+      if (!err || err.code !== 6) throw err; // 6 = ALREADY_EXISTS
+      const prev = (await sessionRef.get()).data();
+      key = prev.licenseKey;
+      resumed = true;
+      claimedAt = prev.claimedAt || 0;
+    }
+    const licRef = db.collection('licenses').doc(key);
+    const licSnap = await licRef.get();
+    if (resumed && licSnap.exists && (licSnap.data().mailSentAt || licSnap.data().mailSkipped || licSnap.data().mailError)) {
       res.status(200).send('already processed');
       return;
     }
-
-    const key = generateLicenseKey();
+    // 先に届いた通知がまだ処理中（確保から60秒以内）なら手を出さない。Stripe が少し後に再送し、
+    // そのときに未完了なら続きから処理する（同じ控えメールが2通届かないようにするため）。
+    if (resumed && Date.now() - claimedAt < 60 * 1000) {
+      res.status(409).send('in progress');
+      return;
+    }
     const email = session.customer_details?.email ?? null;
     const paymentIntent = typeof session.payment_intent === 'string' ? session.payment_intent : null;
     const country = session.customer_details?.address?.country || null;
@@ -229,22 +268,20 @@ exports.stripeWebhook = onRequest(
     if (notYetOffered) console.warn('English order from a country where Pro is not yet offered (refund it)', session.id, country);
     // MP は日本の事業者の国内販売の消費税を扱わないので、英語版を日本から買った分は国内の課税売上として計上する
     const domesticJp = lang === 'en' && country === 'JP';
-    await db.collection('licenses').doc(key).set({
-      email,
-      sessionId: session.id,
-      paymentIntent,
-      lang,
-      country,
-      ...(outsideMpTax ? { outsideMpTax: true } : {}),
-      ...(notYetOffered ? { notYetOffered: true } : {}),
-      ...(domesticJp ? { domesticJp: true } : {}),
-      createdAt: FieldValue.serverTimestamp(),
-    });
-    await sessionRef.set({
-      licenseKey: key,
-      createdAt: FieldValue.serverTimestamp(),
-    });
-    if (outsideMpTax || notYetOffered || domesticJp) {
+    if (!licSnap.exists) {
+      await licRef.set({
+        email,
+        sessionId: session.id,
+        paymentIntent,
+        lang,
+        country,
+        ...(outsideMpTax ? { outsideMpTax: true } : {}),
+        ...(notYetOffered ? { notYetOffered: true } : {}),
+        ...(domesticJp ? { domesticJp: true } : {}),
+        createdAt: FieldValue.serverTimestamp(),
+      });
+    }
+    if (!resumed && (outsideMpTax || notYetOffered || domesticJp)) {
       const why = [
         outsideMpTax && 'Managed Payments が税を扱わない国 → 返金して案内する',
         notYetOffered && '販売を見合わせている地域（EU/EEA・英国・スイス） → 返金して案内する',
@@ -261,21 +298,26 @@ exports.stripeWebhook = onRequest(
       await db.collection('paymentIntents').doc(paymentIntent).set({ licenseKey: key });
     }
 
-    // キーの控えをメールで送る。失敗してもwebhookは成功扱いにする
-    // （ここで500を返すとStripeが再送し、sessionRefの重複ガードで二度と送れなくなる）。
+    // キーの控えをメールで送る。送れなかったら運営者に知らせて、手で送れるようにする
+    // （SMTP の障害で 500 を返し続けると Stripe が再送を重ねるので、webhook は成功扱いにする）。
     try {
       const result = await sendLicenseMail(email, key, lang);
-      await db.collection('licenses').doc(key).update(
+      await licRef.update(
         result.sent
           ? { mailSentAt: FieldValue.serverTimestamp() }
           : { mailSkipped: result.reason }
       );
+      if (!result.sent) {
+        await sendAdminAlert('[MiseFits] ライセンスキーの控えメールを送れませんでした',
+          `理由: ${result.reason}\nsession: ${session.id}\nlicense: ${key}\n控えを手で送ってください。`)
+          .catch((e) => console.error('admin alert failed', e));
+      }
     } catch (err) {
       console.error('license mail failed', err);
-      // 記録に失敗しても200を返しきる（再送されると重複ガードで永久に送れなくなるため）
-      await db.collection('licenses').doc(key)
-        .update({ mailError: String((err && err.message) || err) })
-        .catch(() => {});
+      await licRef.update({ mailError: String((err && err.message) || err) }).catch(() => {});
+      await sendAdminAlert('[MiseFits] ライセンスキーの控えメールの送信に失敗しました',
+        `エラー: ${String((err && err.message) || err)}\nsession: ${session.id}\nlicense: ${key}\n控えを手で送ってください。`)
+        .catch((e) => console.error('admin alert failed', e));
     }
 
     res.status(200).send('ok');

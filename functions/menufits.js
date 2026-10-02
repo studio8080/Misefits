@@ -124,6 +124,18 @@ function menufitsFrom(raw) {
   return addr ? 'MenuFits <' + addr + '>' : raw;
 }
 
+// 要対応の注文やメールの送信失敗を運営者に知らせる。失敗しても webhook は成功扱いにする（呼び出し側で catch）。
+async function sendAdminAlert(subject, text) {
+  const host = smtpHost.value();
+  const user = smtpUser.value();
+  const from = mailFrom.value();
+  const pass = smtpPass.value();
+  if (!host || !user || !from || !pass) return;
+  const port = Number(smtpPort.value()) || 465;
+  const transporter = nodemailer.createTransport({ host, port, secure: port === 465, auth: { user, pass } });
+  await transporter.sendMail({ from: menufitsFrom(from), to: 'studio@kokokikaku.com', subject, text });
+}
+
 // 送信できなくてもキーの発行自体は成功しているので、ここで例外を投げない。
 // 結果は licenses ドキュメントに残して、問い合わせ時に追えるようにする。
 async function sendLicenseMail(to, key, lang = 'ja') {
@@ -131,7 +143,8 @@ async function sendLicenseMail(to, key, lang = 'ja') {
   const user = smtpUser.value();
   const from = mailFrom.value();
   const pass = smtpPass.value();
-  if (!to || !host || !user || !from || !pass) return { sent: false, reason: 'not configured' };
+  if (!to) return { sent: false, reason: 'no email' };
+  if (!host || !user || !from || !pass) return { sent: false, reason: 'not configured' };
 
   const port = Number(smtpPort.value()) || 465;
   const transporter = nodemailer.createTransport({
@@ -175,7 +188,14 @@ exports.menufitsStripeWebhook = onRequest(
       if (charge.refunded && pi) {
         const link = await db().collection(PAYMENT_INTENTS).doc(pi).get();
         if (link.exists) {
-          await db().collection(LICENSES).doc(link.data().licenseKey).update({
+          // 対応表だけ残ってキーが無いと update が NOT_FOUND で落ち、Stripe が3日間再送し続ける
+          const licRef = db().collection(LICENSES).doc(link.data().licenseKey);
+          if (!(await licRef.get()).exists) {
+            console.error('menufits: refund for a missing license', pi);
+            res.status(200).send('ignored (license not found)');
+            return;
+          }
+          await licRef.update({
             revoked: true,
             revokedAt: FieldValue.serverTimestamp(),
           });
@@ -198,6 +218,11 @@ exports.menufitsStripeWebhook = onRequest(
       res.status(200).send('ignored (not paid)');
       return;
     }
+    // MenuFits Pro は買い切り。サブスク（全銀ポンなど）は Stripe に問い合わせる前に除外する
+    if (session.mode && session.mode !== 'payment') {
+      res.status(200).send('ignored (not a one-time payment)');
+      return;
+    }
 
     // 同じStripeアカウントで MiseFits も売っているので、Price ID の一致は
     // 「念のため」ではなく**必須の切り分け**。どちらも未設定なら素通しになる点に注意。
@@ -205,7 +230,13 @@ exports.menufitsStripeWebhook = onRequest(
     const priceJa = menufitsPriceId.value();
     const priceEn = menufitsPriceIdEn.value();
     let lang = 'ja';
-    if (priceJa || priceEn) {
+    // Price ID が未設定なら、ほかの商品の決済にキーを出さないよう止める（500 → Stripe が最大3日間再送）
+    if (!priceJa && !priceEn) {
+      console.error('menufits: STRIPE_PRICE_ID_MENUFITS(_EN) are not configured; refusing to issue', session.id);
+      res.status(500).send('price ids not configured');
+      return;
+    }
+    {
       const lineItems = await stripe.checkout.sessions.listLineItems(session.id, { limit: 10 });
       const has = (id) => !!id && lineItems.data.some((li) => li.price && li.price.id === id);
       if (has(priceEn)) {
@@ -216,15 +247,33 @@ exports.menufitsStripeWebhook = onRequest(
       }
     }
 
-    // Stripe は webhook を再送することがあるため、同一セッションへの重複発行を防ぐ
+    // Stripe は webhook を再送したり、同時に2回送ったりする。sessions を create（既にあれば失敗）で先に確保して、
+    // 同じ決済にキーを2本出さない。途中で失敗した場合は、再送のときに確保済みのキーで続きから処理する。
     const sessionRef = db().collection(SESSIONS).doc(session.id);
-    const existing = await sessionRef.get();
-    if (existing.exists) {
+    let key = generateLicenseKey();
+    let resumed = false;
+    let claimedAt = 0;
+    try {
+      await sessionRef.create({ licenseKey: key, claimedAt: Date.now(), createdAt: FieldValue.serverTimestamp() });
+    } catch (err) {
+      if (!err || err.code !== 6) throw err; // 6 = ALREADY_EXISTS
+      const prev = (await sessionRef.get()).data();
+      key = prev.licenseKey;
+      resumed = true;
+      claimedAt = prev.claimedAt || 0;
+    }
+    const licRef = db().collection(LICENSES).doc(key);
+    const licSnap = await licRef.get();
+    if (resumed && licSnap.exists && (licSnap.data().mailSentAt || licSnap.data().mailSkipped || licSnap.data().mailError)) {
       res.status(200).send('already processed');
       return;
     }
-
-    const key = generateLicenseKey();
+    // 先に届いた通知がまだ処理中（確保から60秒以内）なら手を出さない。Stripe が少し後に再送し、
+    // そのときに未完了なら続きから処理する（同じ控えメールが2通届かないようにするため）。
+    if (resumed && Date.now() - claimedAt < 60 * 1000) {
+      res.status(409).send('in progress');
+      return;
+    }
     const email = session.customer_details?.email ?? null;
     const paymentIntent = typeof session.payment_intent === 'string' ? session.payment_intent : null;
     const country = session.customer_details?.address?.country || null;
@@ -232,38 +281,57 @@ exports.menufitsStripeWebhook = onRequest(
     const notYetOffered = lang === 'en' && !!country && EN_NOT_YET_OFFERED.has(country);
     if (outsideMpTax) console.warn('menufits: English order from a country outside Managed Payments tax coverage (refund it)', session.id, country);
     if (notYetOffered) console.warn('menufits: English order from a country where Pro is not yet offered (refund it)', session.id, country);
-    await db().collection(LICENSES).doc(key).set({
-      email,
-      sessionId: session.id,
-      paymentIntent,
-      lang,
-      country,
-      ...(outsideMpTax ? { outsideMpTax: true } : {}),
-      ...(notYetOffered ? { notYetOffered: true } : {}),
-      createdAt: FieldValue.serverTimestamp(),
-    });
-    await sessionRef.set({
-      licenseKey: key,
-      createdAt: FieldValue.serverTimestamp(),
-    });
+    // Managed Payments は日本の事業者の国内販売の消費税を扱わないので、英語版を日本から買った分は国内の課税売上として計上する
+    const domesticJp = lang === 'en' && country === 'JP';
+    if (!licSnap.exists) {
+      await licRef.set({
+        email,
+        sessionId: session.id,
+        paymentIntent,
+        lang,
+        country,
+        ...(outsideMpTax ? { outsideMpTax: true } : {}),
+        ...(notYetOffered ? { notYetOffered: true } : {}),
+        ...(domesticJp ? { domesticJp: true } : {}),
+        createdAt: FieldValue.serverTimestamp(),
+      });
+    }
+    // 要対応の注文は運営者に知らせる（MiseFits と同じ運用）
+    if (!resumed && (outsideMpTax || notYetOffered || domesticJp)) {
+      const why = [
+        outsideMpTax && 'Managed Payments が税を扱わない国 → 返金して案内する',
+        notYetOffered && '販売を見合わせている地域（EU/EEA・英国・スイス） → 返金して案内する',
+        domesticJp && '日本からの英語版購入 → 国内の課税売上として計上する',
+      ].filter(Boolean).join('\n');
+      await sendAdminAlert(`[MenuFits] 要対応の注文（${country}）`,
+        `${why}\n\nsession: ${session.id}\npayment_intent: ${paymentIntent}\nlicense: ${key}\n` +
+        `Stripe: https://dashboard.stripe.com/payments/${paymentIntent}`)
+        .catch((err) => console.error('menufits admin alert failed', err));
+    }
     if (paymentIntent) {
       await db().collection(PAYMENT_INTENTS).doc(paymentIntent).set({ licenseKey: key });
     }
 
-    // 控えメール。失敗しても webhook は成功扱いにする
-    // （ここで500を返すと Stripe が再送し、上の重複ガードで二度と送れなくなる）。
+    // 控えメール。送れなかったら運営者に知らせて、手で送れるようにする
+    // （SMTP の障害で 500 を返し続けると Stripe が再送を重ねるので、webhook は成功扱いにする）。
     try {
       const result = await sendLicenseMail(email, key, lang);
-      await db().collection(LICENSES).doc(key).update(
+      await licRef.update(
         result.sent
           ? { mailSentAt: FieldValue.serverTimestamp() }
           : { mailSkipped: result.reason }
       );
+      if (!result.sent) {
+        await sendAdminAlert('[MenuFits] ライセンスキーの控えメールを送れませんでした',
+          `理由: ${result.reason}\nsession: ${session.id}\nlicense: ${key}\n控えを手で送ってください。`)
+          .catch((e) => console.error('menufits admin alert failed', e));
+      }
     } catch (err) {
       console.error('menufits license mail failed', err);
-      await db().collection(LICENSES).doc(key)
-        .update({ mailError: String((err && err.message) || err) })
-        .catch(() => {});
+      await licRef.update({ mailError: String((err && err.message) || err) }).catch(() => {});
+      await sendAdminAlert('[MenuFits] ライセンスキーの控えメールの送信に失敗しました',
+        `エラー: ${String((err && err.message) || err)}\nsession: ${session.id}\nlicense: ${key}\n控えを手で送ってください。`)
+        .catch((e) => console.error('menufits admin alert failed', e));
     }
 
     res.status(200).send('ok');
@@ -275,6 +343,11 @@ exports.menufitsIssueLicense = onRequest({ cors: [ALLOWED_ORIGIN], maxInstances:
   const sessionId = req.query.session_id;
   if (!sessionId) {
     res.status(400).json({ error: 'missing session_id' });
+    return;
+  }
+  // Firestore のドキュメントIDとして不正な値（/ を含む・長すぎる）で 500 にならないよう、形式を先に確かめる
+  if (!/^cs_(live|test)_[A-Za-z0-9]{10,200}$/.test(String(sessionId))) {
+    res.status(400).json({ error: 'invalid session_id' });
     return;
   }
   const doc = await db().collection(SESSIONS).doc(String(sessionId)).get();
@@ -299,7 +372,8 @@ exports.menufitsIssueLicense = onRequest({ cors: [ALLOWED_ORIGIN], maxInstances:
 exports.menufitsVerifyLicense = onRequest({ cors: [ALLOWED_ORIGIN], maxInstances: 5 }, async (req, res) => {
   const key = String(req.query.key || '').trim().toUpperCase();
   const device = String(req.query.device || '').slice(0, 64);
-  if (!key) {
+  // キーは MNPRO-XXXX-XXXX-XXXX、端末IDはブラウザが作る 'd'＋英小文字・数字（無しは旧クライアント）
+  if (!/^MNPRO-[A-Z2-9]{4}(-[A-Z2-9]{4}){2}$/.test(key) || (device && !/^d[0-9a-z]{6,40}$/.test(device))) {
     res.status(400).json({ valid: false });
     return;
   }

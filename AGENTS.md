@@ -64,6 +64,13 @@ firebase.json / firestore.rules / firestore.indexes.json … 上記Functionsの�
 
 - Web版（`misefits.kokokikaku.com`）で「MiseFits Pro」買い切り（¥1,480）をStripeで直接販売するための
   Firebase Cloud Functions。iOSアプリのRevenueCat/Apple IAPとは完全に別売り（意図的な設計、統合しない）。
+- **Stripe アカウントは MiseFits・MenuFits・全銀ポン（サブスク）で共用。** MiseFits の webhook は買い切り
+  （`mode=payment`）の決済だけを `checkout.sessions.listLineItems` で照合するので、`STRIPE_SECRET_KEY`
+  （制限付きキー `misefits-functions`）の **Checkout Sessions: 読み取り は外さない**。同じキーを全銀ポンも使い、
+  あちらは **Subscriptions・Customers の読み取り**が必須（2026-10-02 に不足して全銀ポンのキーが届かない障害が起きた）。
+  権限を変えたら、Stripe の「イベントの配信」で3本の webhook が 200 を返すことを確かめる。
+- 発行処理のテスト: `node functions/test/webhook.test.js`（Stripe・Firestore・メールを差し替えて、二重通知・
+  途中失敗からの再開・別商品の除外・Price ID 未設定・返金・メール失敗時の運営者通知を確かめる）。デプロイ前に必ず通す。
 - `index.html`・`pro-unlock.html` はこのFunctionsのURLを`FUNCTIONS_BASE`定数とCSPの`connect-src`に
   ハードコードしている：`https://us-central1-misefits.cloudfunctions.net`（Firebaseプロジェクト
   `misefits`、2026-08-26作成・Blazeプラン・Firestore作成済み）。詳細は HANDOFF.md「Web版での買い切り販売」を参照。
@@ -206,8 +213,7 @@ MP への統合を進めており、後で移行する二度手間を避ける�
   「再デプロイして古いバージョンを破棄するか」には **`n`** と答え、MiseFits の関数だけ個別にデプロイする。
 - `SMTP_PASS` は **Google のアプリ パスワード（16桁）**でないと送れない（通常のパスワードだと 534-5.7.9）。
   v2・v4・v5 は失敗、**v6 で送信を確認**（2026-09-25）。同日に MiseFits（`stripeWebhook`）と全銀ポンは v6 で再デプロイ済み。
-  **MenuFits（`menufitsStripeWebhook`）は v2 のままで、控えメールは 9/1 から失敗している**
-  （再デプロイすると Stripe の鍵も未検証の最新版 v4 に切り替わるため、テスト購入とセットで行う）。
+  MenuFits も後日 v6 で再デプロイし、控えメールが直ったことを確認済み（menufits の AGENTS.md「9/1 から失敗していた控えメールが直った」）。
   v5 は誤登録のため破棄済み（2026-09-25）。
 - **このリポジトリは公開**で、`_config.yml` でサイト配信からは外しているが GitHub 上では読める。**秘密・個人の事情は書かない。**
   漏えい時の手順は `docs/incident-response.md`。
