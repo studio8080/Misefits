@@ -325,6 +325,7 @@ exports.stripeWebhook = onRequest(
 );
 
 exports.issueLicense = onRequest({ cors: [ALLOWED_ORIGIN], maxInstances: 5 }, async (req, res) => {
+  res.set('Cache-Control', 'no-store');
   const sessionId = req.query.session_id;
   if (!sessionId) {
     res.status(400).json({ error: 'missing session_id' });
@@ -356,6 +357,7 @@ exports.issueLicense = onRequest({ cors: [ALLOWED_ORIGIN], maxInstances: 5 }, as
 // {valid:false, reason:'device_limit'} を返す。device無しの呼び出し（旧クライアント）は
 // 存在チェックのみ行い枠を消費しない（後方互換）。
 exports.verifyLicense = onRequest({ cors: [ALLOWED_ORIGIN], maxInstances: 5 }, async (req, res) => {
+  res.set('Cache-Control', 'no-store');
   const key = String(req.query.key || '').trim().toUpperCase();
   const device = String(req.query.device || '').slice(0, 64);
   // キーは MFPRO-XXXX-XXXX-XXXX-XXXX、端末IDはブラウザが作る dev-＋16進32桁（無しは旧クライアント）
@@ -364,32 +366,14 @@ exports.verifyLicense = onRequest({ cors: [ALLOWED_ORIGIN], maxInstances: 5 }, a
     return;
   }
   const ref = db.collection('licenses').doc(key);
-  const doc = await ref.get();
-  if (!doc.exists) {
-    res.status(200).json({ valid: false });
-    return;
+  try {
+    const { registerDevice } = require('./license-registration');
+    const result = await registerDevice(db, ref, device, MAX_DEVICES);
+    res.status(200).json(result);
+  } catch {
+    // インフラ障害時は許可を出さず、キーや内部エラーをログへ残さない。
+    res.status(503).json({ valid: false, reason: 'unavailable' });
   }
-  // 返金されたキーは新しい端末では解放させない。既に解放済みの端末は localStorage で動き続ける
-  // （アカウント無しの設計上、遡って止める手段は持たない）。
-  if (doc.data().revoked) {
-    res.status(200).json({ valid: false, reason: 'revoked' });
-    return;
-  }
-  if (!device) {
-    res.status(200).json({ valid: true });
-    return;
-  }
-  const devices = Array.isArray(doc.data().devices) ? doc.data().devices : [];
-  if (devices.includes(device)) {
-    res.status(200).json({ valid: true });
-    return;
-  }
-  if (devices.length >= MAX_DEVICES) {
-    res.status(200).json({ valid: false, reason: 'device_limit' });
-    return;
-  }
-  await ref.update({ devices: FieldValue.arrayUnion(device) });
-  res.status(200).json({ valid: true });
 });
 
 // MenuFits（menufits.kokokikaku.com）の買い切り販売。別売り・別コレクション・別Webhook。
