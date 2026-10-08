@@ -26,6 +26,7 @@
 <meta name="twitter:title" content="MiseFits｜2Dの間取り・店舗レイアウトシミュレーター（無料・登録不要）">
 <meta name="twitter:description" content="幅と奥行きを入れるだけの2Dレイアウトシミュレーター。間取りも店舗も実寸で検討できるブラウザ完結ツール。無料・登録不要。">
 <meta name="twitter:image" content="https://misefits.kokokikaku.com/assets/misefits-ogp.jpg">
+
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="theme-color" content="#0066cc">
 <link rel="icon" href="assets/misefits-favicon.png">
@@ -44,6 +45,7 @@
   "description": "幅と奥行き(mm)を入れるだけの2Dレイアウトシミュレーター。PDFや画像の図面、または白紙サイズから、間取りや店舗・施設の配置を実寸で検討できます。3Dは使わず、ブラウザだけで完結します。",
   "publisher": {
     "@type": "Organization",
+    "@id":"https://kokokikaku.com/#organization",
     "name": "ここ企画",
     "url": "https://kokokikaku.com/"
   },
@@ -1221,6 +1223,7 @@ if(MF_LANG==='en') document.documentElement.lang = 'en';
         <a class="only-ja" href="tokushoho.html">特商法表記</a>
         <a class="only-en" href="en/terms.html">Terms &amp; refunds</a>
         <a class="only-ja" href="https://menufits.kokokikaku.com/" target="_blank" rel="noopener">姉妹ツール MenuFits（メニュー表）</a>
+        <a class="only-ja" href="https://zenginpon.kokokikaku.com/" target="_blank" rel="noopener">姉妹ツール 全銀ポン（振込データ変換）</a>
         <a href="https://kokokikaku.com/" data-href-en="en/terms.html" target="_blank" rel="noopener">ここ企画</a>
         <a class="only-ja" href="https://docs.google.com/forms/d/e/1FAIpQLSeqM293xJzyK9ft7QF4lvvim8A679jueHyFA1YDXeUypalYwA/viewform" target="_blank" rel="noopener">お問い合わせ</a>
         <a class="only-en" href="https://docs.google.com/forms/d/e/1FAIpQLSeqM293xJzyK9ft7QF4lvvim8A679jueHyFA1YDXeUypalYwA/viewform" target="_blank" rel="noopener">Contact</a>
@@ -2511,7 +2514,7 @@ async function handlePdfFile(file){
   const hadExisting = project.sheets.length>0;     // 既に図面がある状態への追加か
   try{
     const buf=await file.arrayBuffer();
-    const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+    const pdf=await pdfjsLib.getDocument({data:buf,isEvalSupported:false}).promise;
     const page=await pdf.getPage(1);
     const vp=page.getViewport({scale:2.0}); // ~144dpi相当
     const cv=document.createElement('canvas'); cv.width=vp.width; cv.height=vp.height;
