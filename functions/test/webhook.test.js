@@ -46,7 +46,7 @@ Module._load = orig;
 
 async function post(fn, event) {
   let status = 200, body;
-  const res = { status(s) { status = s; return this; }, send(b) { body = b; return this; }, json(b) { body = b; return this; } };
+  const res = { set() { return this; }, status(s) { status = s; return this; }, send(b) { body = b; return this; }, json(b) { body = b; return this; } };
   await fns[fn]({ rawBody: JSON.stringify(event), headers: {} }, res);
   return { status, body };
 }
@@ -143,7 +143,7 @@ const reset = () => { for (const k of Object.keys(store)) delete store[k]; mails
   });
 
   await t('MenuFits: 不正な session_id・キー・端末IDは 400', async () => {
-    const call = async (fn, query) => { let s, b; await fns[fn]({ query }, { status(x) { s = x; return this; }, json(x) { b = x; return this; } }); return s; };
+    const call = async (fn, query) => { let s, b; await fns[fn]({ query }, { set() { return this; }, status(x) { s = x; return this; }, json(x) { b = x; return this; } }); return s; };
     assert.equal(await call('menufitsIssueLicense', { session_id: 'a/b' }), 400);
     assert.equal(await call('menufitsVerifyLicense', { key: 'x/y' }), 400);
     assert.equal(await call('menufitsVerifyLicense', { key: 'MNPRO-ABCD-EFGH-JKMN', device: '../x' }), 400);
