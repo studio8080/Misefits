@@ -2516,7 +2516,7 @@ async function handlePdfFile(file){
   const hadExisting = project.sheets.length>0;     // 既に図面がある状態への追加か
   try{
     const buf=await file.arrayBuffer();
-    const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+    const pdf=await pdfjsLib.getDocument({data:buf,isEvalSupported:false}).promise;
     const page=await pdf.getPage(1);
     const vp=page.getViewport({scale:2.0}); // ~144dpi相当
     const cv=document.createElement('canvas'); cv.width=vp.width; cv.height=vp.height;
