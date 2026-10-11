@@ -78,7 +78,7 @@
     if(!plan) return null;
     var key = plan[pageKey()] || plan['default'];
     var ad = key && AD_TAGS[key];
-    return (ad && ad.tag) ? ad : null;
+    return (ad && ad.tag) ? {id: key, heading: ad.heading, lead: ad.lead, tag: ad.tag} : null;
   }
 
   /* 広告を出すときだけ privacy.html に差し込む説明文。
@@ -170,6 +170,10 @@
 
       var body = document.createElement('div');
       body.className = 'ad-slot__body';
+      body.setAttribute('data-revenue', 'affiliate');
+      body.setAttribute('data-revenue-id', ad.id);
+      body.setAttribute('data-revenue-provider', 'a8');
+      body.setAttribute('data-revenue-placement', el.getAttribute('data-ad'));
       body.innerHTML = ad.tag;
       el.appendChild(body);
     }
