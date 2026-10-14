@@ -356,7 +356,11 @@ exports.issueLicense = onRequest({ cors: [ALLOWED_ORIGIN], maxInstances: 5 }, as
 // 未知のデバイスは空きがあれば devices 配列に登録（＝1枠消費）、上限超過なら
 // {valid:false, reason:'device_limit'} を返す。device無しの呼び出し（旧クライアント）は
 // 存在チェックのみ行い枠を消費しない（後方互換）。
-exports.verifyLicense = onRequest({ cors: [ALLOWED_ORIGIN], maxInstances: 5 }, async (req, res) => {
+exports.verifyLicense = onRequest({
+  cors: [ALLOWED_ORIGIN],
+  maxInstances: 5,
+  serviceAccount: 'misefits-runtime@misefits.iam.gserviceaccount.com',
+}, async (req, res) => {
   res.set('Cache-Control', 'no-store');
   const key = String(req.query.key || '').trim().toUpperCase();
   const device = String(req.query.device || '').slice(0, 64);
