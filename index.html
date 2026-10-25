@@ -717,6 +717,17 @@ if(MF_LANG==='en') document.documentElement.lang = 'en';
   html[lang="en"] body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,"Hiragino Kaku Gothic ProN","Yu Gothic UI",sans-serif;}
   html[lang="en"] .hero-copy h2, html[lang="en"] .hero-copy p, html[lang="en"] .empty-panel p{word-break:normal;overflow-wrap:break-word;}
   .part:focus-visible, .cat-h:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+#comparisonDialog{width:min(1200px,94vw);max-width:94vw;max-height:90dvh;overflow:auto;border:1px solid #cbd5e1;border-radius:12px;padding:24px;background:#fff;color:#1e293b;box-sizing:border-box}
+#comparisonDialog::backdrop{background:#0f172a99}
+.compare-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
+.compare-toolbar h2{margin:0;font-size:22px}
+.compare-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+.compare-grid article{min-width:0;border:1px solid #cbd5e1;padding:14px;border-radius:8px}
+.compare-grid h3{overflow-wrap:anywhere;margin:0 0 12px}
+.compare-grid img{width:100%;height:320px;object-fit:contain;background:#f8fafc}
+.compare-grid pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;font-size:13px}
+.compare-notice{background:#fff7ed;border-left:3px solid #c2410c;padding:12px;font-size:13px}
+@media(max-width:600px){#comparisonDialog{padding:12px}.compare-grid{gap:8px}.compare-grid article{padding:8px}.compare-grid img{height:170px}.compare-grid h3{font-size:14px}.compare-grid p{font-size:12px}}
 </style>
 </head>
 <body>
@@ -886,6 +897,14 @@ if(MF_LANG==='en') document.documentElement.lang = 'en';
       <div class="memo-list" id="memoList"></div>
     </div>
 
+    <div class="section">
+      <h3>A/B 案の比較</h3>
+      <div class="row">
+        <button class="btn sm" onclick="createComparisonPair()">同じ図面から A/B 案を作る</button>
+        <button class="btn sm outline" onclick="openComparison()">並べて比較・相談用PDF</button>
+      </div>
+      <div class="muted" style="margin-top:7px">元シートを残して独立した2案を作ります。シートを切り替えて編集できます。メモの追加・編集は既存のPro機能です。</div>
+    </div>
     <!-- Summary -->
     <div class="section">
       <h3>集計</h3>
@@ -1248,6 +1267,27 @@ if(MF_LANG==='en') document.documentElement.lang = 'en';
    %PRICE% は英語版の価格表示に置き換わる。 */
 const PRO_PRICE_EN = 'US$19';
 const I18N_EN = {
+"A/B 案の比較":"Compare A/B options",
+"同じ図面から A/B 案を作る":"Create A/B from this drawing",
+"並べて比較・相談用PDF":"Compare / consultation PDF",
+"元シートを残して独立した2案を作ります。シートを切り替えて編集できます。メモの追加・編集は既存のPro機能です。":"Create two independent copies and keep the original. Switch sheets to edit. Adding or editing memos remains a Pro feature.",
+"図面の読み込み完了後に操作してください":"Wait for the drawing to finish loading",
+"A/B 案を作りました。B 案を編集中です。元シートは保持しています。":"A/B options created. Editing B; the original is kept.",
+"先に同じ図面から A/B 案を作ってください":"Create A/B options from a drawing first",
+"比較する組":"Comparison pair",
+"比較を準備中…":"Preparing comparison…",
+"相談用PDFを保存":"Save consultation PDF",
+"閉じる":"Close",
+"席数・通路幅は検討の目安です。法令適合や安全を保証しません。最終判断は建築士・施工会社・所轄窓口へ確認してください。":"Seats and aisle widths are planning estimates, not a guarantee of legal compliance or safety. Confirm final decisions with an architect, contractor or local authority.",
+"通路幅の計測なし":"No aisle measurements",
+"メモなし":"No memos",
+"メモ・通路幅の記録":"Memos / aisle measurements",
+"通路幅（{n}）: {mm} mm":"Aisle ({n}): {mm} mm",
+"縮尺未校正：寸法は要確認":"Scale not calibrated: verify dimensions",
+"縮尺: 1px = {mm} mm":"Scale: 1px = {mm} mm",
+"用紙に収めた比較図（縮尺固定ではありません）":"Comparison fitted to page (not a fixed print scale)",
+"比較画像を作れませんでした。図面を確認して開き直してください。":"Unable to render comparison. Check drawings and reopen.",
+"相談用PDFを保存しました":"Consultation PDF saved",
 "MiseFits かんたん店舗レイアウトシミュレーター": "MiseFits — free floor plan & store layout planner",
 "メニュー": "Menu",
 "ホームに戻る（作業中のシートは保持されます）": "Back to home (your open sheets are kept)",
@@ -3089,8 +3129,7 @@ function viewCenterScene(){
 }
 
 /* ================= 寸法・プロパティ ================= */
-function objRealSize(o){
-  const scale=mmpp();
+function objRealSize(o, scale=mmpp()){
   const d=o.data||{};
   if(d.kind==='memo'||d.kind==='trace') return {w:0,d:0,text:true};   // 注記に「什器としての実寸」は無い
   if(d.shape==='text') return {w:0,d:0,text:true};
@@ -3339,14 +3378,14 @@ const SEAT_COUNT = { bench:3, chair_round:1, chair_sq:1, sofa:3,
   desk_island4:4, student_desk:1, phone_booth:1 };
 const SEAT_PER_MM = { counter:600 };
 
-function computeSummary(){
+function computeSummary(s=activeSheet(), objects=canvas?canvas.getObjects():[]){
   const res={ items:0, seats:0, areaMm2:0, list:[], sheetArea:0, sheetLabel:'', ratio:null };
-  const s=activeSheet(); if(!s||!canvas) return res;
+  if(!s) return res;
   const counts={};
-  canvas.getObjects().forEach(o=>{
+  objects.forEach(o=>{
     const d=o.data; if(!d||d.shape==='text') return;
     if(d.kind==='memo'||d.kind==='trace') return;   // 注記は什器ではないので席数・面積・パーツ数に含めない
-    const sz=objRealSize(o);
+    const sz=objRealSize(o,s.mmPerPixel);
     res.items++;
     res.areaMm2 += sz.circle ? Math.PI*Math.pow(sz.w/2,2) : sz.w*sz.d;
     const per=SEAT_PER_MM[d.key];
@@ -3547,14 +3586,14 @@ function measureHitTest(p){
 function undoLastMeasure(){
   const list=sheetMeasures();
   if(!list.length){ showHint(t('取り消す計測線がありません')); return; }
-  list.pop(); measP1=null; measHover=null;
+  list.pop(); measP1=null; measHover=null; autosave();
   canvas.requestRenderAll(); showHint(t('計測線を1本取り消しました'));
 }
 function measClick(p){
   if(!measP1){
     const hit=measureHitTest(p);          // 既存の線をクリックしたら、その1本を削除
     if(hit>=0){
-      sheetMeasures().splice(hit,1);
+      sheetMeasures().splice(hit,1); autosave();
       canvas.requestRenderAll();
       showHint(t('計測線を削除しました'));
       return;
@@ -3562,7 +3601,7 @@ function measClick(p){
     measP1={x:p.x,y:p.y}; measHover={x:p.x,y:p.y};
     document.getElementById('calBanner').textContent=t('📐 2点目をクリック（終了はEsc）');
   } else {
-    sheetMeasures().push({x1:measP1.x,y1:measP1.y,x2:p.x,y2:p.y});
+    sheetMeasures().push({x1:measP1.x,y1:measP1.y,x2:p.x,y2:p.y}); autosave();
     const mm=Math.round(Math.hypot(p.x-measP1.x,p.y-measP1.y)*mmpp());
     measP1=null; measHover=null;
     document.getElementById('calBanner').textContent=t('📐 計測モード：1点目をクリック（終了はEsc）');
@@ -3575,7 +3614,7 @@ function clearMeasures(){
   const n=(s._meas||[]).length;
   if(!n){ showHint(t('計測線はありません')); return; }
   if(n>1 && !confirm(t('計測線 {n} 本をすべて消しますか？',{n}))) return;
-  s._meas=[]; measP1=null; measHover=null; canvas.requestRenderAll();
+  s._meas=[]; measP1=null; measHover=null; canvas.requestRenderAll(); autosave();
   showHint(t('計測線をクリアしました'));
 }
 function measColor(mm){ return mm<AISLE_TIGHT? '#e63946' : (mm<AISLE_OK? '#e07c0a' : '#1f8f7d'); }
@@ -3584,6 +3623,9 @@ function drawMeasures(){
   if(measMode && measP1 && measHover) list.push({x1:measP1.x,y1:measP1.y,x2:measHover.x,y2:measHover.y,live:true});
   if(!list.length) return;
   const ctx=canvas.getContext(), vpt=canvas.viewportTransform, z=canvas.getZoom(), scale=mmpp();
+  drawMeasureLines(ctx,list,vpt,z,scale);
+}
+function drawMeasureLines(ctx,list,vpt,z,scale){
   ctx.save();
   ctx.lineCap='butt';
   list.forEach(m=>{
@@ -3897,7 +3939,10 @@ function sanitizeSheet(s){
     shape: (typeof s.shape==='string' && SHAPE_LABEL[s.shape]) ? s.shape : undefined,
     shapeParams: (s.shapeParams && typeof s.shapeParams==='object') ? s.shapeParams : undefined,
     freeVerts: sanitizeVerts(s.freeVerts),
-    objects: Array.isArray(s.objects) ? s.objects : []
+    objects: Array.isArray(s.objects) ? s.objects : [],
+    _meas: sanitizeMeasures(s.measures || s._meas),
+    comparisonGroup: typeof s.comparisonGroup==='string' ? s.comparisonGroup.slice(0,100) : undefined,
+    comparisonVariant: ['A','B'].includes(s.comparisonVariant) ? s.comparisonVariant : undefined
   };
 }
 // [[x,y],...] の形と有限数だけを通す（壊れた値で描画やシューレース計算が破綻しないように）
@@ -3993,19 +4038,168 @@ function updateScaleNote(){
 function renderComposite(cb, multiplier){
   const s=activeSheet(); if(!s){ showHint(t('図面がありません')); return; }
   syncActiveObjects();
-  const off=new fabric.StaticCanvas(null,{width:s._imgW,height:s._imgH,backgroundColor:'#fff'});
-  fabric.Image.fromURL(s.image, img=>{
-    off.setBackgroundImage(img,()=>{
-      fabric.util.enlivenObjects(s.objects||[], objs=>{
-        objs.forEach(o=>off.add(o)); off.renderAll();
-        // multiplier未指定なら、Pro判定と端末のキャンバス上限から自動決定する
-        const m = multiplier || exportMultiplier(s._imgW, s._imgH);
-        const url=off.toDataURL({format:'png',multiplier:m});
-        off.dispose();
-        cb(url, s._imgW, s._imgH, s);
-      });
+  renderSheetComposite(s,multiplier).then(result=>cb(result.url,result.w,result.h,s))
+    .catch(()=>showHint(t('比較画像を作れませんでした。図面を確認して開き直してください。')));
+}
+
+// Shared offscreen renderer: the editable canvas and current sheet never change.
+function renderSheetComposite(sheet,multiplier,includeMeasures=false){
+  return new Promise((resolve,reject)=>{
+    let off, finished=false;
+    const finish=(error,result)=>{ if(finished) return; finished=true; clearTimeout(timer); if(off) off.dispose(); error?reject(error):resolve(result); };
+    const timer=setTimeout(()=>finish(Error('render timeout')),20000);
+    fabric.Image.fromURL(sheet.image,img=>{
+      if(finished) return;
+      if(!img||!img.width||!img.height){ finish(Error('invalid image')); return; }
+      try{
+        const w=img.width,h=img.height;
+        off=new fabric.StaticCanvas(null,{width:w,height:h,backgroundColor:'#fff',enableRetinaScaling:false});
+        off.setBackgroundImage(img,()=>{
+          fabric.util.enlivenObjects(sheet.objects||[],objs=>{
+            if(finished) return;
+            try{
+              objs.forEach(obj=>off.add(obj)); off.renderAll();
+              const m=multiplier||exportMultiplier(w,h);
+              const output=document.createElement('canvas'); output.width=Math.max(1,Math.round(w*m)); output.height=Math.max(1,Math.round(h*m));
+              const context=output.getContext('2d'); context.drawImage(off.lowerCanvasEl,0,0,output.width,output.height);
+              if(includeMeasures){ context.save(); context.scale(m,m); drawMeasureLines(context,sanitizeMeasures(sheet._meas),[1,0,0,1,0,0],1,sheet.mmPerPixel); context.restore(); }
+              const summary=computeSummary({...sheet,_imgW:w,_imgH:h},objs);
+              finish(null,{url:output.toDataURL('image/png'),w,h,summary,sheet});
+            }catch(error){ finish(error); }
+          });
+        });
+      }catch(error){ finish(error); }
     });
   });
+}
+
+/* ================= A/B consultation (local only) ================= */
+function sanitizeMeasures(list){
+  return Array.isArray(list)?list.filter(line=>line&&['x1','y1','x2','y2'].every(key=>typeof line[key]==='number'&&Number.isFinite(line[key])&&Math.abs(line[key])<=1e7))
+    .map(({x1,y1,x2,y2})=>({x1,y1,x2,y2})):[];
+}
+function createComparisonPair(){
+  if(!activeSheet()){ showHint(t('先に図面シートを読み込んでください')); return; }
+  if(sheetLoading){ showHint(t('図面の読み込み完了後に操作してください')); return; }
+  if(calMode) endCalibration();
+  if(measMode) endMeasure();
+  if(traceMode) endTrace(true);
+  const snapshot=serializeProject().sheets[project.active];
+  const group=Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10);
+  ['A','B'].forEach(variant=>{
+    const copy=sanitizeSheet(JSON.parse(JSON.stringify(snapshot)));
+    copy.name=snapshot.name.slice(0,110)+' / '+variant;
+    copy.comparisonGroup=group; copy.comparisonVariant=variant;
+    addSheet(copy,false);
+  });
+  switchSheet(project.sheets.length-1); autosave();
+  showHint(t('A/B 案を作りました。B 案を編集中です。元シートは保持しています。'),5000);
+}
+function comparisonPairs(){
+  const groups=new Map();
+  project.sheets.forEach(sheet=>{
+    if(!sheet.comparisonGroup||!sheet.comparisonVariant) return;
+    if(!groups.has(sheet.comparisonGroup)) groups.set(sheet.comparisonGroup,{});
+    groups.get(sheet.comparisonGroup)[sheet.comparisonVariant]=sheet;
+  });
+  return [...groups].filter(([,pair])=>pair.A&&pair.B&&pair.A.image===pair.B.image);
+}
+const COMPARISON_NOTICE='席数・通路幅は検討の目安です。法令適合や安全を保証しません。最終判断は建築士・施工会社・所轄窓口へ確認してください。';
+function comparisonLines(sheet){
+  const lines=sanitizeMeasures(sheet._meas).map((line,index)=>t('通路幅（{n}）: {mm} mm',{n:index+1,mm:Math.round(Math.hypot(line.x2-line.x1,line.y2-line.y1)*sheet.mmPerPixel)}));
+  if(!lines.length) lines.push(t('通路幅の計測なし'));
+  const memos=(sheet.objects||[]).filter(obj=>obj.data&&obj.data.kind==='memo');
+  lines.push('',t('メモ'));
+  if(!memos.length) lines.push(t('メモなし'));
+  memos.forEach((obj,index)=>lines.push((index+1)+'. '+String(obj.data.text||'')));
+  return lines;
+}
+async function openComparison(){
+  if(sheetLoading){ showHint(t('図面の読み込み完了後に操作してください')); return; }
+  syncActiveObjects();
+  const pairs=comparisonPairs();
+  if(!pairs.length){ showHint(t('先に同じ図面から A/B 案を作ってください')); return; }
+  let dialog=document.getElementById('comparisonDialog');
+  if(!dialog){ dialog=document.createElement('dialog'); dialog.id='comparisonDialog'; document.body.appendChild(dialog); }
+  if(dialog.open) return;
+  dialog.innerHTML=`<div class="compare-toolbar"><h2 id="comparisonTitle">${t('A/B 案の比較')}</h2><button class="btn sm" id="comparisonClose">${t('閉じる')}</button></div>
+    <label>${t('比較する組')} <select class="inp" id="comparisonPair">${pairs.map(([key,pair])=>`<option value="${escapeHtml(key)}">${escapeHtml(pair.A.name)}</option>`).join('')}</select></label>
+    <p class="compare-notice">${t(COMPARISON_NOTICE)}</p><p>${t('用紙に収めた比較図（縮尺固定ではありません）')}</p>
+    <div id="comparisonResult" aria-live="polite"></div><div class="row" style="margin-top:16px"><button class="btn" id="comparisonPDF" disabled>${t('相談用PDFを保存')}</button></div>`;
+  dialog.setAttribute('aria-labelledby','comparisonTitle');
+  document.getElementById('comparisonClose').onclick=()=>dialog.close();
+  const select=document.getElementById('comparisonPair');
+  select.value=(activeSheet()&&pairs.some(([key])=>key===activeSheet().comparisonGroup))?activeSheet().comparisonGroup:pairs[pairs.length-1][0];
+  let generation=0, results=null;
+  const render=async()=>{
+    const current=++generation; results=null; document.getElementById('comparisonPDF').disabled=true;
+    document.getElementById('comparisonResult').textContent=t('比較を準備中…');
+    const pair=pairs.find(([key])=>key===select.value)[1];
+    const snapshots=['A','B'].map(variant=>JSON.parse(JSON.stringify(pair[variant])));
+    try{
+      const rendered=[];
+      for(const sheet of snapshots) rendered.push(await renderSheetComposite(sheet,Math.min(1,exportMultiplier(sheet._imgW||1600,sheet._imgH||1600)),true));
+      if(current!==generation||!dialog.open) return;
+      results=rendered;
+      const host=document.getElementById('comparisonResult'); host.className='compare-grid';
+      host.innerHTML=results.map((result,index)=>`<article><h3>${'AB'[index]} — ${escapeHtml(result.sheet.name)}</h3><img alt="${escapeHtml(result.sheet.name)}" src="${result.url}"><p><b>${result.summary.seats}</b> ${t('席・人数の目安')} / ${result.summary.items} ${t('配置パーツ数')}</p><p>${escapeHtml(result.sheet.calibrated?t('縮尺: 1px = {mm} mm',{mm:result.sheet.mmPerPixel.toFixed(3)}):t('縮尺未校正：寸法は要確認'))}</p><pre>${escapeHtml(comparisonLines(result.sheet).join('\n'))}</pre></article>`).join('');
+      document.getElementById('comparisonPDF').disabled=false;
+    }catch(error){ if(current===generation) document.getElementById('comparisonResult').textContent=t('比較画像を作れませんでした。図面を確認して開き直してください。'); }
+  };
+  select.onchange=render;
+  document.getElementById('comparisonPDF').onclick=async()=>{
+    if(!results) return;
+    const button=document.getElementById('comparisonPDF'); button.disabled=true;
+    try{
+      const blob=await buildComparisonPDF(results);
+      triggerDownload(URL.createObjectURL(blob),'misefits-consultation-AB.pdf'); showHint(t('相談用PDFを保存しました'));
+    }catch(error){ showHint(t('PDFライブラリの読み込みに失敗しました（オンライン環境が必要）')); }
+    finally{ button.disabled=!results; }
+  };
+  dialog.showModal(); render();
+}
+// Canvas text keeps Japanese notes intact without sending fonts or data to a server.
+function wrapComparisonText(context,text,width){
+  const lines=[];
+  String(text).split('\n').forEach(paragraph=>{
+    let line='';
+    for(const character of paragraph){ if(line&&context.measureText(line+character).width>width){ lines.push(line); line=''; } line+=character; }
+    lines.push(line);
+  });
+  return lines;
+}
+async function buildComparisonPDF(results){
+  if(!window.jspdf||!window.jspdf.jsPDF) await loadLib('jspdf');
+  const pdf=new window.jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+  const width=1588,height=1123;
+  const page=()=>{ const image=document.createElement('canvas'); image.width=width; image.height=height; const context=image.getContext('2d'); context.fillStyle='#fff';context.fillRect(0,0,width,height);context.fillStyle='#1e293b';context.font='bold 30px sans-serif';context.fillText('MiseFits — '+t('A/B 案の比較'),40,54);return {image,context}; };
+  const addPage=({image,context},first=false)=>{
+    context.fillStyle='#334155'; context.font='18px sans-serif';
+    wrapComparisonText(context,t(COMPARISON_NOTICE),width-80).forEach((line,index)=>context.fillText(line,40,height-70+index*24));
+    if(!first) pdf.addPage(); pdf.addImage(image.toDataURL('image/png'),'PNG',0,0,297,210,undefined,'FAST');
+  };
+  const first=page(); first.context.font='20px sans-serif'; first.context.fillText(t('用紙に収めた比較図（縮尺固定ではありません）'),40,88);
+  for(let index=0;index<2;index++){
+    const result=results[index],x=40+index*780,context=first.context;
+    context.font='bold 23px sans-serif'; wrapComparisonText(context,'AB'[index]+' — '+result.sheet.name,720).forEach((line,n)=>context.fillText(line,x,130+n*27));
+    const img=new Image(); await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;img.src=result.url;});
+    const ratio=Math.min(720/result.w,650/result.h);context.drawImage(img,x+(720-result.w*ratio)/2,220,result.w*ratio,result.h*ratio);
+    context.font='22px sans-serif';context.fillText(result.summary.seats+' '+t('席・人数の目安')+' / '+result.summary.items+' '+t('配置パーツ数'),x,916);
+    context.font='19px sans-serif';context.fillText(result.sheet.calibrated?t('縮尺: 1px = {mm} mm',{mm:result.sheet.mmPerPixel.toFixed(3)}):t('縮尺未校正：寸法は要確認'),x,951);
+  }
+  addPage(first,true);
+  const measureContext=first.context; measureContext.font='20px sans-serif';
+  const notes=results.map(result=>comparisonLines(result.sheet).flatMap(line=>wrapComparisonText(measureContext,line,720)));
+  const perPage=34,total=Math.max(...notes.map(lines=>lines.length));
+  for(let start=0;start<total;start+=perPage){
+    const detail=page(); detail.context.font='bold 24px sans-serif';detail.context.fillText(t('メモ・通路幅の記録'),40,98);
+    ['A','B'].forEach((variant,index)=>{
+      const x=40+index*780; detail.context.font='bold 24px sans-serif'; detail.context.fillText(variant,x,145);
+      detail.context.font='20px sans-serif'; notes[index].slice(start,start+perPage).forEach((line,n)=>detail.context.fillText(line,x,185+n*24));
+    });
+    addPage(detail);
+  }
+  return pdf.output('blob');
 }
 
 /* ================= 端末の共有メニューへ書き出す ================= */
@@ -4268,7 +4462,8 @@ function serializeProject(){
     blank:!!s.blank, realW:s.realW, realH:s.realH,
     // 形状情報を落とすと、復元後にL字/コの字/自由形状の面積が「外接矩形の面積」に化けてしまう
     realArea:s.realArea, shape:s.shape, shapeParams:s.shapeParams, freeVerts:s.freeVerts,
-    objects:s.objects||[] })) };
+    objects:s.objects||[], measures:sanitizeMeasures(s._meas),
+    comparisonGroup:s.comparisonGroup, comparisonVariant:s.comparisonVariant })) };
 }
 function tryRestore(){
   let raw=null; try{ raw=localStorage.getItem('layoutSim'); }catch(e){}
@@ -4355,6 +4550,7 @@ function bindEvents(){
   if(librarySearch) librarySearch.addEventListener('input',filterLibrary);
 
   window.addEventListener('keydown',e=>{
+    if(document.getElementById('comparisonDialog')?.open) return;
     if(e.key==='Escape'&&calMode){ endCalibration(); return; }
     if(e.key==='Escape'&&measMode){ endMeasure(); return; }
     if(e.key==='Escape'&&traceMode){ endTrace(); return; }
