@@ -89,6 +89,23 @@
 function trackEvent(name, params){
   try{ if(typeof window.gtag==='function') window.gtag('event', name, params||{}); }catch(e){}
 }
+/* 什器を実際に追加できたページで1回だけ。図面・寸法・什器名・URLの入力値は送らない。 */
+var layoutStartedTracked = false;
+function trackLayoutStarted(){
+  try{
+    if(layoutStartedTracked || window['ga-disable-G-W0Y7GMPVRK'] === true) return;
+    if(localStorage.getItem('misefitsAnalyticsOptOut')==='1') return;
+    if(navigator.doNotTrack==='1' || window.doNotTrack==='1' || navigator.globalPrivacyControl===true) return;
+    if(String(Intl.DateTimeFormat().resolvedOptions().timeZone).indexOf('Europe/')===0) return;
+    if(typeof window.gtag!=='function') return;
+    window.gtag('event', 'layout_started', {
+      action: 'fixture_added',
+      page_location: 'https://misefits.kokokikaku.com/',
+      page_referrer: ''
+    });
+    layoutStartedTracked = true;
+  }catch(e){} // 計測拒否・例外は配置処理へ影響させない
+}
 /* 表示言語。既定は日本語で、?lang=en か、以前に英語を選んだときだけ英語にする。
    ブラウザの言語設定では自動で切り替えない（Googlebotは英語環境でレンダリングするため、
    日本語のトップが英語で索引される事故を防ぐ）。 */
@@ -3096,6 +3113,7 @@ function addFixture(key, pos){
   pushRecent(key);                      // よく使うパーツバーを更新
   updateWorkStatus();
   autosave(); historyMark();
+  trackLayoutStarted();
 }
 
 // 操作モードを1オブジェクトへ適用（ハンドル表示/非表示）
